@@ -1,4 +1,4 @@
-package BPlusTree;
+package minidb.basic.bplustree;
 
 /**
  *

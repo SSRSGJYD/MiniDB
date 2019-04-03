@@ -1,9 +1,9 @@
-package BPlusTree;
+package minidb.basic.bplustree;
 
 import java.io.RandomAccessFile;
 import java.util.LinkedList;
 
-import BPlusTree.BPlusTreeConst;
+import minidb.basic.bplustree.BPlusTreeConst;
 
 /**
  *

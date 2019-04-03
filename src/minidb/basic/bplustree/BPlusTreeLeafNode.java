@@ -1,10 +1,12 @@
-package BPlusTree;
+package minidb.basic.bplustree;
 
-import BPlusTree.BPlusTreeNode;
+import minidb.basic.bplustree.BPlusTreeNode;
 
 /**
  *
  * Class of leaf node of B+ Tree
+ *
+ * To store (key,value) in a page
  *
  */
 
