@@ -1,6 +1,8 @@
 package minidb.basic.bplustree;
 
-import minidb.BPlusTree.BPlusTreeNode;
+import java.util.LinkedList;
+
+import minidb.basic.bplustree.BPlusTreeNode;
 
 
 /**
@@ -11,9 +13,18 @@ import minidb.BPlusTree.BPlusTreeNode;
  *
  */
 
-public class BPlusTreeInternalNode<T> extends BPlusTreeNode<T> {
+public class BPlusTreeInternalNode<K extends Comparable<K>,V> extends BPlusTreeNode<K,V> {
 
-    public BPlusTreeInternalNode() {
-        // TODO
+    private LinkedList<K> keyList;
+    private LinkedList<Long> ptrList; // list of pointers to child nodes
+
+    /**
+     * constructor
+     *
+     */
+    public BPlusTreeInternalNode(int nodeType, long pageIndex, int valueType) {
+        super(nodeType, pageIndex, valueType);
+        keyList = new LinkedList<K>();
+        ptrList = new LinkedList<Long>();
     }
 }

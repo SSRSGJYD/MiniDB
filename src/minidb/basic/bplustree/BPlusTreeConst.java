@@ -16,4 +16,11 @@ public class BPlusTreeConst {
     int NODE_TYPE_LEAF_OVERFLOW = 5;
     int NODE_TYPE_LOOKUP_OVERFLOW = 6;
 
+    // valueType : type of value stored
+    int VALUE_TYPE_INT = 1;
+    int VALUE_TYPE_LONG = 2;
+    int VALUE_TYPE_FLOAT = 3;
+    int VALUE_TYPE_DOUBLE = 4;
+    int VALUE_TYPE_STRING = 5;
+
 }
