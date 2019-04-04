@@ -1,10 +1,9 @@
-package BPlusTree;
+package minidb.basic.bplustree;
 
 import java.io.RandomAccessFile;
-import java.util.LinkedList;
 
-import BPlusTree.BPlusTreeConfig;
-import BPlusTree.BPlusTreeNode;
+import minidb.basic.bplustree.BPlusTreeConfig;
+import minidb.basic.bplustree.BPlusTreeNode;
 
 /**
  *
@@ -12,10 +11,10 @@ import BPlusTree.BPlusTreeNode;
  *
  */
 
-public class BPlusTree<T> {
+public class BPlusTree<K extends Comparable<K>, V> {
 
-	private BPlusTreeConfig root; // root of B+ tree
-    private BPlusTreeNode aChild; // first child
+	private BPlusTreeNode<K,V> root; // root of B+ tree
+    private BPlusTreeNode<K,V> aChild;
     private BPlusTreeConfig config; // config of B+ tree
     private RandomAccessFile fa; // file access
     

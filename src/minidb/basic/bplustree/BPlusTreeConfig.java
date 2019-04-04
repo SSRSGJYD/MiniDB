@@ -1,4 +1,4 @@
-package BPlusTree;
+package minidb.basic.bplustree;
 
 /**
  *
@@ -8,8 +8,9 @@ package BPlusTree;
 
 public class BPlusTreeConfig {
 
-    private int pageSize; // page size
-    private int keySize; // key size, Long.Size
+    private int pageSize;   // page size
+    private int valueType;  // type of value
+    private int keySize;    // key size, Long.Size
 
     // header size
     private int internalNodeHeaderSize;
