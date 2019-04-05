@@ -1,14 +1,17 @@
 package minidb.basic.database;
 
-public class Statement {
+public abstract class Statement {
 	
-	Type type;
+	StatementType stType;
 	
 	
-	enum Type
+	public enum StatementType
 	{ 
 	    Create,Drop,Insert,Delete,Update,Select; 
-	} 
-	
+	}
+	public enum DataType
+	{ 
+		Int,Long,Float,Double,String; 
+	}
 	
 }
