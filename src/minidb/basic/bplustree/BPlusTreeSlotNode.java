@@ -2,14 +2,24 @@ package minidb.basic.bplustree;
 
 import minidb.basic.bplustree.BPlusTreeNode;
 
-public class BPlusTreeSlotNode<K extends Comparable<K>,V> extends BPlusTreeNode<K,V> {
+import java.util.LinkedList;
 
-    private long nextPage;
-    private long prevPage;
+public class BPlusTreeSlotNode<K extends Comparable<K>> extends BPlusTreeNode<K> {
 
-    public BPlusTreeSlotNode(int nodeType, long pageIndex, int valueType, long nextPage, long prevPage) {
-        super(nodeType, pageIndex, valueType);
+    protected long nextPage;
+    protected LinkedList<Long> freeSlots;
+
+    public BPlusTreeSlotNode(int nodeType, long pageIndex, int valueSize, long nextPage) {
+        super(nodeType, pageIndex, valueSize);
         this.nextPage = nextPage;
-        this.prevPage = prevPage;
+        this.freeSlots = new LinkedList<Long>();
+    }
+
+    public long getNextPage() {
+        return nextPage;
+    }
+
+    public void setNextPage(long nextPage) {
+        this.nextPage = nextPage;
     }
 }
