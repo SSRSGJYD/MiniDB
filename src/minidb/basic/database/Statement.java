@@ -1,5 +1,7 @@
 package minidb.basic.database;
 
+import minidb.basic.database.DataBase;
+
 public abstract class Statement {
 	
 	StatementType stType;
@@ -9,9 +11,8 @@ public abstract class Statement {
 	{ 
 	    Create,Drop,Insert,Delete,Update,Select; 
 	}
-	public enum DataType
-	{ 
-		Int,Long,Float,Double,String; 
-	}
+
+	
+	public abstract Result execute(DataBase db);
 	
 }

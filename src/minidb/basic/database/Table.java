@@ -7,7 +7,7 @@ public class Table {
 	String tableName;
 	Schema schema;
 	
-	public Table() {
+	public Table(String tableName,Schema schema) {
 		
 	}
 	
