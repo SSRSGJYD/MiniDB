@@ -1,7 +1,6 @@
 package minidb.basic.database;
 
 import java.util.HashMap; 
-import java.util.Map; 
 import minidb.basic.database.Result;
 import minidb.basic.database.Statement;
 import minidb.basic.database.StatementCreate;

@@ -8,9 +8,11 @@ public class Table {
 	Schema schema;
 	
 	public Table(String tableName,Schema schema) {
-		
+		this.tableName=tableName;
+		this.schema=schema;
 	}
 	
-	
-	
+	public void insert(Row row) {
+		
+	}
 }
