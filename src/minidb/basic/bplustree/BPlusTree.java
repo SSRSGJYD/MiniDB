@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.stream.Collectors;
 
 import minidb.types.TypeConst;
 import minidb.basic.database.Row;
@@ -268,7 +267,7 @@ public class BPlusTree<K extends Comparable<K>> {
                 for(Object slot : node.freeSlots) {
                     slotPool.add((Long)slot);
                 }
-                index = node.getNextPage();
+                index = node.getNextPageIndex();
             }
         }
     }

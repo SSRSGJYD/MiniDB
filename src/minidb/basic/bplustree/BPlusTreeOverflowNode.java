@@ -7,43 +7,49 @@ import minidb.basic.database.Row;
 
 /**
  *
- * Class of overflow node of B+ Tree
+ * Class of overflow node of B+ Tree, to store overflow values in a new page
  *
- * To store overflow values in a new page
+ * Overflow Leaf node in file page:
+ *      node type: 2 bytes(Short.SIZE)
+ *      next page index: 8 bytes(Long.SIZE)
+ *      prev page index: 8 bytes(Long.SIZE)
+ *      capacity: 4 bytes(Int.SIZE)
+ *      value: valueSize
+ * layout: value1, value2, ...
  *
  */
 
 public class BPlusTreeOverflowNode<K extends Comparable<K>> extends BPlusTreeNode<K> {
 
     protected LinkedList<Row> valueList;
-    private long prevPage; // index of prev overflow page
-    private long nextPage; // index of next overflow page
+    private long prevPageIndex; // index of prev overflow page
+    private long nextPageIndex; // index of next overflow page
 
     /**
      * constructor
      *
      */
-    public BPlusTreeOverflowNode(int nodeType, long pageIndex, int valueSize, long prevPage, long nextPage) {
+    public BPlusTreeOverflowNode(int nodeType, long pageIndex, int valueSize, long prevPageIndex, long nextPageIndex) {
         super(nodeType, pageIndex, valueSize);
-        this.prevPage = prevPage;
-        this.nextPage = nextPage;
+        this.prevPageIndex = prevPageIndex;
+        this.nextPageIndex = nextPageIndex;
         this.valueList = new LinkedList<Row>();
     }
 
-    public long getPrevPage() {
-        return prevPage;
+    public long getPrevPageIndex() {
+        return prevPageIndex;
     }
 
-    public void setPrevPage(long prevPage) {
-        this.prevPage = prevPage;
+    public void setPrevPageIndex(long prevPageIndex) {
+        this.prevPageIndex = prevPageIndex;
     }
 
-    public long getNextPage() {
-        return nextPage;
+    public long getNextPageIndex() {
+        return nextPageIndex;
     }
 
-    public void setNextPage(long nextPage) {
-        this.nextPage = nextPage;
+    public void setNextPageIndex(long nextPageIndex) {
+        this.nextPageIndex = nextPageIndex;
     }
 
     /**
@@ -58,6 +64,18 @@ public class BPlusTreeOverflowNode<K extends Comparable<K>> extends BPlusTreeNod
      */
     public void writeNode(RandomAccessFile fa, int pageSize, int headerSize, int keyType, int keySize)
             throws IOException {
+        fa.seek(getPageIndex());
+        fa.writeShort(getNodeType());
+        fa.writeLong(nextPageIndex);
+        fa.writeLong(prevPageIndex);
+        int capacity = getCapacity();
+        fa.writeInt(capacity);
+        for(int i = 0; i < capacity; i++) {
+            BPlusTreeUtils.writeRowToFile(fa, valueList.get(i));
+        }
 
+        if(fa.length() < getPageIndex() + pageSize) {
+            fa.setLength(getPageIndex() + pageSize);
+        }
     }
 }

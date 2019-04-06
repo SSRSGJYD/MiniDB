@@ -12,8 +12,8 @@ import minidb.basic.database.Row;
  *
  * Leaf node in file page:
  *      node type: 2 bytes(Short.SIZE)
- *      next pointer: 8 bytes(Long.SIZE)
- *      prev pointer: 8 bytes(Long.SIZE)
+ *      next page index: 8 bytes(Long.SIZE)
+ *      prev page index: 8 bytes(Long.SIZE)
  *      capacity: 4 bytes(Int.SIZE)
  *      key: keySize
  *      overflow node index:8 bytes(Long.SIZE)
