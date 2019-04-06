@@ -2,12 +2,15 @@ package minidb.basic.bplustree;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.LinkedList;
+import java.util.ArrayList;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.stream.Collectors;
 
 import minidb.types.TypeConst;
+import minidb.basic.database.Row;
+import minidb.basic.bplustree.BPlusTreeUtils.*;
 
 /**
  *
@@ -61,7 +64,7 @@ public class BPlusTree<K extends Comparable<K>> {
             throws IOException {
         ParameterizedType pt = (ParameterizedType) this.getClass().getGenericSuperclass();
         Class K_class = (Class<K>) pt.getActualTypeArguments()[0];
-        this.keyType = getClassType(K_class);
+        this.keyType = BPlusTreeUtils.getClassType(K_class);
 
         this.pageSize = pageSize;
         this.keySize = (this.keyType < TypeConst.VALUE_TYPE_STRING)? TypeConst.VALUE_SIZE[this.keyType]:keySize;
@@ -163,7 +166,7 @@ public class BPlusTree<K extends Comparable<K>> {
                 BPlusTreeInternalNode<K> node = new BPlusTreeInternalNode<K>(nodeType, index, valueSize);
                 int curCapacity = fa.readInt();
                 for (int i = 0; i < curCapacity; i++) {
-                    node.keyList.add(i, (K)readKeyFromFile(keyType, keySize));
+                    node.keyList.add(i, (K)BPlusTreeUtils.readKeyFromFile(fa, keyType, keySize));
                     node.ptrList.add(i, fa.readLong());
                 }
                 node.ptrList.add(curCapacity, fa.readLong());
@@ -176,12 +179,11 @@ public class BPlusTree<K extends Comparable<K>> {
                 long prevptr = fa.readLong();
                 int curCapacity = fa.readInt();
                 BPlusTreeOverflowNode<K> node = new BPlusTreeOverflowNode<K>(nodeType, index, valueSize, nextptr, prevptr);
+                // read in rows
+                ArrayList<Row> rows = BPlusTreeUtils.readRowsFromFile(fa, valueSize, curCapacity);
+                for (Row row: rows) {
 
-                // read entries
-                for (int i = 0; i < curCapacity; i++) {
-                    Row value = new Row();
-                    // TODO: design row data format and read in row data
-                    node.valueList.add(i, value);
+                    node.valueList.add(row);
                 }
                 node.setCapacity(curCapacity);
                 return node;
@@ -194,11 +196,9 @@ public class BPlusTree<K extends Comparable<K>> {
                 BPlusTreeLeafNode<K> node = new BPlusTreeLeafNode<K>(nodeType, index, valueSize, nextptr, prevptr);
 
                 for (int i = 0; i < curCapacity; i++) {
-                    node.keyList.add(i, (K)readKeyFromFile(keyType, keySize));
+                    node.keyList.add(i, (K)BPlusTreeUtils.readKeyFromFile(fa, keyType, keySize));
                     node.overflowList.add(i, fa.readLong());
-                    Row value = new Row();
-                    // TODO: design row data format and read in row data
-                    node.valueList.add(i, value);
+                    node.valueList.add(i, BPlusTreeUtils.readRowsFromFile(fa, valueSize, 1).get(0));
                 }
                 node.setCapacity(curCapacity);
                 node.setValid(true);
@@ -219,28 +219,7 @@ public class BPlusTree<K extends Comparable<K>> {
         }
     }
 
-    private Object readKeyFromFile(int keyType, int keySize) throws IOException {
-        switch (keyType) {
-            case TypeConst.VALUE_TYPE_INT:
-                return fa.readInt();
-            case TypeConst.VALUE_SIZE_LONG:
-                return fa.readLong();
-            case TypeConst.VALUE_TYPE_FLOAT:
-                return fa.readFloat();
-            case TypeConst.VALUE_TYPE_DOUBLE:
-                return fa.readDouble();
-            default:  //TypeConst.VALUE_TYPE_STRING:
-                byte[] tmp = new byte[keySize+1];
-                fa.read(tmp,0, keySize);
-                return new String(tmp);
-        }
-    }
 
-    private Object readValueFromFile() throws IOException {
-        Row value = new Row();
-        // TODO: read in row from file
-        return value;
-    }
 
     /**
      * Function that initially creates the tree. Here we always
@@ -251,7 +230,7 @@ public class BPlusTree<K extends Comparable<K>> {
     private BPlusTreeNode<K> createTree() throws IOException {
         if(root == null) {
             root = new BPlusTreeLeafNode<K>(BPlusTreeConst.NODE_TYPE_ROOT_LEAF, getFreeSlot(), valueSize, -1, -1);
-            root.writeNode(fa);
+            root.writeNode(fa, pageSize, treeHeaderSize, keyType, keySize);
         }
         return root;
     }
@@ -286,43 +265,15 @@ public class BPlusTree<K extends Comparable<K>> {
             while (index != -1L) {
                 slotPool.add(index);
                 node = (BPlusTreeSlotNode)readNodeFromFile(index);
-                //Iterator it = lpOvf.freeSlots.iterator();
-//                for(slot:lpOvf.freeSlots) {
-//                    slotPool.add(slot);
-//                }
-                slotPool.addAll(node.freeSlots.stream().collect(Collectors.toList()));
+                for(Object slot : node.freeSlots) {
+                    slotPool.add((Long)slot);
+                }
                 index = node.getNextPage();
             }
         }
     }
 
-    /**
-     * get the const defined in TypeConst of the class
-     *
-     * @param cls class
-     * @return TypeConst value
-     */
-    public int getClassType(Class cls) {
-        String cls_name = cls.getName();
-        if (cls_name.equals(Integer.class.getName())) {
-            return TypeConst.VALUE_TYPE_INT;
-        }
-        if (cls_name.equals(Long.class.getName())) {
-            return TypeConst.VALUE_TYPE_LONG;
-        }
-        if (cls_name.equals(Float.class.getName())) {
-            return TypeConst.VALUE_TYPE_FLOAT;
-        }
-        if (cls_name.equals(Double.class.getName())) {
-            return TypeConst.VALUE_TYPE_DOUBLE;
-        }
-        if (cls_name.equals(String.class.getName())) {
-            return TypeConst.VALUE_TYPE_STRING;
-        } else {
-            System.out.println(String.format("not support type %s", cls_name));
-        }
-        return -1;
-    }
+
 
     /**
      * calculates the degree of a node (internal node or leaf node)

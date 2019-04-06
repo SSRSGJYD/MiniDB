@@ -2,6 +2,8 @@ package minidb.basic.bplustree;
 
 import minidb.basic.bplustree.BPlusTreeNode;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.LinkedList;
 
 public class BPlusTreeSlotNode<K extends Comparable<K>> extends BPlusTreeNode<K> {
@@ -21,5 +23,20 @@ public class BPlusTreeSlotNode<K extends Comparable<K>> extends BPlusTreeNode<K>
 
     public void setNextPage(long nextPage) {
         this.nextPage = nextPage;
+    }
+
+    /**
+     *  write node to tree file
+     *
+     * @param fa file descriptor
+     * @param pageSize
+     * @param headerSize
+     * @param keyType
+     * @param keySize
+     * @throws IOException
+     */
+    public void writeNode(RandomAccessFile fa, int pageSize, int headerSize, int keyType, int keySize)
+            throws IOException {
+
     }
 }
