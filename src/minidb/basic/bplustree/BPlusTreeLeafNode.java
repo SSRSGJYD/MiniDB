@@ -2,9 +2,6 @@ package minidb.basic.bplustree;
 
 import java.util.LinkedList;
 
-import minidb.basic.bplustree.BPlusTreeNode;
-import minidb.basic.Row;
-
 /**
  *
  * Class of leaf node of B+ Tree
