@@ -1,13 +1,11 @@
 package minidb.basic.database;
 
 import java.util.HashMap; 
-import minidb.basic.database.Result;
-import minidb.basic.database.Statement;
-import minidb.basic.database.StatementCreate;
 
 public class DataBase {
 	
 	HashMap<String,Table> tables;
+	String currentTable;
 	
 	
 	public DataBase() {
@@ -19,29 +17,19 @@ public class DataBase {
 		//load schema from disk to memory
     	//load index
     }
-    
-	public Result runSQL(String sql) {
-		return null;
-    }
 	
 	protected void loadSchemas() {
 		
 	}
 	
-	protected void runStatement(Statement st) {
-		switch(st.stType) {
-		case Create:
-			StatementCreate stc=(StatementCreate)st;
-			stc.execute(this);
-			break;
-		default:
-			break;
-			
-		}
+	protected void addTable(Table tb) {
+		tables.put(tb.tableName, tb);
 	}
 	
-	public void insertTable(Table tb) {
-		tables.put(tb.tableName, tb);
+	public void createTable(String tableName, Schema sc) {
+		Table tb=new Table(tableName,sc);
+		addTable(tb);
+		//TODO insert into schema file
 	}
 	
 	public void dropTable(String name) {
