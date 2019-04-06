@@ -28,7 +28,6 @@ public class DataBase implements Serializable{
     	//load index
     }
 	
-	@SuppressWarnings("unchecked")
 	protected static DataBase loadFromFile(String path) throws ClassNotFoundException, IOException {
         ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path));
         DataBase db = (DataBase)ois.readObject();
