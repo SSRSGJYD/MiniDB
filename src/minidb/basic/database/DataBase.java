@@ -22,6 +22,11 @@ public class DataBase {
 		
 	}
 	
+	protected void storeSchemas() {
+		
+	}
+
+	
 	protected void addTable(Table tb) {
 		tables.put(tb.tableName, tb);
 	}
