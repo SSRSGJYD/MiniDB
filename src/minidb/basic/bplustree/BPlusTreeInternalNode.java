@@ -13,18 +13,20 @@ import minidb.basic.bplustree.BPlusTreeNode;
  *
  */
 
-public class BPlusTreeInternalNode<K extends Comparable<K>,V> extends BPlusTreeNode<K,V> {
+public class BPlusTreeInternalNode<K extends Comparable<K>> extends BPlusTreeNode<K> {
 
-    private LinkedList<K> keyList;
-    private LinkedList<Long> ptrList; // list of pointers to child nodes
+    protected LinkedList<K> keyList;
+    protected LinkedList<Long> ptrList; // list of pointers to child nodes
 
     /**
      * constructor
      *
      */
-    public BPlusTreeInternalNode(int nodeType, long pageIndex, int valueType) {
-        super(nodeType, pageIndex, valueType);
+    public BPlusTreeInternalNode(int nodeType, long pageIndex, int valueSize) {
+        super(nodeType, pageIndex, valueSize);
         keyList = new LinkedList<K>();
         ptrList = new LinkedList<Long>();
     }
+
+
 }
