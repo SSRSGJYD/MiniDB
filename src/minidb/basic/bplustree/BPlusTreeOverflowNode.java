@@ -2,8 +2,6 @@ package minidb.basic.bplustree;
 
 import java.util.LinkedList;
 
-import minidb.basic.bplustree.BPlusTreeNode;
-
 /**
  *
  * Class of overflow node of B+ Tree
@@ -12,9 +10,9 @@ import minidb.basic.bplustree.BPlusTreeNode;
  *
  */
 
-public class BPlusTreeOverflowNode<K extends Comparable<K>,V> extends BPlusTreeNode<K,V> {
+public class BPlusTreeOverflowNode<K extends Comparable<K>> extends BPlusTreeNode<K> {
 
-    private LinkedList<Long> keyList;
+    protected LinkedList<Row> valueList;
     private long prevPage; // index of prev overflow page
     private long nextPage; // index of next overflow page
 
@@ -22,10 +20,11 @@ public class BPlusTreeOverflowNode<K extends Comparable<K>,V> extends BPlusTreeN
      * constructor
      *
      */
-    public BPlusTreeOverflowNode(int nodeType, long pageIndex, int valueType, long prevPage, long nextPage) {
-        super(nodeType, pageIndex, valueType);
+    public BPlusTreeOverflowNode(int nodeType, long pageIndex, int valueSize, long prevPage, long nextPage) {
+        super(nodeType, pageIndex, valueSize);
         this.prevPage = prevPage;
         this.nextPage = nextPage;
+        this.valueList = new LinkedList<Row>();
     }
 
     public long getPrevPage() {
