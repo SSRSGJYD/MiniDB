@@ -1,12 +1,24 @@
 package minidb.basic.bplustree;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.LinkedList;
+
+import minidb.basic.database.Row;
 
 /**
  *
  * Class of leaf node of B+ Tree
  *
- * To store (key,value) in a page
+ * Leaf node in file page:
+ *      node type: 2 bytes(Short.SIZE)
+ *      next page index: 8 bytes(Long.SIZE)
+ *      prev page index: 8 bytes(Long.SIZE)
+ *      capacity: 4 bytes(Int.SIZE)
+ *      key: keySize
+ *      overflow node index:8 bytes(Long.SIZE)
+ *      value: valueSize
+ * layout: (key, overflow node index, value) ...
  *
  */
 
@@ -45,5 +57,39 @@ public class BPlusTreeLeafNode<K extends Comparable<K>> extends BPlusTreeNode<K>
 
     public void setPrevPageIndex(long prevPageIndex) {
         this.prevPageIndex = prevPageIndex;
+    }
+
+    /**
+     *  write node to tree file
+     *
+     * @param fa file descriptor
+     * @param pageSize
+     * @param headerSize
+     * @param keyType
+     * @param keySize
+     * @throws IOException
+     */
+    public void writeNode(RandomAccessFile fa, int pageSize, int headerSize, int keyType, int keySize)
+            throws IOException {
+        if(this.getNodeType() == BPlusTreeConst.NODE_TYPE_ROOT_INTERNAL ||
+                this.getNodeType() == BPlusTreeConst.NODE_TYPE_ROOT_LEAF) {
+            fa.seek(headerSize-8);
+            fa.writeLong(getPageIndex());
+        }
+        fa.seek(getPageIndex());
+        fa.writeShort(getNodeType());
+        fa.writeLong(nextPageIndex);
+        fa.writeLong(prevPageIndex);
+        int capacity = getCapacity();
+        fa.writeInt(capacity);
+        for(int i = 0; i < capacity; i++) {
+            BPlusTreeUtils.writeKeyToFile(fa, keyList.get(i), keyType, keySize);
+            fa.writeLong(overflowList.get(i));
+            BPlusTreeUtils.writeRowToFile(fa, valueList.get(i));
+        }
+
+        if(fa.length() < getPageIndex() + pageSize) {
+            fa.setLength(getPageIndex() + pageSize);
+        }
     }
 }

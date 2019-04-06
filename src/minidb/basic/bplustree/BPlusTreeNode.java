@@ -63,11 +63,16 @@ abstract class BPlusTreeNode<K extends Comparable<K>> {
     }
 
     /**
-     * writes node to a page slot
+     *  write node to tree file
      *
-     * @param fa opened file descriptor of tree file
-     * @throws IOException is thrown when an I/O operation fails.
+     * @param fa file descriptor
+     * @param pageSize
+     * @param headerSize
+     * @param keyType
+     * @param keySize
+     * @throws IOException
      */
-    public abstract void writeNode(RandomAccessFile fa) throws IOException;
+    public abstract void writeNode(RandomAccessFile fa, int pageSize, int headerSize, int keyType, int keySize)
+            throws IOException;
 
 }
