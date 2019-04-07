@@ -10,6 +10,7 @@ import java.io.RandomAccessFile;
 import minidb.types.TypeConst;
 import minidb.basic.database.Row;
 import minidb.basic.bplustree.BPlusTreeUtils.*;
+import minidb.result.SearchResult;
 
 /**
  *
@@ -229,7 +230,7 @@ public class BPlusTree<K extends Comparable<K>> {
     private BPlusTreeNode<K> createTree() throws IOException {
         if(root == null) {
             root = new BPlusTreeLeafNode<K>(BPlusTreeConst.NODE_TYPE_ROOT_LEAF, getFreeSlot(), valueSize, -1, -1);
-            writeNode(root);
+            writeNodeToFile(root);
         }
         return root;
     }
@@ -307,6 +308,89 @@ public class BPlusTree<K extends Comparable<K>> {
         }
     }
 
+
+    /**
+     * search by key
+     *
+     * @param node node to search
+     * @param key
+     * @return a search result object
+     * @throws IOException
+     */
+    public SearchResult searchByKey(BPlusTreeNode<K> node, K key) throws IOException {
+        // search for the key
+        int i = searchNode(node, key, BPlusTreeConst.SEARCH_EXACT, 0, node.getCapacity()-1);
+        int nodeType = node.getNodeType();
+        if(nodeType == BPlusTreeConst.NODE_TYPE_LEAF_OVERFLOW
+                || nodeType == BPlusTreeConst.NODE_TYPE_LEAF
+                || nodeType == BPlusTreeConst.NODE_TYPE_ROOT_LEAF) { // leaf node
+            BPlusTreeLeafNode<K> leaf = (BPlusTreeLeafNode<K>)node;
+            if(i >= 0 && i < node.getCapacity() && key == leaf.keyList.get(i)) {
+                if(leaf.overflowList.get(i) == -1L ) { // no overflow node
+                    return new SearchResult(); // TODO
+                }
+                else { // deal with overflow node
+                    BPlusTreeOverflowNode<K> overflowNode = (BPlusTreeOverflowNode<K>)readNodeFromFile(leaf.overflowList.get(i));
+                    LinkedList<Row> valueList = new LinkedList<Row>();
+                    valueList.add(leaf.valueList.get(i));
+                    int j = 0;
+                    while(j < overflowNode.getCapacity()) {
+                        valueList.add(overflowNode.valueList.get(j));
+                        ++j;
+                        if(j == overflowNode.getCapacity() && overflowNode.getNextPageIndex() != -1L) {
+                            overflowNode = (BPlusTreeOverflowNode<K>)readNodeFromFile(overflowNode.getNextPageIndex());
+                            j = 0;
+                        }
+                    }
+                    return new SearchResult(); // TODO
+                }
+            }
+            else { // key not found
+                return new SearchResult(); // TODO
+            }
+        }
+        else { // internal node
+            BPlusTreeInternalNode<K> internal = (BPlusTreeInternalNode<K>)node;
+            // padding to account for the last pointer (if needed)
+            if(i != node.getCapacity() && key.compareTo(internal.keyList.get(i)) == 1) {
+                i++;
+            }
+            BPlusTreeNode<K> nextToSearch = readNodeFromFile(internal.ptrList.get(i));
+            return searchByKey(nextToSearch, key);
+        }
+    }
+
+    /**
+     * search by key in a range
+     *
+     * @param node node to search
+     * @param key
+     * @param lbound lower bound
+     * @param uselbound whether use lower bound or not
+     * @param hbound higher bound
+     * @param usehbound whether use higher bound or not
+     * @return a search result object
+     * @throws IOException
+     */
+    public SearchResult searchByKeyWithRange(BPlusTreeNode<K> node, K key, K lbound, boolean uselbound, K hbound, boolean usehbound) throws IOException {
+        // TODO
+        return new SearchResult();
+    }
+
+    /**
+     * search by attribute value
+     *
+     * @param node node to search
+     * @param attributes attributes to search
+     * @param attributeIndex index of attributes used for searching
+     * @return a search result object
+     * @throws IOException
+     */
+    public SearchResult searchByAttributes(BPlusTreeNode<K> node, Object[] attributes, int[] attributeIndex) throws IOException {
+        // TODO
+        return new SearchResult();
+    }
+
     /**
      * to insert value into the tree
      *
@@ -362,14 +446,14 @@ public class BPlusTree<K extends Comparable<K>> {
                     return;
                 }
                 if(leaf.overflowList.get(j) < 0) { // overflow page does not exist
-                    createOverflowPage(leaf, j, value);
+                    appendOverflowNode(leaf, j, value);
                 }
                 else { // overflow page exists
                     BPlusTreeOverflowNode<K> overflowNode =
                             (BPlusTreeOverflowNode<K>)readNodeFromFile(leaf.overflowList.get(j));
                     while(isFullNode(overflowNode)) {
                         if(overflowNode.getNextPageIndex() < 0) { // have to create overflow page
-                            createOverflowPage(overflowNode, -1, value);
+                            appendOverflowNode(overflowNode, -1, value);
                             return;
                         }
                         else { // load next overflow page
@@ -379,7 +463,7 @@ public class BPlusTree<K extends Comparable<K>> {
                     // add value to overflow page
                     overflowNode.valueList.push(value);
                     overflowNode.increaseCapacity();
-                    writeNode(overflowNode);
+                    writeNodeToFile(overflowNode);
                 }
             }
             else { // a new key
@@ -387,7 +471,7 @@ public class BPlusTree<K extends Comparable<K>> {
                 leaf.valueList.add(i, value);
                 leaf.overflowList.add(i, -1L); // create a NULL overflow pointer
                 leaf.increaseCapacity();
-                writeNode(leaf);
+                writeNodeToFile(leaf);
             }
         }
         else { // internal node
@@ -418,14 +502,45 @@ public class BPlusTree<K extends Comparable<K>> {
     }
 
     /**
+     * binary search a key in a tree node
      *
-     *
-     *
-     *
-     *
+     * @param node node to search
+     * @param key key to search
+     * @param l start index of key
+     * @param r end index of key
+     * @param policy search policy
+     * @return index of the found key or the bound
      */
     private int searchNode(BPlusTreeNode<K> node, K key, int policy, int l, int r) {
-
+        if (l > r) { // search stop here
+            switch (policy) {
+                case BPlusTreeConst.SEARCH_PREV:
+                    return l == 0 ? l : l - 1;
+                case BPlusTreeConst.SEARCH_NEXT:
+                    return (l > 0 && l == node.getCapacity()) ? l - 1 : l;
+                default: //BPlusTreeConst.SEARCH_EXACT
+                    return l;
+            }
+        }
+        else {
+            int mid = (l + r) / 2;
+            K midKey;
+            int nodeType = node.getNodeType();
+            if(nodeType == BPlusTreeConst.NODE_TYPE_LEAF || nodeType == BPlusTreeConst.NODE_TYPE_ROOT_LEAF){
+                midKey = ((BPlusTreeLeafNode<K>)node).keyList.get(mid);
+            }
+            else { // internal node
+                midKey = ((BPlusTreeInternalNode<K>)node).keyList.get(mid);
+            }
+            int compare = midKey.compareTo(key);
+            if (compare == -1) {
+                return searchNode(node, key, policy, mid + 1, r);
+            } else if (compare == 1) {
+                return searchNode(node, key, policy, l, mid - 1);
+            } else { // equal
+                return mid;
+            }
+        }
     }
 
     /**
@@ -457,6 +572,47 @@ public class BPlusTree<K extends Comparable<K>> {
     }
 
     /**
+     * append new overflow page to leaf node or overflow node
+     *
+     * @param node node to append at
+     * @param leafIndex index of key in leaf node
+     * @param value value to write into overflow node
+     */
+    private void appendOverflowNode(BPlusTreeNode<K> node, int leafIndex, Row value)
+        throws IOException {
+        BPlusTreeOverflowNode<K> newOverflowNode;
+        int nodeType = node.getNodeType();
+        if(nodeType == BPlusTreeConst.NODE_TYPE_ROOT_LEAF
+            || nodeType == BPlusTreeConst.NODE_TYPE_LEAF) { // leaf node
+            BPlusTreeLeafNode<K> leaf = (BPlusTreeLeafNode<K>)node; // convert type
+            // create new overflow node and insert value
+            newOverflowNode = createOverflowNode(getFreeSlot(), -1L, leaf.getPageIndex());
+            newOverflowNode.valueList.push(value);
+            newOverflowNode.increaseCapacity();
+            leaf.overflowList.set(leafIndex, newOverflowNode.getPageIndex());
+            newOverflowNode.setValid(true);
+            // update node info in tree file
+            writeNodeToFile(newOverflowNode);
+            writeNodeToFile(leaf);
+        }
+        else { //BPlusTreeConst.NODE_TYPE_LEAF_OVERFLOW
+            BPlusTreeOverflowNode<K> overflowNode = (BPlusTreeOverflowNode<K>)node;
+            newOverflowNode = createOverflowNode(getFreeSlot(), -1L, overflowNode.getPageIndex());
+            newOverflowNode.valueList.push(value);
+            newOverflowNode.increaseCapacity();
+            overflowNode.setNextPageIndex(newOverflowNode.getPageIndex());
+            newOverflowNode.setValid(true);
+            // update node info in tree file
+            writeNodeToFile(newOverflowNode);
+            writeNodeToFile(overflowNode);
+        }
+        // update info in tree file
+        fa.seek(treeHeaderSize-16);
+        fa.writeLong(totalPageNum); // update page count
+        fa.writeLong(maxPageNumber); // update max page number
+    }
+
+    /**
      * check if node is full
      */
     private boolean isFullNode(BPlusTreeNode<K> node) {
@@ -476,7 +632,7 @@ public class BPlusTree<K extends Comparable<K>> {
      * @param node
      * @throws IOException
      */
-    private void writeNode(BPlusTreeNode<K> node)  throws IOException {
+    private void writeNodeToFile(BPlusTreeNode<K> node)  throws IOException {
         node.writeNode(fa, pageSize, treeHeaderSize, keyType, keySize);
         return;
     }
