@@ -19,7 +19,7 @@ public class DataBase implements Serializable{
 	
 	
 	public DataBase() {
-		// TODO
+		// TODO 
 		tables=new HashMap<String,Table>();
 	}
 	
@@ -59,8 +59,11 @@ public class DataBase implements Serializable{
 
 	public static void main(String[] args) throws UnsupportedEncodingException, IOException, ClassNotFoundException {
 		Schema sc = new Schema();
-		sc.descriptors.put("1223", (byte)12);
-		sc.descriptors.put("1224", (byte)112);
+		SchemaDescriptor sd=new SchemaDescriptor();
+		sd.setNotNull(true);
+		sd.setType(1);
+		sc.descriptors.put("1223", sd);
+
 		Table tb=new Table("table", sc);
 		DataBase db=new DataBase();
 		db.name="dba";
