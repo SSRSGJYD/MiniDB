@@ -75,4 +75,28 @@ abstract class BPlusTreeNode<K extends Comparable<K>> {
     public abstract void writeNode(RandomAccessFile fa, int pageSize, int headerSize, int keyType, int keySize)
             throws IOException;
 
+    /**
+     * check if node is full
+     */
+    public abstract boolean isFull(int internalNodeDegree, int leafNodeDegree, int overflowNodeDegree);
+
+    /**
+     * check if node is 'under-used'
+     */
+    public abstract boolean isSparse(int internalNodeDegree, int leafNodeDegree);
+
+    /**
+     * increase the node capacity
+     */
+    public void increaseCapacity()  {
+        capacity++;
+    }
+
+    /**
+     * decrease the node capacity
+     */
+    public void decrementCapacity() {
+        capacity--;
+    }
+
 }

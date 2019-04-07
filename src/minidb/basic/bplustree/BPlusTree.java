@@ -177,7 +177,7 @@ public class BPlusTree<K extends Comparable<K>> {
                 long nextptr = fa.readLong();
                 long prevptr = fa.readLong();
                 int curCapacity = fa.readInt();
-                BPlusTreeOverflowNode<K> node = new BPlusTreeOverflowNode<K>(nodeType, index, valueSize, nextptr, prevptr);
+                BPlusTreeOverflowNode<K> node = createOverflowNode(index, nextptr, prevptr);
                 // read in rows
                 ArrayList<Row> rows = BPlusTreeUtils.readRowsFromFile(fa, valueSize, curCapacity);
                 for (Row row: rows) {
@@ -207,7 +207,7 @@ public class BPlusTree<K extends Comparable<K>> {
             {
                 long nextptr = fa.readLong();
                 int curCapacity = fa.readInt();
-                BPlusTreeSlotNode<K> node = new BPlusTreeSlotNode<K>(nodeType, index, valueSize, nextptr);
+                BPlusTreeSlotNode<K> node = createSlotNode(index, nextptr);
 
                 for (int i = 0; i < curCapacity; i++) {
                     node.freeSlots.add(i, fa.readLong());
@@ -229,7 +229,7 @@ public class BPlusTree<K extends Comparable<K>> {
     private BPlusTreeNode<K> createTree() throws IOException {
         if(root == null) {
             root = new BPlusTreeLeafNode<K>(BPlusTreeConst.NODE_TYPE_ROOT_LEAF, getFreeSlot(), valueSize, -1, -1);
-            root.writeNode(fa, pageSize, treeHeaderSize, keyType, keySize);
+            writeNode(root);
         }
         return root;
     }
@@ -305,6 +305,180 @@ public class BPlusTree<K extends Comparable<K>> {
             index = pageSize * (maxPageNumber + 1);
             return index;
         }
+    }
+
+    /**
+     * to insert value into the tree
+     *
+     * @param key
+     * @param value
+     * @param unique whether allow duplicate value
+     * @throws IOException
+     */
+    public void insert(K key, Row value, boolean unique) throws IOException {
+
+        assert root != null;
+
+        if(isFullNode(root)) {
+            // create a new root
+            aChild = this.root;
+            BPlusTreeInternalNode<K> node = createInternalNode(getFreeSlot());
+            node.ptrList.add(0, aChild.getPageIndex());
+            this.root = node;
+            // split old root node
+            splitNode(node, 0);
+            writeFileHeader();
+            insertToNode(node, key, value, unique);
+        }
+        else {
+            insertToNode(root, key, value, unique);
+        }
+    }
+
+    /**
+     * to insert key and value to a node which is not full
+     *
+     * @param node node to insert into
+     * @param key
+     * @param value
+     * @param unique whether value is unique
+     * @throws IOException
+     */
+    private void insertToNode(BPlusTreeNode<K> node, K key, Row value, boolean unique)
+            throws IOException {
+        boolean useChild = true;
+        int i = searchNode(node, key, BPlusTreeConst.SEARCH_EXACT, 0, node.getCapacity()-1) + 1;
+        // check if we have a leaf
+        int nodeType = node.getNodeType();
+        if(nodeType == BPlusTreeConst.NODE_TYPE_LEAF_OVERFLOW
+            || nodeType == BPlusTreeConst.NODE_TYPE_LEAF
+            || nodeType == BPlusTreeConst.NODE_TYPE_ROOT_LEAF) { // leaf node
+            
+            BPlusTreeLeafNode<K> leaf = (BPlusTreeLeafNode<K>)node;
+            int j = (leaf.getCapacity() > 0 && i == 0
+                    && leaf.keyList.getFirst().compareTo(key) == 1) ? i : i-1;
+            if(leaf.getCapacity() > 0 && leaf.keyList.get(j) == key) { // same value already exists
+                if(unique) {
+                    return;
+                }
+                if(leaf.overflowList.get(j) < 0) { // overflow page does not exist
+                    createOverflowPage(leaf, j, value);
+                }
+                else { // overflow page exists
+                    BPlusTreeOverflowNode<K> overflowNode =
+                            (BPlusTreeOverflowNode<K>)readNodeFromFile(leaf.overflowList.get(j));
+                    while(isFullNode(overflowNode)) {
+                        if(overflowNode.getNextPageIndex() < 0) { // have to create overflow page
+                            createOverflowPage(overflowNode, -1, value);
+                            return;
+                        }
+                        else { // load next overflow page
+                            overflowNode = (BPlusTreeOverflowNode<K>)readNodeFromFile(overflowNode.getNextPageIndex());
+                        }
+                    }
+                    // add value to overflow page
+                    overflowNode.valueList.push(value);
+                    overflowNode.increaseCapacity();
+                    writeNode(overflowNode);
+                }
+            }
+            else { // a new key
+                leaf.keyList.add(i, key);
+                leaf.valueList.add(i, value);
+                leaf.overflowList.add(i, -1L); // create a NULL overflow pointer
+                leaf.increaseCapacity();
+                writeNode(leaf);
+            }
+        }
+        else { // internal node
+            // convert type
+            BPlusTreeInternalNode<K> internal = (BPlusTreeInternalNode<K>)node;
+            aChild = readNodeFromFile(internal.ptrList.get(i));
+            BPlusTreeNode<K> nextAfterAChild = null;
+            if(isFullNode(aChild)) {
+                splitNode(internal, i);
+                if (internal.keyList.get(i).compareTo(key) == -1) {
+                    useChild = false;
+                    nextAfterAChild = readNodeFromFile(internal.ptrList.get(i+1));
+                }
+            }
+            insertToNode(useChild ? aChild : nextAfterAChild, key, value, unique);
+        }
+    }
+
+    /**
+     * split an internal node
+     *
+     * @param node node to split
+     * @param index index of key to split at
+     * @throws IOException
+     */
+    private void splitNode(BPlusTreeInternalNode<K> node, int index) throws IOException {
+        // TODO
+    }
+
+    /**
+     *
+     *
+     *
+     *
+     *
+     */
+    private int searchNode(BPlusTreeNode<K> node, K key, int policy, int l, int r) {
+
+    }
+
+    /**
+     * internal node factory
+     */
+    private BPlusTreeInternalNode<K> createInternalNode(long pageIndex) {
+        return new BPlusTreeInternalNode<K>(BPlusTreeConst.NODE_TYPE_INTERNAL, getFreeSlot(), valueSize);
+    }
+
+    /**
+     * leaf node factory
+     */
+    private BPlusTreeLeafNode<K> createLeafNode(long pageIndex, long nextPage, long prevPage) {
+        return new BPlusTreeLeafNode<K>(BPlusTreeConst.NODE_TYPE_LEAF, getFreeSlot(), valueSize, nextPage, prevPage);
+    }
+
+    /**
+     * leaf overflow node factory
+     */
+    private BPlusTreeOverflowNode<K> createOverflowNode(long pageIndex, long nextPage, long prevPage) {
+        return new BPlusTreeOverflowNode<K>(BPlusTreeConst.NODE_TYPE_LEAF_OVERFLOW, getFreeSlot(), valueSize, nextPage, prevPage);
+    }
+
+    /**
+     * slot node factory
+     */
+    private BPlusTreeSlotNode<K> createSlotNode(long pageIndex, long nextPage) {
+        return new BPlusTreeSlotNode<K>(BPlusTreeConst.NODE_TYPE_SLOT_OVERFLOW, getFreeSlot(), valueSize, nextPage);
+    }
+
+    /**
+     * check if node is full
+     */
+    private boolean isFullNode(BPlusTreeNode<K> node) {
+        return node.isFull(internalNodeDegree, leafNodeDegree, overflowNodeDegree);
+    }
+
+    /**
+     * check if node is 'under-used'
+     */
+    private boolean isSparseNode(BPlusTreeNode<K> node) {
+        return node.isSparse(internalNodeDegree, leafNodeDegree);
+    }
+
+    /**
+     * update node information to tree file
+     *
+     * @param node
+     * @throws IOException
+     */
+    private void writeNode(BPlusTreeNode<K> node)  throws IOException {
+        node.writeNode(fa, pageSize, treeHeaderSize, keyType, keySize);
+        return;
     }
 
 }
