@@ -1,0 +1,14 @@
+T__0=1
+T__1=2
+T__2=3
+T__3=4
+T__4=5
+TABLENAME=6
+ATTRNAME=7
+TYPE=8
+WS=9
+'create table'=1
+'('=2
+')'=3
+' '=4
+'primary key'=5

@@ -16,4 +16,12 @@ public class TypeConst {
     public static final int VALUE_SIZE_CHAR = Character.SIZE;
 
     public static final int VALUE_SIZE[] = {Integer.SIZE, Long.SIZE, Float.SIZE, Double.SIZE, Character.SIZE};
+
+    public static int fromString(String str) {
+    	if(str.equalsIgnoreCase("Int")) return VALUE_TYPE_INT;
+    	else if(str.equalsIgnoreCase("Long")) return VALUE_TYPE_LONG;
+    	else if(str.equalsIgnoreCase("Float")) return VALUE_TYPE_FLOAT;
+    	else if(str.equalsIgnoreCase("Double")) return VALUE_TYPE_LONG;
+    	else return VALUE_TYPE_STRING;
+    }
 }
