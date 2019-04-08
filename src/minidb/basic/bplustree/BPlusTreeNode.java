@@ -42,6 +42,8 @@ abstract class BPlusTreeNode<K extends Comparable<K>> {
         return this.nodeType;
     }
 
+    public void setNodeType(int nodeType) { this.nodeType = nodeType; }
+
     public int getCapacity() {
         return this.capacity;
     }
@@ -95,7 +97,7 @@ abstract class BPlusTreeNode<K extends Comparable<K>> {
     /**
      * decrease the node capacity
      */
-    public void decrementCapacity() {
+    public void decreaseCapacity() {
         capacity--;
     }
 

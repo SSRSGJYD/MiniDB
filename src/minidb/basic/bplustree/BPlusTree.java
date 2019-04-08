@@ -24,7 +24,6 @@ public class BPlusTree<K extends Comparable<K>> {
     private int valueSize;
 
 	private BPlusTreeNode<K> root; // root of B+ tree
-    private BPlusTreeNode<K> aChild;
     private RandomAccessFile fa; // file access
 
     private LinkedList<Long> slotPool;      // pool for free slots(for key or value)
@@ -405,12 +404,12 @@ public class BPlusTree<K extends Comparable<K>> {
 
         if(isFullNode(root)) {
             // create a new root
-            aChild = this.root;
+            BPlusTreeNode<K> childNode = this.root;
             BPlusTreeInternalNode<K> node = createInternalNode(getFreeSlot());
-            node.ptrList.add(0, aChild.getPageIndex());
+            node.ptrList.add(0, childNode.getPageIndex());
             this.root = node;
             // split old root node
-            splitNode(node, 0);
+            splitNode(node, childNode, 0);
             writeFileHeader();
             insertToNode(node, key, value, unique);
         }
@@ -477,28 +476,125 @@ public class BPlusTree<K extends Comparable<K>> {
         else { // internal node
             // convert type
             BPlusTreeInternalNode<K> internal = (BPlusTreeInternalNode<K>)node;
-            aChild = readNodeFromFile(internal.ptrList.get(i));
-            BPlusTreeNode<K> nextAfterAChild = null;
-            if(isFullNode(aChild)) {
-                splitNode(internal, i);
+            BPlusTreeNode<K> childNode = readNodeFromFile(internal.ptrList.get(i));
+            BPlusTreeNode<K> nextChild = null;
+            if(isFullNode(childNode)) {
+                splitNode(internal, childNode, i);
                 if (internal.keyList.get(i).compareTo(key) == -1) {
                     useChild = false;
-                    nextAfterAChild = readNodeFromFile(internal.ptrList.get(i+1));
+                    nextChild = readNodeFromFile(internal.ptrList.get(i+1));
                 }
             }
-            insertToNode(useChild ? aChild : nextAfterAChild, key, value, unique);
+            insertToNode(useChild ? childNode : nextChild, key, value, unique);
         }
+    }
+
+    /**
+     * delete by key at a node
+     *
+     * @param key
+     * @param node
+     * @param parent parent of the node
+     * @param parentPointerIndex
+     * @param parentKeyIndex
+     * @throws IOException
+     */
+    public void deleteByKeyAtNode(K key, BPlusTreeNode<K> node, BPlusTreeNode<K> parent, int parentPointerIndex, int parentKeyIndex) throws IOException{
+        // TODO
+    }
+
+
+
+    /**
+     * delete by value
+     *
+     *
+     * @throws IOException
+     *
+     */
+    public void deleteByValue() throws IOException {
+        // TODO
     }
 
     /**
      * split an internal node
      *
-     * @param node node to split
-     * @param index index of key to split at
+     * @param parent parent of the split node
+     * @param child node to split
+     * @param index index of key in parent node to insert new key
      * @throws IOException
      */
-    private void splitNode(BPlusTreeInternalNode<K> node, int index) throws IOException {
-        // TODO
+    private void splitNode(BPlusTreeInternalNode<K> parent, BPlusTreeNode<K> child, int index) throws IOException {
+        int splitAt;
+        BPlusTreeNode<K> nodeToAdd;
+        K keyToAdd;
+        // internal node
+        if(child.getNodeType() == BPlusTreeConst.NODE_TYPE_ROOT_INTERNAL
+            || child.getNodeType() == BPlusTreeConst.NODE_TYPE_INTERNAL) {
+            BPlusTreeInternalNode<K> internalToAdd;
+            BPlusTreeInternalNode<K> internalToSplit = (BPlusTreeInternalNode<K>)child;
+            internalToAdd = createInternalNode(getFreeSlot());
+            splitAt = internalNodeDegree - 1;
+            // move key and pointer to new node
+            int i;
+            for(i = 0; i < splitAt; i++) {
+                internalToAdd.keyList.add(i, internalToSplit.keyList.pop());
+                internalToAdd.ptrList.add(i, internalToSplit.ptrList.pop());
+            }
+            internalToAdd.ptrList.add(i, internalToSplit.ptrList.pop());
+            // move one key up to parent node
+            keyToAdd = internalToSplit.keyList.pop();
+            // update capacity
+            internalToAdd.setCapacity(splitAt);
+            internalToSplit.setCapacity(splitAt);
+            // update node type
+            internalToSplit.setNodeType(BPlusTreeConst.NODE_TYPE_INTERNAL);
+            // update parent node
+            parent.ptrList.add(index, internalToAdd.getPageIndex());
+            parent.keyList.add(index, keyToAdd);
+            parent.increaseCapacity();
+            // nodeToAdd to use later
+            nodeToAdd = internalToAdd;
+        }
+        else { // leaf node
+            BPlusTreeLeafNode<K> leafToAdd, nextLeaf;
+            BPlusTreeLeafNode<K> leafToSplit = (BPlusTreeLeafNode<K>)child;
+            leafToAdd = createLeafNode(getFreeSlot(), leafToSplit.getNextPageIndex(), leafToSplit.getPageIndex());
+            // update the prevPageIndex of the node after leafToSplit
+            if(leafToSplit.getNextPageIndex() != -1) {
+                nextLeaf = (BPlusTreeLeafNode<K>)readNodeFromFile(leafToSplit.getNextPageIndex());
+                nextLeaf.setPrevPageIndex(leafToAdd.getPageIndex());
+                writeNodeToFile(nextLeaf);
+            }
+            // update nextPageIndex of leafToSplit
+            leafToSplit.setNextPageIndex(leafToAdd.getPageIndex());
+            // move values from leafToSplit to leafToAdd
+            splitAt = leafNodeDegree - 1;
+            for(int i = 0; i < splitAt; i++) {
+                leafToAdd.keyList.push(leafToSplit.keyList.removeLast());
+                leafToAdd.valueList.push(leafToSplit.valueList.removeLast());
+                leafToAdd.overflowList.push(leafToSplit.overflowList.removeLast());
+                leafToAdd.increaseCapacity();
+                leafToSplit.decreaseCapacity();
+            }
+            // update nodeType
+            leafToSplit.setNodeType(BPlusTreeConst.NODE_TYPE_LEAF);
+            // update parent
+            parent.ptrList.add(index + 1, leafToAdd.getPageIndex());
+            parent.keyList.add(index, leafToAdd.keyList.get(0));
+            parent.increaseCapacity();
+            // nodeToAdd to use later
+            nodeToAdd = leafToAdd;
+        }
+        nodeToAdd.setValid(true);
+        // update node info in tree file
+        writeNodeToFile(nodeToAdd);
+        writeNodeToFile(child);
+        writeNodeToFile(parent);
+        // update info in tree file
+        fa.seek(treeHeaderSize-16);
+        fa.writeLong(totalPageNum); // update page count
+        fa.writeLong(maxPageNumber); // update max page number
     }
 
     /**
