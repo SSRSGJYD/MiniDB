@@ -5,6 +5,8 @@ import minidb.basic.database.StatementDelete;
 import minidb.basic.database.StatementDrop;
 import minidb.basic.database.StatementInsertA;
 import minidb.basic.database.StatementInsertB;
+import minidb.basic.database.StatementSelectA;
+import minidb.basic.database.StatementUpdate;
 import minidb.types.TypeConst;
 
 public class MyListener extends MiniSQLBaseListener {
@@ -14,7 +16,40 @@ public class MyListener extends MiniSQLBaseListener {
 	StatementInsertA sia;
 	StatementInsertB sib;
 	StatementDelete sdl;
+	StatementUpdate su;
+	StatementSelectA ssa;
 	int type;
+	
+	@Override 
+	public void enterSelectA(MiniSQLParser.SelectAContext ctx) {
+		type=Statement.selectA;
+		ssa=new StatementSelectA();
+		ssa.tableName=ctx.Name().getText();
+		ssa.existWhere=false;
+		if(ctx.condition() != null) {
+			ssa.existWhere=true;
+			ssa.cdName=ctx.condition().Name().getText();
+			ssa.cdValue=ctx.condition().value().getText();
+			String op=ctx.condition().op().getText();
+			ssa.op=Statement.opFromString(op);
+		}
+		for(int i=0;i<ctx.names().Name().size();i++) {
+			ssa.names.add(ctx.names().Name(i).getText());
+		}
+	}
+	
+	@Override 
+	public void enterUpdate(MiniSQLParser.UpdateContext ctx) {
+		type=Statement.update;
+		su=new StatementUpdate();
+		su.tableName=ctx.Name().getText();
+		su.setName=ctx.set().Name().getText();
+		su.setValue=ctx.set().value().getText();
+		su.cdName=ctx.condition().Name().getText();
+		su.cdValue=ctx.condition().value().getText();
+		String op=ctx.condition().op().getText();
+		su.op=Statement.opFromString(op);
+	}
 	
 	@Override 
 	public void enterInsertB(MiniSQLParser.InsertBContext ctx) {
@@ -43,18 +78,7 @@ public class MyListener extends MiniSQLBaseListener {
 		sdl.cdName=ctx.condition().Name().getText();
 		sdl.cdValue=ctx.condition().value().getText();
 		String op=ctx.condition().op().getText();
-		if(op.equals("=")) 
-			sdl.op=Statement.eq;
-		else if(op.equals(">")) 
-			sdl.op=Statement.lg;
-		else if(op.equals("<")) 
-			sdl.op=Statement.lt;
-		else if(op.equals(">=")) 
-			sdl.op=Statement.lge;
-		else if(op.equals("<=")) 
-			sdl.op=Statement.lte;
-		else if(op.equals("<>")) 
-			sdl.op=Statement.neq;
+		sdl.op=Statement.opFromString(op);
 	}
 	
 	@Override 

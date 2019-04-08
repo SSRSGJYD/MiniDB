@@ -143,6 +143,16 @@ public interface MiniSQLListener extends ParseTreeListener {
 	 */
 	void exitCondition(MiniSQLParser.ConditionContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link MiniSQLParser#set}.
+	 * @param ctx the parse tree
+	 */
+	void enterSet(MiniSQLParser.SetContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MiniSQLParser#set}.
+	 * @param ctx the parse tree
+	 */
+	void exitSet(MiniSQLParser.SetContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link MiniSQLParser#names}.
 	 * @param ctx the parse tree
 	 */

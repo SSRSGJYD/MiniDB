@@ -17,5 +17,22 @@ public abstract class Statement {
 	public static final int lte = 4;
 	public static final int neq = 5;
 	
+	public static int opFromString(String Op) {
+		int op = 0;
+		if(Op.equals("=")) 
+			op=Statement.eq;
+		else if(Op.equals(">")) 
+			op=Statement.lg;
+		else if(Op.equals("<")) 
+			op=Statement.lt;
+		else if(Op.equals(">=")) 
+			op=Statement.lge;
+		else if(Op.equals("<=")) 
+			op=Statement.lte;
+		else if(Op.equals("<>")) 
+			op=Statement.neq;
+		return op;
+	}
+	
 	public int type;
 }

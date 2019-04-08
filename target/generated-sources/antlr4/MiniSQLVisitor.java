@@ -90,6 +90,12 @@ public interface MiniSQLVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitCondition(MiniSQLParser.ConditionContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link MiniSQLParser#set}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSet(MiniSQLParser.SetContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link MiniSQLParser#names}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
