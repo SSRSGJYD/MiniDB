@@ -16,4 +16,9 @@ public class BPlusTreeConst {
     public static final int NODE_TYPE_LEAF_OVERFLOW = 5;
     public static final int NODE_TYPE_SLOT_OVERFLOW = 6;
 
+    // search policy
+    public static final int SEARCH_EXACT = 1;
+    public static final int SEARCH_PREV = 2;
+    public static final int SEARCH_NEXT = 3;
+
 }

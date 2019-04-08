@@ -60,6 +60,20 @@ public class BPlusTreeSlotNode<K extends Comparable<K>> extends BPlusTreeNode<K>
         }
     }
 
+    /**
+     * invalid for slot node
+     */
+    @Override
+    public boolean isFull(int internalNodeDegree, int leafNodeDegree, int overflowNodeDegree) {
+        return false;
+    }
 
+    /**
+     * invalid for slot node
+     */
+    @Override
+    public boolean isSparse(int internalNodeDegree, int leafNodeDegree) {
+        return false;
+    }
 
 }

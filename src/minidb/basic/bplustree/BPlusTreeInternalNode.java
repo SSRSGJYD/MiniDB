@@ -68,4 +68,26 @@ public class BPlusTreeInternalNode<K extends Comparable<K>> extends BPlusTreeNod
     }
 
 
+    /**
+     * check if node is full
+     */
+    @Override
+    public boolean isFull(int internalNodeDegree, int leafNodeDegree, int overflowNodeDegree) {
+        return getCapacity() == internalNodeDegree * 2 - 1;
+    }
+
+    /**
+     * check if node is 'under-used'
+     */
+    @Override
+    public boolean isSparse(int internalNodeDegree, int leafNodeDegree) {
+        if(getNodeType() == BPlusTreeConst.NODE_TYPE_ROOT_INTERNAL) {
+            return getCapacity() <= 1;
+        }
+        else {
+            return getCapacity() < internalNodeDegree;
+        }
+    }
+
+
 }
