@@ -10,6 +10,12 @@ import org.antlr.v4.runtime.tree.ParseTreeVisitor;
  */
 public interface MiniSQLVisitor<T> extends ParseTreeVisitor<T> {
 	/**
+	 * Visit a parse tree produced by {@link MiniSQLParser#type}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitType(MiniSQLParser.TypeContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code create}
 	 * labeled alternative in {@link MiniSQLParser#sql}.
 	 * @param ctx the parse tree
@@ -17,11 +23,12 @@ public interface MiniSQLVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitCreate(MiniSQLParser.CreateContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link MiniSQLParser#schema}.
+	 * Visit a parse tree produced by the {@code attrcons}
+	 * labeled alternative in {@link MiniSQLParser#schema}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitSchema(MiniSQLParser.SchemaContext ctx);
+	T visitAttrcons(MiniSQLParser.AttrconsContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code normalattr}
 	 * labeled alternative in {@link MiniSQLParser#attribute}.

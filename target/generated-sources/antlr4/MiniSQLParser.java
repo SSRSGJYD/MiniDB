@@ -16,26 +16,27 @@ public class MiniSQLParser extends Parser {
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, TABLENAME=6, ATTRNAME=7, TYPE=8, 
-		WS=9;
+		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, T__7=8, T__8=9, 
+		T__9=10, String=11, WS=12;
 	public static final int
-		RULE_sql = 0, RULE_schema = 1, RULE_attribute = 2, RULE_constraint = 3;
+		RULE_type = 0, RULE_sql = 1, RULE_schema = 2, RULE_attribute = 3, RULE_constraint = 4;
 	private static String[] makeRuleNames() {
 		return new String[] {
-			"sql", "schema", "attribute", "constraint"
+			"type", "sql", "schema", "attribute", "constraint"
 		};
 	}
 	public static final String[] ruleNames = makeRuleNames();
 
 	private static String[] makeLiteralNames() {
 		return new String[] {
-			null, "'create table'", "'('", "')'", "' '", "'primary key'"
+			null, "'int'", "'long'", "'float'", "'double'", "'string'", "'create table'", 
+			"'('", "')'", "','", "'primary key'"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
 	private static String[] makeSymbolicNames() {
 		return new String[] {
-			null, null, null, null, null, null, "TABLENAME", "ATTRNAME", "TYPE", 
+			null, null, null, null, null, null, null, null, null, null, null, "String", 
 			"WS"
 		};
 	}
@@ -90,6 +91,56 @@ public class MiniSQLParser extends Parser {
 		_interp = new ParserATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
 	}
 
+	public static class TypeContext extends ParserRuleContext {
+		public TypeContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_type; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniSQLListener ) ((MiniSQLListener)listener).enterType(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof MiniSQLListener ) ((MiniSQLListener)listener).exitType(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof MiniSQLVisitor ) return ((MiniSQLVisitor<? extends T>)visitor).visitType(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+
+	public final TypeContext type() throws RecognitionException {
+		TypeContext _localctx = new TypeContext(_ctx, getState());
+		enterRule(_localctx, 0, RULE_type);
+		int _la;
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(10);
+			_la = _input.LA(1);
+			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__0) | (1L << T__1) | (1L << T__2) | (1L << T__3) | (1L << T__4))) != 0)) ) {
+			_errHandler.recoverInline(this);
+			}
+			else {
+				if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
+				_errHandler.reportMatch(this);
+				consume();
+			}
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
 	public static class SqlContext extends ParserRuleContext {
 		public SqlContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -102,7 +153,7 @@ public class MiniSQLParser extends Parser {
 		}
 	}
 	public static class CreateContext extends SqlContext {
-		public TerminalNode TABLENAME() { return getToken(MiniSQLParser.TABLENAME, 0); }
+		public TerminalNode String() { return getToken(MiniSQLParser.String, 0); }
 		public SchemaContext schema() {
 			return getRuleContext(SchemaContext.class,0);
 		}
@@ -124,21 +175,21 @@ public class MiniSQLParser extends Parser {
 
 	public final SqlContext sql() throws RecognitionException {
 		SqlContext _localctx = new SqlContext(_ctx, getState());
-		enterRule(_localctx, 0, RULE_sql);
+		enterRule(_localctx, 2, RULE_sql);
 		try {
 			_localctx = new CreateContext(_localctx);
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(8);
-			match(T__0);
-			setState(9);
-			match(TABLENAME);
-			setState(10);
-			match(T__1);
-			setState(11);
-			schema();
 			setState(12);
-			match(T__2);
+			match(T__5);
+			setState(13);
+			match(String);
+			setState(14);
+			match(T__6);
+			setState(15);
+			schema();
+			setState(16);
+			match(T__7);
 			}
 		}
 		catch (RecognitionException re) {
@@ -153,36 +204,103 @@ public class MiniSQLParser extends Parser {
 	}
 
 	public static class SchemaContext extends ParserRuleContext {
-		public AttributeContext attribute() {
-			return getRuleContext(AttributeContext.class,0);
-		}
 		public SchemaContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_schema; }
+	 
+		public SchemaContext() { }
+		public void copyFrom(SchemaContext ctx) {
+			super.copyFrom(ctx);
+		}
+	}
+	public static class AttrconsContext extends SchemaContext {
+		public List<AttributeContext> attribute() {
+			return getRuleContexts(AttributeContext.class);
+		}
+		public AttributeContext attribute(int i) {
+			return getRuleContext(AttributeContext.class,i);
+		}
+		public List<ConstraintContext> constraint() {
+			return getRuleContexts(ConstraintContext.class);
+		}
+		public ConstraintContext constraint(int i) {
+			return getRuleContext(ConstraintContext.class,i);
+		}
+		public AttrconsContext(SchemaContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof MiniSQLListener ) ((MiniSQLListener)listener).enterSchema(this);
+			if ( listener instanceof MiniSQLListener ) ((MiniSQLListener)listener).enterAttrcons(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof MiniSQLListener ) ((MiniSQLListener)listener).exitSchema(this);
+			if ( listener instanceof MiniSQLListener ) ((MiniSQLListener)listener).exitAttrcons(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSQLVisitor ) return ((MiniSQLVisitor<? extends T>)visitor).visitSchema(this);
+			if ( visitor instanceof MiniSQLVisitor ) return ((MiniSQLVisitor<? extends T>)visitor).visitAttrcons(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 
 	public final SchemaContext schema() throws RecognitionException {
 		SchemaContext _localctx = new SchemaContext(_ctx, getState());
-		enterRule(_localctx, 2, RULE_schema);
+		enterRule(_localctx, 4, RULE_schema);
+		int _la;
 		try {
+			_localctx = new AttrconsContext(_localctx);
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(14);
-			attribute();
+			setState(20);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case String:
+				{
+				setState(18);
+				attribute();
+				}
+				break;
+			case T__9:
+				{
+				setState(19);
+				constraint();
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+			setState(29);
+			_errHandler.sync(this);
+			_la = _input.LA(1);
+			while (_la==T__8) {
+				{
+				{
+				setState(22);
+				match(T__8);
+				setState(25);
+				_errHandler.sync(this);
+				switch (_input.LA(1)) {
+				case String:
+					{
+					setState(23);
+					attribute();
+					}
+					break;
+				case T__9:
+					{
+					setState(24);
+					constraint();
+					}
+					break;
+				default:
+					throw new NoViableAltException(this);
+				}
+				}
+				}
+				setState(31);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+			}
 			}
 		}
 		catch (RecognitionException re) {
@@ -208,8 +326,10 @@ public class MiniSQLParser extends Parser {
 		}
 	}
 	public static class NormalattrContext extends AttributeContext {
-		public TerminalNode ATTRNAME() { return getToken(MiniSQLParser.ATTRNAME, 0); }
-		public TerminalNode TYPE() { return getToken(MiniSQLParser.TYPE, 0); }
+		public TerminalNode String() { return getToken(MiniSQLParser.String, 0); }
+		public TypeContext type() {
+			return getRuleContext(TypeContext.class,0);
+		}
 		public NormalattrContext(AttributeContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -228,17 +348,15 @@ public class MiniSQLParser extends Parser {
 
 	public final AttributeContext attribute() throws RecognitionException {
 		AttributeContext _localctx = new AttributeContext(_ctx, getState());
-		enterRule(_localctx, 4, RULE_attribute);
+		enterRule(_localctx, 6, RULE_attribute);
 		try {
 			_localctx = new NormalattrContext(_localctx);
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(16);
-			match(ATTRNAME);
-			setState(17);
-			match(T__3);
-			setState(18);
-			match(TYPE);
+			setState(32);
+			match(String);
+			setState(33);
+			type();
 			}
 		}
 		catch (RecognitionException re) {
@@ -264,7 +382,7 @@ public class MiniSQLParser extends Parser {
 		}
 	}
 	public static class PrimarykeyContext extends ConstraintContext {
-		public TerminalNode ATTRNAME() { return getToken(MiniSQLParser.ATTRNAME, 0); }
+		public TerminalNode String() { return getToken(MiniSQLParser.String, 0); }
 		public PrimarykeyContext(ConstraintContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -283,19 +401,19 @@ public class MiniSQLParser extends Parser {
 
 	public final ConstraintContext constraint() throws RecognitionException {
 		ConstraintContext _localctx = new ConstraintContext(_ctx, getState());
-		enterRule(_localctx, 6, RULE_constraint);
+		enterRule(_localctx, 8, RULE_constraint);
 		try {
 			_localctx = new PrimarykeyContext(_localctx);
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(20);
-			match(T__4);
-			setState(21);
-			match(T__1);
-			setState(22);
-			match(ATTRNAME);
-			setState(23);
-			match(T__2);
+			setState(35);
+			match(T__9);
+			setState(36);
+			match(T__6);
+			setState(37);
+			match(String);
+			setState(38);
+			match(T__7);
 			}
 		}
 		catch (RecognitionException re) {
@@ -310,13 +428,17 @@ public class MiniSQLParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\13\34\4\2\t\2\4\3"+
-		"\t\3\4\4\t\4\4\5\t\5\3\2\3\2\3\2\3\2\3\2\3\2\3\3\3\3\3\4\3\4\3\4\3\4\3"+
-		"\5\3\5\3\5\3\5\3\5\3\5\2\2\6\2\4\6\b\2\2\2\27\2\n\3\2\2\2\4\20\3\2\2\2"+
-		"\6\22\3\2\2\2\b\26\3\2\2\2\n\13\7\3\2\2\13\f\7\b\2\2\f\r\7\4\2\2\r\16"+
-		"\5\4\3\2\16\17\7\5\2\2\17\3\3\2\2\2\20\21\5\6\4\2\21\5\3\2\2\2\22\23\7"+
-		"\t\2\2\23\24\7\6\2\2\24\25\7\n\2\2\25\7\3\2\2\2\26\27\7\7\2\2\27\30\7"+
-		"\4\2\2\30\31\7\t\2\2\31\32\7\5\2\2\32\t\3\2\2\2\2";
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\16+\4\2\t\2\4\3\t"+
+		"\3\4\4\t\4\4\5\t\5\4\6\t\6\3\2\3\2\3\3\3\3\3\3\3\3\3\3\3\3\3\4\3\4\5\4"+
+		"\27\n\4\3\4\3\4\3\4\5\4\34\n\4\7\4\36\n\4\f\4\16\4!\13\4\3\5\3\5\3\5\3"+
+		"\6\3\6\3\6\3\6\3\6\3\6\2\2\7\2\4\6\b\n\2\3\3\2\3\7\2(\2\f\3\2\2\2\4\16"+
+		"\3\2\2\2\6\26\3\2\2\2\b\"\3\2\2\2\n%\3\2\2\2\f\r\t\2\2\2\r\3\3\2\2\2\16"+
+		"\17\7\b\2\2\17\20\7\r\2\2\20\21\7\t\2\2\21\22\5\6\4\2\22\23\7\n\2\2\23"+
+		"\5\3\2\2\2\24\27\5\b\5\2\25\27\5\n\6\2\26\24\3\2\2\2\26\25\3\2\2\2\27"+
+		"\37\3\2\2\2\30\33\7\13\2\2\31\34\5\b\5\2\32\34\5\n\6\2\33\31\3\2\2\2\33"+
+		"\32\3\2\2\2\34\36\3\2\2\2\35\30\3\2\2\2\36!\3\2\2\2\37\35\3\2\2\2\37 "+
+		"\3\2\2\2 \7\3\2\2\2!\37\3\2\2\2\"#\7\r\2\2#$\5\2\2\2$\t\3\2\2\2%&\7\f"+
+		"\2\2&\'\7\t\2\2\'(\7\r\2\2()\7\n\2\2)\13\3\2\2\2\5\26\33\37";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

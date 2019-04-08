@@ -15,6 +15,18 @@ public class MiniSQLBaseListener implements MiniSQLListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterType(MiniSQLParser.TypeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitType(MiniSQLParser.TypeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterCreate(MiniSQLParser.CreateContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -27,13 +39,13 @@ public class MiniSQLBaseListener implements MiniSQLListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSchema(MiniSQLParser.SchemaContext ctx) { }
+	@Override public void enterAttrcons(MiniSQLParser.AttrconsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitSchema(MiniSQLParser.SchemaContext ctx) { }
+	@Override public void exitAttrcons(MiniSQLParser.AttrconsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

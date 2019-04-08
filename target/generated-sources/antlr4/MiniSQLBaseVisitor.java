@@ -16,6 +16,13 @@ public class MiniSQLBaseVisitor<T> extends AbstractParseTreeVisitor<T> implement
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
+	@Override public T visitType(MiniSQLParser.TypeContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
 	@Override public T visitCreate(MiniSQLParser.CreateContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
@@ -23,7 +30,7 @@ public class MiniSQLBaseVisitor<T> extends AbstractParseTreeVisitor<T> implement
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitSchema(MiniSQLParser.SchemaContext ctx) { return visitChildren(ctx); }
+	@Override public T visitAttrcons(MiniSQLParser.AttrconsContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

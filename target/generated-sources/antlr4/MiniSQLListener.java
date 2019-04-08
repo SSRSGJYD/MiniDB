@@ -7,6 +7,16 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
  */
 public interface MiniSQLListener extends ParseTreeListener {
 	/**
+	 * Enter a parse tree produced by {@link MiniSQLParser#type}.
+	 * @param ctx the parse tree
+	 */
+	void enterType(MiniSQLParser.TypeContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MiniSQLParser#type}.
+	 * @param ctx the parse tree
+	 */
+	void exitType(MiniSQLParser.TypeContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code create}
 	 * labeled alternative in {@link MiniSQLParser#sql}.
 	 * @param ctx the parse tree
@@ -19,15 +29,17 @@ public interface MiniSQLListener extends ParseTreeListener {
 	 */
 	void exitCreate(MiniSQLParser.CreateContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link MiniSQLParser#schema}.
+	 * Enter a parse tree produced by the {@code attrcons}
+	 * labeled alternative in {@link MiniSQLParser#schema}.
 	 * @param ctx the parse tree
 	 */
-	void enterSchema(MiniSQLParser.SchemaContext ctx);
+	void enterAttrcons(MiniSQLParser.AttrconsContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link MiniSQLParser#schema}.
+	 * Exit a parse tree produced by the {@code attrcons}
+	 * labeled alternative in {@link MiniSQLParser#schema}.
 	 * @param ctx the parse tree
 	 */
-	void exitSchema(MiniSQLParser.SchemaContext ctx);
+	void exitAttrcons(MiniSQLParser.AttrconsContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code normalattr}
 	 * labeled alternative in {@link MiniSQLParser#attribute}.

@@ -1,8 +1,9 @@
 grammar MiniSQL;
 
-TABLENAME : [a-z]+ ;
-ATTRNAME : [a-z]+ ;
-TYPE : 'int'
+String : [a-z]+ ;
+
+
+type : 'int'
      | 'long'
      | 'float'
      | 'double'
@@ -11,16 +12,15 @@ TYPE : 'int'
 
 WS: [ \t\r\n]+ -> skip;
 
-sql : 'create table' TABLENAME '(' schema ')' #create
+sql : 'create table' String '(' schema ')' #create
     ;
 
-schema : attribute //',' schema #attrs
-      // | attribute #attrs
+schema : (attribute|constraint) (',' (attribute|constraint))* #attrcons
        ;
 
-attribute : ATTRNAME ' ' TYPE #normalattr
+attribute : String type #normalattr
     //      | ATTRNAME TYPE 'not null' #notnullattr
           ;
 
-constraint :'primary key' '(' ATTRNAME ')'#primarykey;
+constraint :'primary key' '(' String ')'#primarykey;
 
