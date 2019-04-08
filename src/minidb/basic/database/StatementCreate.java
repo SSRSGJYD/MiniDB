@@ -8,5 +8,6 @@ public class StatementCreate extends Statement {
 	
 	public StatementCreate() {
 		this.type=Statement.create;
+		this.descriptors=new HashMap<String,SchemaDescriptor>();
 	}
 }

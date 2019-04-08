@@ -39,6 +39,18 @@ public class MiniSQLBaseListener implements MiniSQLListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterDrop(MiniSQLParser.DropContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitDrop(MiniSQLParser.DropContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterAttrcons(MiniSQLParser.AttrconsContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -58,6 +70,18 @@ public class MiniSQLBaseListener implements MiniSQLListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitNormalattr(MiniSQLParser.NormalattrContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterNotnullattr(MiniSQLParser.NotnullattrContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitNotnullattr(MiniSQLParser.NotnullattrContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

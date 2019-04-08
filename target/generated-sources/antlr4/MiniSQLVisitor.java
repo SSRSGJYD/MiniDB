@@ -23,6 +23,13 @@ public interface MiniSQLVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitCreate(MiniSQLParser.CreateContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code drop}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDrop(MiniSQLParser.DropContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code attrcons}
 	 * labeled alternative in {@link MiniSQLParser#schema}.
 	 * @param ctx the parse tree
@@ -36,6 +43,13 @@ public interface MiniSQLVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitNormalattr(MiniSQLParser.NormalattrContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code notnullattr}
+	 * labeled alternative in {@link MiniSQLParser#attribute}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNotnullattr(MiniSQLParser.NotnullattrContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code primarykey}
 	 * labeled alternative in {@link MiniSQLParser#constraint}.

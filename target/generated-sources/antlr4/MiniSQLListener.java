@@ -29,6 +29,18 @@ public interface MiniSQLListener extends ParseTreeListener {
 	 */
 	void exitCreate(MiniSQLParser.CreateContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code drop}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
+	 * @param ctx the parse tree
+	 */
+	void enterDrop(MiniSQLParser.DropContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code drop}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
+	 * @param ctx the parse tree
+	 */
+	void exitDrop(MiniSQLParser.DropContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code attrcons}
 	 * labeled alternative in {@link MiniSQLParser#schema}.
 	 * @param ctx the parse tree
@@ -52,6 +64,18 @@ public interface MiniSQLListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitNormalattr(MiniSQLParser.NormalattrContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code notnullattr}
+	 * labeled alternative in {@link MiniSQLParser#attribute}.
+	 * @param ctx the parse tree
+	 */
+	void enterNotnullattr(MiniSQLParser.NotnullattrContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code notnullattr}
+	 * labeled alternative in {@link MiniSQLParser#attribute}.
+	 * @param ctx the parse tree
+	 */
+	void exitNotnullattr(MiniSQLParser.NotnullattrContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code primarykey}
 	 * labeled alternative in {@link MiniSQLParser#constraint}.

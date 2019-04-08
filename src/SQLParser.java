@@ -18,13 +18,18 @@ public class SQLParser{
 
 		MiniSQLParser parser = new MiniSQLParser(tokens);
 		ParseTree tree = parser.sql(); // begin parsing at rule 'r'
-		EvalVisitor eval=new EvalVisitor();
-		eval.visit(tree);
+		
+		MyListener extractor = new MyListener();
+		ParseTreeWalker walker=new ParseTreeWalker();
+		walker.walk(extractor, tree);
+		
+		
 		System.out.println(tree.toStringTree(parser)); // print LISP-style tree
-		switch(eval.type) {
+		
+		/*switch(eval.type) {
 		case Statement.create:
 			StatementCreate sc=eval.sc;
 			break;
-		}
+		}*/
 	}
 } 

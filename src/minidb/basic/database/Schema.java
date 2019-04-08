@@ -14,6 +14,9 @@ public class Schema implements Serializable{
 	public Schema() {
 		descriptors=new HashMap<String,SchemaDescriptor>();
 	}
+	public Schema(HashMap<String,SchemaDescriptor> data) {
+		this.descriptors=data;
+	}
 
 
 }

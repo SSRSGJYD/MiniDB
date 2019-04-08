@@ -28,6 +28,21 @@ public class DataBase implements Serializable{
     	//load index
     }
 	
+	public void execute(Statement st) {
+		switch(st.type) {
+		case Statement.create:
+			StatementCreate sc=(StatementCreate) st;
+			Schema sa=new Schema(sc.descriptors);
+			Table tb=new Table(sc.tableName,sa);
+			addTable(tb);
+			break;
+		case Statement.drop:
+			StatementDrop sd=(StatementDrop) st;
+			dropTable(sd.tableName);
+			break;
+		}
+	}
+	
 	protected static DataBase loadFromFile(String path) throws ClassNotFoundException, IOException {
         ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path));
         DataBase db = (DataBase)ois.readObject();
