@@ -1,4 +1,3 @@
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
@@ -6,8 +5,6 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
 import minidb.basic.database.DataBase;
-import minidb.basic.database.Statement;
-import minidb.basic.database.StatementCreate;
 
 public class SQLParser{
 	
