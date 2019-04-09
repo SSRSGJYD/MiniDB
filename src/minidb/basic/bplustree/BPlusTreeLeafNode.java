@@ -92,4 +92,25 @@ public class BPlusTreeLeafNode<K extends Comparable<K>> extends BPlusTreeNode<K>
             fa.setLength(getPageIndex() + pageSize);
         }
     }
+
+    /**
+     * check if node is full
+     */
+    @Override
+    public boolean isFull(int internalNodeDegree, int leafNodeDegree, int overflowNodeDegree) {
+        return getCapacity() == 2 * leafNodeDegree - 1;
+    }
+
+    /**
+     * check if node is 'under-used'
+     */
+    @Override
+    public boolean isSparse(int internalNodeDegree, int leafNodeDegree) {
+        if(getNodeType() == BPlusTreeConst.NODE_TYPE_ROOT_LEAF) {
+            return getCapacity() <= 1;
+        }
+        else {
+            return getCapacity() < leafNodeDegree;
+        }
+    }
 }

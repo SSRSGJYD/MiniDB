@@ -29,7 +29,7 @@ public class BPlusTreeOverflowNode<K extends Comparable<K>> extends BPlusTreeNod
      * constructor
      *
      */
-    public BPlusTreeOverflowNode(int nodeType, long pageIndex, int valueSize, long prevPageIndex, long nextPageIndex) {
+    public BPlusTreeOverflowNode(int nodeType, long pageIndex, int valueSize,  long nextPageIndex, long prevPageIndex) {
         super(nodeType, pageIndex, valueSize);
         this.prevPageIndex = prevPageIndex;
         this.nextPageIndex = nextPageIndex;
@@ -77,5 +77,21 @@ public class BPlusTreeOverflowNode<K extends Comparable<K>> extends BPlusTreeNod
         if(fa.length() < getPageIndex() + pageSize) {
             fa.setLength(getPageIndex() + pageSize);
         }
+    }
+
+    /**
+     * check if node is full
+     */
+    @Override
+    public boolean isFull(int internalNodeDegree, int leafNodeDegree, int overflowNodeDegree) {
+        return getCapacity() == 2 * overflowNodeDegree - 1;
+    }
+
+    /**
+     * check if node is 'under-used'
+     */
+    @Override
+    public boolean isSparse(int internalNodeDegree, int leafNodeDegree) {
+        return getCapacity() == 0;
     }
 }
