@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.LinkedList;
 import minidb.basic.database.Row;
+import minidb.basic.database.RowObject;
 
 /**
  *
@@ -19,9 +20,9 @@ import minidb.basic.database.Row;
  *
  */
 
-public class BPlusTreeOverflowNode<K extends Comparable<K>> extends BPlusTreeNode<K> {
+public class BPlusTreeOverflowNode<K extends Comparable<K>, V extends RowObject> extends BPlusTreeNode<K,V> {
 
-    protected LinkedList<Row> valueList;
+    protected LinkedList<V> valueList;
     private long prevPageIndex; // index of prev overflow page
     private long nextPageIndex; // index of next overflow page
 
@@ -33,7 +34,7 @@ public class BPlusTreeOverflowNode<K extends Comparable<K>> extends BPlusTreeNod
         super(nodeType, pageIndex, valueSize);
         this.prevPageIndex = prevPageIndex;
         this.nextPageIndex = nextPageIndex;
-        this.valueList = new LinkedList<Row>();
+        this.valueList = new LinkedList<V>();
     }
 
     public long getPrevPageIndex() {

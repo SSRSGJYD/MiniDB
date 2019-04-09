@@ -1,6 +1,7 @@
 package minidb.basic.bplustree;
 
 import minidb.basic.database.Row;
+import minidb.basic.database.RowObject;
 import minidb.types.TypeConst;
 
 import java.io.IOException;
@@ -81,17 +82,17 @@ public class BPlusTreeUtils {
      * @return an arraylist of rows
      * @throws IOException
      */
-    public static ArrayList<Row> readRowsFromFile(RandomAccessFile fa, int valueSize, int count) throws IOException {
+    public static ArrayList<RowObject> readRowsFromFile(RandomAccessFile fa, int valueSize, int count) throws IOException {
         byte[] tmp = new byte[valueSize];
-        ArrayList<Row> rows = new ArrayList<Row>();
+        ArrayList<RowObject> rows = new ArrayList<RowObject>();
         for(int i=0; i<count; ++i) {
             fa.read(tmp, 0, valueSize);
-            rows.add(new Row(tmp));
+            rows.add(new RowObject(tmp));
         }
         return rows;
     }
 
-    public static void writeRowToFile(RandomAccessFile fa, Row row)
+    public static void writeRowToFile(RandomAccessFile fa, RowObject row)
         throws IOException {
         // TODO
     }
