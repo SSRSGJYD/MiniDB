@@ -40,6 +40,8 @@ public class DataBase implements Serializable{
 			StatementDrop sd=(StatementDrop) st;
 			dropTable(sd.tableName);
 			break;
+		case Statement.insertA:
+			break;
 		}
 	}
 	

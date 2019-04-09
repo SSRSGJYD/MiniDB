@@ -27,7 +27,7 @@ sql : 'create table' Name '(' schema ')' #create
     | 'delete from' Name 'where' condition #delete
     | 'update' Name 'set' set 'where' condition #update
     | 'select' names 'from' Name ('where' condition)? #selectA
-    | 'select' cnames 'from' jnames 'on' onCondition ('where' condition)? #selectB
+    | 'select' cnames 'from' jnames  ('where' condition)? #selectB
     ;
     
 
@@ -46,7 +46,7 @@ cnames : cname (',' cname)*
 onCondition : cname'='cname
 	;
 	
-jnames : Name ('join' Name)+
+jnames : Name ('join' Name 'on' onCondition)+
 	;
 
 values : value (',' value)*

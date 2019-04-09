@@ -1,3 +1,4 @@
+import minidb.basic.database.Pair;
 import minidb.basic.database.SchemaDescriptor;
 import minidb.basic.database.Statement;
 import minidb.basic.database.StatementCreate;
@@ -6,24 +7,54 @@ import minidb.basic.database.StatementDrop;
 import minidb.basic.database.StatementInsertA;
 import minidb.basic.database.StatementInsertB;
 import minidb.basic.database.StatementSelectA;
+import minidb.basic.database.StatementSelectB;
 import minidb.basic.database.StatementUpdate;
 import minidb.types.TypeConst;
 
 public class MyListener extends MiniSQLBaseListener {
 
-	StatementCreate sc;
-	StatementDrop sd;
-	StatementInsertA sia;
-	StatementInsertB sib;
-	StatementDelete sdl;
-	StatementUpdate su;
-	StatementSelectA ssa;
+	Statement st;
 	int type;
 	
 	@Override 
+	public void enterSelectB(MiniSQLParser.SelectBContext ctx) {
+		type=Statement.selectB;
+		StatementSelectB ssb=new StatementSelectB();
+		st=(Statement) ssb;
+		
+		ssb.existWhere=false;
+		if(ctx.condition() != null) {
+			ssb.existWhere=true;
+			ssb.cdName=ctx.condition().Name().getText();
+			ssb.cdValue=ctx.condition().value().getText();
+			String op=ctx.condition().op().getText();
+			ssb.op=Statement.opFromString(op);
+		}
+		
+		for(int i=0;i<ctx.cnames().cname().size();i++) {
+			ssb.cnames.add(new Pair<String, String>(ctx.cnames().cname(i).Name(0).getText()
+					,ctx.cnames().cname(i).Name(1).getText()));
+		}
+		for(int i=0;i<ctx.jnames().Name().size();i++) {
+			ssb.jnames.add(ctx.jnames().Name(i).getText());
+			if(i>0) {
+				Pair<String, String> l=new Pair<String,String>(ctx.jnames().onCondition(i-1).cname(0).Name(0).getText()
+						,ctx.jnames().onCondition(i-1).cname(0).Name(1).getText());
+				Pair<String, String> r=new Pair<String,String>(ctx.jnames().onCondition(i-1).cname(1).Name(0).getText()
+						,ctx.jnames().onCondition(i-1).cname(1).Name(1).getText());
+				
+				ssb.onConditions.add(new Pair<Pair<String, String>, Pair<String, String>>(l,r));
+				
+			}
+		}
+	}
+	
+	@Override 
 	public void enterSelectA(MiniSQLParser.SelectAContext ctx) {
+		StatementSelectA ssa=new StatementSelectA();
+		st=(Statement) ssa;
+		
 		type=Statement.selectA;
-		ssa=new StatementSelectA();
 		ssa.tableName=ctx.Name().getText();
 		ssa.existWhere=false;
 		if(ctx.condition() != null) {
@@ -40,8 +71,10 @@ public class MyListener extends MiniSQLBaseListener {
 	
 	@Override 
 	public void enterUpdate(MiniSQLParser.UpdateContext ctx) {
+		StatementUpdate su=new StatementUpdate();
+		st=(Statement) su;
+		
 		type=Statement.update;
-		su=new StatementUpdate();
 		su.tableName=ctx.Name().getText();
 		su.setName=ctx.set().Name().getText();
 		su.setValue=ctx.set().value().getText();
@@ -53,8 +86,10 @@ public class MyListener extends MiniSQLBaseListener {
 	
 	@Override 
 	public void enterInsertB(MiniSQLParser.InsertBContext ctx) {
+		StatementInsertB sib=new StatementInsertB();
+		st=(Statement) sib;
+
 		type=Statement.insertB;
-		sib=new StatementInsertB();
 		sib.tableName=ctx.Name().getText();
 		for(int i=0;i<ctx.values().value().size();i++) {
 			sib.pairs.put(ctx.names().Name(i).getText(), ctx.values().value(i).getText());
@@ -63,8 +98,10 @@ public class MyListener extends MiniSQLBaseListener {
 	
 	@Override 
 	public void enterInsertA(MiniSQLParser.InsertAContext ctx) {
+		StatementInsertA sia=new StatementInsertA();
+		st=(Statement) sia;
+		
 		type=Statement.insertA;
-		sia=new StatementInsertA();
 		sia.tableName=ctx.Name().getText();
 		for(int i=0;i<ctx.values().value().size();i++) {
 			sia.values.add(ctx.values().value(i).getText());
@@ -72,8 +109,9 @@ public class MyListener extends MiniSQLBaseListener {
 	}
 	@Override 
 	public void enterDelete(MiniSQLParser.DeleteContext ctx) {
+		StatementDelete sdl=new StatementDelete();
+		st=(Statement) sdl;
 		type=Statement.delete;
-		sdl=new StatementDelete();
 		sdl.tableName=ctx.Name().getText();
 		sdl.cdName=ctx.condition().Name().getText();
 		sdl.cdValue=ctx.condition().value().getText();
@@ -84,14 +122,16 @@ public class MyListener extends MiniSQLBaseListener {
 	@Override 
 	public void enterCreate(MiniSQLParser.CreateContext ctx) { 
 		type=Statement.create;
-		sc=new StatementCreate();
+		StatementCreate sc=new StatementCreate();
+		st=(Statement) sc;
 		sc.tableName=ctx.Name().getText();
 	}
 	
 	@Override
 	public void enterDrop(MiniSQLParser.DropContext ctx) { 
 		type=Statement.drop;
-		sd=new StatementDrop();
+		StatementDrop sd=new StatementDrop();
+		st=(Statement) sd;
 		sd.tableName=ctx.Name().getText();
 	}
 	
@@ -99,6 +139,7 @@ public class MyListener extends MiniSQLBaseListener {
 	public void enterNormalattr(MiniSQLParser.NormalattrContext ctx) { 
 		SchemaDescriptor sd=new SchemaDescriptor();
 		sd.setType(TypeConst.fromString(ctx.type().getText()));
+		StatementCreate sc=(StatementCreate) st;
 		switch(type) {
 		case Statement.create:
 			sc.descriptors.put(ctx.Name().getText(), sd);
@@ -110,6 +151,7 @@ public class MyListener extends MiniSQLBaseListener {
 	public void enterNotnullattr(MiniSQLParser.NotnullattrContext ctx) { 
 		SchemaDescriptor sd=new SchemaDescriptor();
 		sd.setType(TypeConst.fromString(ctx.type().getText()));
+		StatementCreate sc=(StatementCreate) st;
 		sd.setNotNull(true);
 		switch(type) {
 		case Statement.create:
@@ -120,13 +162,11 @@ public class MyListener extends MiniSQLBaseListener {
 	
 	@Override 
 	public void enterPrimarykey(MiniSQLParser.PrimarykeyContext ctx) { 
-		switch(type) {
-		case Statement.create:
-			SchemaDescriptor sd=sc.descriptors.get(ctx.Name().getText());
-			sd.setPrimary(true);
-			sc.descriptors.put(ctx.Name().getText(), sd);
-			break;
-		}
+		StatementCreate sc=(StatementCreate) st;
+		SchemaDescriptor sd=sc.descriptors.get(ctx.Name().getText());
+		sd.setPrimary(true);
+		sc.descriptors.put(ctx.Name().getText(), sd);
+		
 	}
 
 }
