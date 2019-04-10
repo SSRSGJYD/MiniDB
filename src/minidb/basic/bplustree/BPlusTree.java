@@ -312,14 +312,15 @@ public class BPlusTree<K extends Key, V extends Value> {
      * search by key
      *
      * @param key
+     * @param useAll for secondary key
      * @return a search result object
      * @throws IOException
      */
-    public SearchResult searchByKey(K key) throws IOException {
+    public SearchResult searchByKey(K key, boolean useAll) throws IOException {
         if(this.root == null) { // empty tree
             return new SearchResult();
         }
-        return searchByKey(this.root, key);
+        return searchByKey(this.root, key, useAll);
     }
 
 
@@ -328,10 +329,11 @@ public class BPlusTree<K extends Key, V extends Value> {
      *
      * @param node node to search
      * @param key
+     * @param useAll for secondary key
      * @return a search result object
      * @throws IOException
      */
-    private SearchResult searchByKey(BPlusTreeNode<K,V> node, K key) throws IOException {
+    private SearchResult searchByKey(BPlusTreeNode<K,V> node, K key, boolean useAll) throws IOException {
         // search for the key
         int i = searchNode(node, key, BPlusTreeConst.SEARCH_EXACT, 0, node.getCapacity()-1);
         int nodeType = node.getNodeType();
@@ -339,7 +341,7 @@ public class BPlusTree<K extends Key, V extends Value> {
                 || nodeType == BPlusTreeConst.NODE_TYPE_LEAF
                 || nodeType == BPlusTreeConst.NODE_TYPE_ROOT_LEAF) { // leaf node
             BPlusTreeLeafNode<K,V> leaf = (BPlusTreeLeafNode<K,V>)node;
-            if(i >= 0 && i < node.getCapacity() && key == leaf.keyList.get(i)) {
+            if(i >= 0 && i < node.getCapacity() && key.compareTo(leaf.keyList.get(i), useAll) == 0) {
                 if(leaf.overflowList.get(i) == -1L ) { // no overflow node
                     return new SearchResult(leaf.valueList.get(i));
                 }
@@ -366,11 +368,11 @@ public class BPlusTree<K extends Key, V extends Value> {
         else { // internal node
             BPlusTreeInternalNode<K,V> internal = (BPlusTreeInternalNode<K,V>)node;
             // padding to account for the last pointer (if needed)
-            if(i != node.getCapacity() && key.compareTo(internal.keyList.get(i)) == 1) {
+            if(i != node.getCapacity() && key.compareTo(internal.keyList.get(i), useAll) == 1) {
                 i++;
             }
             BPlusTreeNode<K,V> nextToSearch = readNodeFromFile(internal.ptrList.get(i));
-            return searchByKey(nextToSearch, key);
+            return searchByKey(nextToSearch, key, useAll);
         }
     }
 
@@ -381,15 +383,16 @@ public class BPlusTree<K extends Key, V extends Value> {
      * @param uselbound whether use lower bound or not
      * @param hbound higher bound
      * @param usehbound whether use higher bound or not
+     * @param useAll for secondary key
      * @return a search result object
      * @throws IOException
      */
-    public SearchResult searchByKeyWithRange(K lbound, boolean uselbound, K hbound, boolean usehbound)
+    public SearchResult searchByKeyWithRange(K lbound, boolean uselbound, K hbound, boolean usehbound, boolean useAll)
             throws IOException {
         if(this.root == null) { // empty tree
             return new SearchResult();
         }
-        return searchByKeyWithRange(this.root, lbound, uselbound, hbound, usehbound);
+        return searchByKeyWithRange(this.root, lbound, uselbound, hbound, usehbound, useAll);
     }
 
     /**
@@ -400,10 +403,11 @@ public class BPlusTree<K extends Key, V extends Value> {
      * @param uselbound whether use lower bound or not
      * @param hbound higher bound
      * @param usehbound whether use higher bound or not
+     * @param useAll for secondary key
      * @return a search result object
      * @throws IOException
      */
-    private SearchResult searchByKeyWithRange(BPlusTreeNode<K,V> node, K lbound, boolean uselbound, K hbound, boolean usehbound)
+    private SearchResult searchByKeyWithRange(BPlusTreeNode<K,V> node, K lbound, boolean uselbound, K hbound, boolean usehbound, boolean useAll)
             throws IOException {
         assert (uselbound || usehbound);
         LinkedList<Value> rows = new LinkedList<Value>();
@@ -416,7 +420,7 @@ public class BPlusTree<K extends Key, V extends Value> {
                     || nodeType == BPlusTreeConst.NODE_TYPE_ROOT_LEAF) { // leaf node
                 BPlusTreeLeafNode<K, V> leaf = (BPlusTreeLeafNode<K, V>) node;
                 // find first key bigger than lower bound
-                while(leaf.keyList.get(i).compareTo(lbound) == -1) {
+                while(leaf.keyList.get(i).compareTo(lbound, useAll) == -1) {
                     if(i < leaf.getCapacity() - 1) {
                         i++;
                     }
@@ -427,7 +431,7 @@ public class BPlusTree<K extends Key, V extends Value> {
                 }
                 // save values
                 if(usehbound) {
-                    while(leaf.keyList.get(i).compareTo(hbound) == -1) {
+                    while(leaf.keyList.get(i).compareTo(hbound, useAll) == -1) {
                         rows.add(leaf.valueList.get(i));
                         long overflowIndex = leaf.overflowList.get(i);
                         if(overflowIndex != -1L) {
@@ -470,7 +474,7 @@ public class BPlusTree<K extends Key, V extends Value> {
             else { // internal node
                 BPlusTreeInternalNode<K,V> internal = (BPlusTreeInternalNode<K,V>)node;
                 BPlusTreeNode<K,V> nextToSearch = readNodeFromFile(internal.ptrList.get(i));
-                return searchByKeyWithRange(nextToSearch, lbound, uselbound, hbound, usehbound);
+                return searchByKeyWithRange(nextToSearch, lbound, uselbound, hbound, usehbound, useAll);
             }
         }
         else { // only use higher bound, node must be root now
@@ -488,7 +492,7 @@ public class BPlusTree<K extends Key, V extends Value> {
             while(true) {
                 int capacity = leaf.getCapacity();
                 for(int i=0; i<capacity; i++) {
-                    if(leaf.keyList.get(i).compareTo(hbound) == 1) {
+                    if(leaf.keyList.get(i).compareTo(hbound, useAll) == 1) {
                         return new SearchResult(rows);
                     }
                     rows.push(leaf.valueList.get(i));
@@ -553,6 +557,8 @@ public class BPlusTree<K extends Key, V extends Value> {
 
         return new SearchResult(rows);
     }
+
+
 
     /**
      * to insert value into the tree
