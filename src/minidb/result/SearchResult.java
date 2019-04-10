@@ -4,24 +4,24 @@ import java.util.LinkedList;
 
 import minidb.basic.bplustree.BPlusTreeLeafNode;
 import minidb.basic.database.Row;
-import minidb.basic.database.RowObject;
+import minidb.basic.index.Value;
 
 
 public class SearchResult {
 
-    public LinkedList<RowObject> rows;
+    public LinkedList<Value> rows;
 
     public SearchResult() {
-        this.rows = new LinkedList<RowObject>();
+        this.rows = new LinkedList<Value>();
     }
 
-    public SearchResult(RowObject row) {
-        this.rows = new LinkedList<RowObject>();
+    public SearchResult(Value row) {
+        this.rows = new LinkedList<Value>();
         rows.push(row);
     }
 
 
-    public SearchResult(LinkedList<RowObject> rows) {
+    public SearchResult(LinkedList<Value> rows) {
         this.rows = rows;
     }
 }

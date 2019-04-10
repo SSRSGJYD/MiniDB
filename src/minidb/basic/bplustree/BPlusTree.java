@@ -7,18 +7,18 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-import minidb.basic.database.RowObject;
+import minidb.basic.index.Key;
+import minidb.basic.index.Value;
 import minidb.types.TypeConst;
 import minidb.basic.bplustree.BPlusTreeUtils.*;
 import minidb.result.SearchResult;
 
 /**
- *
  * Generic class of B+ Tree for all value types (int, long, float, double, string)
  *
  */
 
-public class BPlusTree<K extends Comparable<K>, V extends RowObject> {
+public class BPlusTree<K extends Key, V extends Value> {
 
     private int keyType;
     private int valueSize;
@@ -183,8 +183,8 @@ public class BPlusTree<K extends Comparable<K>, V extends RowObject> {
                 int curCapacity = fa.readInt();
                 BPlusTreeOverflowNode<K,V> node = createOverflowNode(index, nextptr, prevptr);
                 // read in rows
-                ArrayList<RowObject> rows = BPlusTreeUtils.readRowsFromFile(fa, valueSize, curCapacity);
-                for (RowObject row: rows) {
+                ArrayList<Value> rows = BPlusTreeUtils.readRowsFromFile(fa, valueSize, curCapacity);
+                for (Value row: rows) {
                     node.valueList.add((V)row);
                 }
                 node.setCapacity(curCapacity);
@@ -345,7 +345,7 @@ public class BPlusTree<K extends Comparable<K>, V extends RowObject> {
                 }
                 else { // deal with overflow node
                     BPlusTreeOverflowNode<K,V> overflowNode = (BPlusTreeOverflowNode<K,V>)readNodeFromFile(leaf.overflowList.get(i));
-                    LinkedList<RowObject> valueList = new LinkedList<RowObject>();
+                    LinkedList<Value> valueList = new LinkedList<Value>();
                     valueList.add(leaf.valueList.get(i));
                     int j = 0;
                     while(j < overflowNode.getCapacity()) {
@@ -406,7 +406,7 @@ public class BPlusTree<K extends Comparable<K>, V extends RowObject> {
     private SearchResult searchByKeyWithRange(BPlusTreeNode<K,V> node, K lbound, boolean uselbound, K hbound, boolean usehbound)
             throws IOException {
         assert (uselbound || usehbound);
-        LinkedList<RowObject> rows = new LinkedList<RowObject>();
+        LinkedList<Value> rows = new LinkedList<Value>();
         if(uselbound) {
             // search for the key
             int i = searchNode(node, lbound, BPlusTreeConst.SEARCH_PREV, 0, node.getCapacity()-1);
@@ -522,7 +522,7 @@ public class BPlusTree<K extends Comparable<K>, V extends RowObject> {
         if(root == null) {
             return new SearchResult();
         }
-        LinkedList<RowObject> rows = new LinkedList<RowObject>();
+        LinkedList<Value> rows = new LinkedList<Value>();
         BPlusTreeNode<K,V> iterator = root;
         while(iterator.getNodeType() != BPlusTreeConst.NODE_TYPE_LEAF
             && iterator.getNodeType() != BPlusTreeConst.NODE_TYPE_ROOT_LEAF) {

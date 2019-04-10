@@ -13,7 +13,7 @@ import java.io.IOException;
  */
 public class PrimaryIndex<K extends Comparable<K>> {
 
-    private BPlusTree<K, Row> tree;
+    private BPlusTree<PrimaryKey<K>, Row> tree;
 
     /**
      * constructor
@@ -27,7 +27,7 @@ public class PrimaryIndex<K extends Comparable<K>> {
      */
     public PrimaryIndex(int pageSize, int keySize, int valueSize, int conditionThreshold, String path)
         throws IOException {
-        this.tree = new BPlusTree<K,Row>(pageSize,keySize,valueSize,conditionThreshold,path);
+        this.tree = new BPlusTree<PrimaryKey<K>,Row>(pageSize,keySize,valueSize,conditionThreshold,path);
 
     }
 
@@ -38,7 +38,7 @@ public class PrimaryIndex<K extends Comparable<K>> {
      * @param value value(a row)
      * @throws IOException
      */
-    public void insert(K key, Row value) throws IOException {
+    public void insert(PrimaryKey<K> key, Row value) throws IOException {
         tree.insert(key, value, true);
     }
 
@@ -49,7 +49,7 @@ public class PrimaryIndex<K extends Comparable<K>> {
      * @return a SearchResult Object
      * @throws IOException
      */
-    public SearchResult search(K key) throws IOException {
+    public SearchResult search(PrimaryKey<K> key) throws IOException {
         return tree.searchByKey(key);
     }
 
@@ -63,7 +63,7 @@ public class PrimaryIndex<K extends Comparable<K>> {
      * @return a SearchResult Object
      * @throws IOException
      */
-    public SearchResult searchByRange(K lbound, boolean uselbound, K hbound, boolean usehbound)
+    public SearchResult searchByRange(PrimaryKey<K> lbound, boolean uselbound, PrimaryKey<K> hbound, boolean usehbound)
         throws IOException {
         assert uselbound || usehbound;
         return tree.searchByKeyWithRange(lbound,uselbound,hbound,usehbound);
@@ -85,7 +85,7 @@ public class PrimaryIndex<K extends Comparable<K>> {
      * @param key key
      * @throws IOException
      */
-    public void delete(K key) throws IOException {
+    public void delete(PrimaryKey<K> key) throws IOException {
         tree.deleteByKey(key, true);
     }
 
@@ -96,7 +96,7 @@ public class PrimaryIndex<K extends Comparable<K>> {
      * @param value new value
      * @throws IOException
      */
-    public void update(K key, Row value) throws IOException {
+    public void update(PrimaryKey<K> key, Row value) throws IOException {
         tree.update(key, value);
     }
 

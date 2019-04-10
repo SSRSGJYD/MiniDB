@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.LinkedList;
 
-import minidb.basic.database.RowObject;
+import minidb.basic.index.Key;
+import minidb.basic.index.Value;
 
 /**
  *
@@ -22,7 +23,7 @@ import minidb.basic.database.RowObject;
  *
  */
 
-public class BPlusTreeLeafNode<K extends Comparable<K>, V extends RowObject> extends BPlusTreeNode<K,V> {
+public class BPlusTreeLeafNode<K extends Key, V extends Value> extends BPlusTreeNode<K,V> {
 
     private long nextPageIndex;
     private long prevPageIndex;

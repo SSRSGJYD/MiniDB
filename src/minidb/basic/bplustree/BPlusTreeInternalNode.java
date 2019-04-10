@@ -5,7 +5,8 @@ import java.io.RandomAccessFile;
 import java.util.LinkedList;
 
 import minidb.basic.bplustree.BPlusTreeNode;
-import minidb.basic.database.RowObject;
+import minidb.basic.index.Key;
+import minidb.basic.index.Value;
 
 
 /**
@@ -20,7 +21,7 @@ import minidb.basic.database.RowObject;
  *
  */
 
-public class BPlusTreeInternalNode<K extends Comparable<K>, V extends RowObject> extends BPlusTreeNode<K,V> {
+public class BPlusTreeInternalNode<K extends Key, V extends Value> extends BPlusTreeNode<K,V> {
 
     protected LinkedList<K> keyList;
     protected LinkedList<Long> ptrList; // list of pointers to child nodes
