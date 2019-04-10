@@ -5,7 +5,8 @@ import java.io.RandomAccessFile;
 import java.util.LinkedList;
 
 import minidb.basic.bplustree.BPlusTreeConst;
-import minidb.basic.database.RowObject;
+import minidb.basic.index.Key;
+import minidb.basic.index.Value;
 
 /**
  *
@@ -13,7 +14,7 @@ import minidb.basic.database.RowObject;
  *
  */
 
-abstract class BPlusTreeNode<K extends Comparable<K>, V extends RowObject> {
+abstract class BPlusTreeNode<K extends Key, V extends Value> {
 
     private int nodeType;       // actual node type
     private long pageIndex;     // node page index
