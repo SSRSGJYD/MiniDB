@@ -3,6 +3,7 @@ package minidb.basic.database;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Map;
 
 
 public class Schema implements Serializable{
@@ -16,6 +17,15 @@ public class Schema implements Serializable{
 	}
 	public Schema(HashMap<String,SchemaDescriptor> data) {
 		this.descriptors=data;
+	}
+	public int getPrimaryKeyType() {
+		for (SchemaDescriptor value : descriptors.values()) {
+			if(value.isPrimary()) {
+				return value.getType();
+			}
+		}
+		return 0;
+		
 	}
 
 

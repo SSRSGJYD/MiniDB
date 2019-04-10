@@ -28,6 +28,6 @@ public class SchemaDescriptor implements Serializable{
 		descriptor=(byte) (is?(descriptor|0b0010):(descriptor&0b1101));
 	}
 	public void setType(int type) {
-		descriptor=(byte) (descriptor|type<<4);
+		descriptor=(byte) ((descriptor&0b00001111)|type<<4);
 	}
 }

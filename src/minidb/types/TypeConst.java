@@ -9,6 +9,9 @@ public class TypeConst {
     public static final int VALUE_TYPE_DOUBLE = 3;
     public static final int VALUE_TYPE_STRING = 4;
 
+    public static final int MAX_STRING_LENGTH= 128;
+
+
     public static final int VALUE_SIZE_INT = Integer.SIZE;
     public static final int VALUE_SIZE_LONG = Long.SIZE;
     public static final int VALUE_SIZE_FLOAT = Float.SIZE;
@@ -23,5 +26,19 @@ public class TypeConst {
     	else if(str.equalsIgnoreCase("Float")) return VALUE_TYPE_FLOAT;
     	else if(str.equalsIgnoreCase("Double")) return VALUE_TYPE_LONG;
     	else return VALUE_TYPE_STRING;
+    }
+    public static int type2size(int type) {
+    	switch(type) {
+    	case TypeConst.VALUE_TYPE_INT:
+    		return TypeConst.VALUE_SIZE_INT;
+    	case TypeConst.VALUE_TYPE_LONG:
+    		return TypeConst.VALUE_SIZE_LONG;
+    	case TypeConst.VALUE_TYPE_FLOAT:
+    		return TypeConst.VALUE_SIZE_FLOAT;
+    	case TypeConst.VALUE_TYPE_DOUBLE:
+    		return TypeConst.VALUE_SIZE_DOUBLE;
+    	default:
+    		return TypeConst.VALUE_SIZE_CHAR*TypeConst.MAX_STRING_LENGTH;
+    	}
     }
 }
