@@ -15,7 +15,7 @@ import java.io.IOException;
  */
 public class SecondaryIndex<K extends Comparable<K>, PK extends Comparable<PK>> {
 
-    private BPlusTree<SecondaryKey<K,PK>, Value> tree;
+    private BPlusTree<SecondaryKey<K,PK>, PrimaryKeyValue> tree;
 
     /**
      * constructor
@@ -29,7 +29,7 @@ public class SecondaryIndex<K extends Comparable<K>, PK extends Comparable<PK>> 
      */
     public SecondaryIndex(int pageSize, int keySize, int valueSize, int conditionThreshold, String path)
             throws IOException {
-        this.tree = new BPlusTree<SecondaryKey<K,PK>, Value>(pageSize,keySize,valueSize,conditionThreshold,path);
+        this.tree = new BPlusTree<SecondaryKey<K,PK>, PrimaryKeyValue>(pageSize,keySize,valueSize,conditionThreshold,path);
     }
 
     /**
@@ -39,7 +39,7 @@ public class SecondaryIndex<K extends Comparable<K>, PK extends Comparable<PK>> 
      * @param value value(a row)
      * @throws IOException
      */
-    public void insert(SecondaryKey<K,PK> key, Row value) throws IOException {
+    public void insert(SecondaryKey<K,PK> key, PrimaryKeyValue value) throws IOException {
         tree.insert(key, value, true);
     }
 
@@ -97,7 +97,7 @@ public class SecondaryIndex<K extends Comparable<K>, PK extends Comparable<PK>> 
      * @param value new value
      * @throws IOException
      */
-    public void update(SecondaryKey<K,PK> key, Value value) throws IOException {
+    public void update(SecondaryKey<K,PK> key, PrimaryKeyValue value) throws IOException {
         tree.update(key, value);
     }
 }

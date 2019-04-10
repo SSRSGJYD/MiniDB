@@ -1,5 +1,11 @@
 package minidb.basic.index;
 
+
+/**
+ * class of key of secondary index
+ * use both attribute and primary key to ensure uniqueness
+ *
+ */
 public class SecondaryKey<K extends Comparable<K>, PK extends Comparable<PK>> extends Key {
 
     private K key;          // one column of table

@@ -14,7 +14,6 @@ import minidb.basic.bplustree.BPlusTreeUtils.*;
 import minidb.result.SearchResult;
 
 /**
- *
  * Generic class of B+ Tree for all value types (int, long, float, double, string)
  *
  */

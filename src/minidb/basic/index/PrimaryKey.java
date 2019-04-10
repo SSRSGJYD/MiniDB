@@ -1,5 +1,9 @@
 package minidb.basic.index;
 
+/**
+ * class of key of primary index
+ *
+ */
 public class PrimaryKey<K extends Comparable<K>> extends Key {
 
     private K key;
