@@ -1,6 +1,8 @@
 package minidb.basic.bplustree;
 
 import minidb.basic.bplustree.BPlusTreeNode;
+import minidb.basic.index.Key;
+import minidb.basic.index.Value;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -19,7 +21,7 @@ import java.util.LinkedList;
  * layout: slot1, slot2, ...
  *
  */
-public class BPlusTreeSlotNode<K extends Comparable<K>> extends BPlusTreeNode<K> {
+public class BPlusTreeSlotNode<K extends Key, V extends Value> extends BPlusTreeNode<K,V> {
 
     protected long nextPageIndex;
     protected LinkedList<Long> freeSlots;
