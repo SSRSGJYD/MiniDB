@@ -1,9 +1,11 @@
 package minidb.basic.database;
 
-public class Row {
+import minidb.basic.index.Value;
 
+public class Row extends Value {
 
     public Row() {
+        super();
     }
 
     public Row(byte[] fileContent) {
