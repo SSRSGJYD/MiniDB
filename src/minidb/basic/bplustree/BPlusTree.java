@@ -346,7 +346,7 @@ public class BPlusTree<K extends Key, V extends Value> {
                 if(leaf.overflowList.get(i) == -1L ) { // no overflow node
                     return new SearchResult(leaf.valueList.get(i));
                 }
-                else { // deal with overflow node
+                else { // deal node overflow node
                     BPlusTreeOverflowNode<K,V> overflowNode = (BPlusTreeOverflowNode<K,V>)readNodeFromFile(leaf.overflowList.get(i));
                     LinkedList<Value> valueList = new LinkedList<Value>();
                     valueList.add(leaf.valueList.get(i));
@@ -605,7 +605,7 @@ public class BPlusTree<K extends Key, V extends Value> {
         if(nodeType == BPlusTreeConst.NODE_TYPE_LEAF_OVERFLOW
             || nodeType == BPlusTreeConst.NODE_TYPE_LEAF
             || nodeType == BPlusTreeConst.NODE_TYPE_ROOT_LEAF) { // leaf node
-            
+
             BPlusTreeLeafNode<K,V> leaf = (BPlusTreeLeafNode<K,V>)node;
             int j = (leaf.getCapacity() > 0 && i == 0
                     && leaf.keyList.getFirst().compareTo(key) == 1) ? i : i-1;
@@ -672,7 +672,7 @@ public class BPlusTree<K extends Key, V extends Value> {
     /**
      * update one value given key, used only for primary index; if no such key, do nothing
      *
-     * @param node node to deal with
+     * @param node node to deal node
      * @param key key
      * @param value new value
      * @throws IOException
@@ -734,8 +734,9 @@ public class BPlusTree<K extends Key, V extends Value> {
             BPlusTreeNode<K,V> mergedNode = null;
             switch (nodeType) {
                 case BPlusTreeConst.NODE_TYPE_ROOT_INTERNAL:
-                case BPlusTreeConst.NODE_TYPE_ROOT_LEAF:
                     mergedNode = adjustRootNode(node);
+                    break;
+                case BPlusTreeConst.NODE_TYPE_ROOT_LEAF:
                     break;
                 case BPlusTreeConst.NODE_TYPE_INTERNAL:
                     mergedNode = adjustInternalNode(node, (BPlusTreeInternalNode<K, V>) parent, parentPointerIndex, parentKeyIndex);
@@ -761,7 +762,7 @@ public class BPlusTree<K extends Key, V extends Value> {
             if(key.compareTo(internal.keyList.get(i)) >= 0) {
                 parentPtrIndex++;
             }
-            // deal with next internal node
+            // deal node next internal node
             BPlusTreeNode<K,V> nextInternal = readNodeFromFile(internal.ptrList.get(parentPtrIndex));
             return deleteByKeyAtNode(key, nextInternal, internal, parentPtrIndex, i);
         }
@@ -1005,14 +1006,209 @@ public class BPlusTree<K extends Key, V extends Value> {
     }
 
     /**
+     * release a page slot
+     *
+     * @param pageIndex index of page to be release
+     * @throws IOException
+     */
+    private void releasePage(long pageIndex) throws IOException{
+        // TODO
+    }
+
+    /**
+     * Simple helper function to check if we can re-distribute the node
+     * values.
+     *
+     * @param node node to check the capacity
+     * @return the number of positions to check
+     */
+    private boolean canRedistribute(BPlusTreeNode<K,V> node) {
+        if(node != null) {
+            int nodeType = node.getNodeType();
+            switch (nodeType) {
+                case BPlusTreeConst.NODE_TYPE_INTERNAL:
+                case BPlusTreeConst.NODE_TYPE_ROOT_INTERNAL:
+                    return node.getCapacity() - 1 >= internalNodeDegree-1;
+                case BPlusTreeConst.NODE_TYPE_LEAF:
+                case BPlusTreeConst.NODE_TYPE_ROOT_LEAF:
+                    return node.getCapacity() - 1 >= leafNodeDegree-1;
+                default:
+                    return false;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * redistribute two adjacent leaf nodes
+     *
+     * @param to move value to the node
+     * @param from remove value from the node
+     * @param leftToRight direction of move
+     * @param parent parent node
+     * @param parentKeyIndex index of splitting key in parent node
+     * @throws IOException
+     */
+    private void redistributeLeafNodes(BPlusTreeLeafNode<K,V> to, BPlusTreeLeafNode<K,V> from, boolean leftToRight,
+                                   BPlusTreeInternalNode<K,V> parent, int parentKeyIndex)
+            throws IOException {
+        K key; // need to pass to parent node
+        if(leftToRight) { // move (key,value) from left to right leaf
+            to.overflowList.push(from.overflowList.removeLast());
+            to.valueList.push(from.valueList.removeLast());
+            to.keyList.push(from.keyList.removeLast());
+            to.increaseCapacity();
+            from.decreaseCapacity();
+            key = to.keyList.get(0);
+        }
+        else { // move (key,value) from right to left leaf
+            to.overflowList.addLast(from.overflowList.pop());
+            to.valueList.addLast(from.valueList.pop());
+            to.keyList.addLast(from.keyList.pop());
+            to.increaseCapacity();
+            from.decreaseCapacity();
+            key = from.keyList.get(0);
+        }
+        // update parent key
+        parent.keyList.set(parentKeyIndex, key);
+        // update tree file
+        writeNodeToFile(to);
+        writeNodeToFile(from);
+        writeNodeToFile(parent);
+    }
+
+    /**
+     * redistribute two adjacent internal nodes
+     *
+     * @param to move value to the node
+     * @param from remove value from the node
+     * @param leftToRight direction of move
+     * @param parent parent node
+     * @param parentKeyIndex index of splitting key in parent node
+     * @throws IOException
+     */
+    private void redistributeInternalNodes(BPlusTreeInternalNode<K,V> to, BPlusTreeInternalNode<K,V> from, boolean leftToRight,
+                                       BPlusTreeInternalNode<K,V> parent, int parentKeyIndex)
+            throws IOException {
+        K key; // need to pass to parent node
+        K parentKey = parent.keyList.get(parentKeyIndex); // need to move from parent node to one of the two children
+        if(leftToRight) { // move key from left to parent, parent to right
+            to.keyList.push(parentKey);
+            key = from.keyList.removeLast();
+            to.ptrList.push(from.ptrList.removeLast());
+            to.increaseCapacity();
+            from.decreaseCapacity();
+        }
+        else { // move key from right to parent, parent to left
+            to.keyList.addLast(parentKey);
+            key = from.keyList.pop();
+            to.ptrList.addLast(from.ptrList.pop());
+            to.increaseCapacity();
+            from.decreaseCapacity();
+        }
+        // update parent key
+        parent.keyList.set(parentKeyIndex, key);
+        // update tree file
+        writeNodeToFile(to);
+        writeNodeToFile(from);
+        writeNodeToFile(parent);
+    }
+
+    private void mergeLeafNodes(BPlusTreeLeafNode<K,V> left, BPlusTreeLeafNode<K,V> right) {
+        // TODO
+    }
+
+    private void mergeInternalNodes(BPlusTreeInternalNode<K,V> left, BPlusTreeInternalNode<K,V> right, K key) {
+        // TODO
+    }
+
+    /**
      * adjust root node during deletion
      *
-     * @param node root of the tree
+     * @param node root of the tree, supposed to be internal node
      * @return adjusted root node
      * @throws IOException
      */
     private BPlusTreeNode<K,V> adjustRootNode(BPlusTreeNode<K,V> node) throws IOException {
-        // TODO
+        if (node.getCapacity() > 1) { // no need to adjust
+            return root;
+        }
+        BPlusTreeInternalNode<K,V> splitNode = (BPlusTreeInternalNode<K,V>)node;
+        BPlusTreeNode<K,V> lChild, rChild;
+        lChild = readNodeFromFile(splitNode.ptrList.get(0));
+        rChild = readNodeFromFile(splitNode.ptrList.get(1));
+        int lchildCapacity = lChild.getCapacity();
+        int rchildCapacity = rChild.getCapacity();
+
+        if(lChild.getNodeType() == BPlusTreeConst.NODE_TYPE_LEAF) {
+            if(lchildCapacity > leafNodeDegree-1 && rchildCapacity > leafNodeDegree-1) {
+                // both child is not sparse, no need to adjust
+                return node;
+            }
+            // convert type
+            BPlusTreeInternalNode<K,V> internal = (BPlusTreeInternalNode<K,V>)node;
+            BPlusTreeLeafNode<K,V> lLeaf = (BPlusTreeLeafNode<K,V>) lChild;
+            BPlusTreeLeafNode<K,V> rLeaf = (BPlusTreeLeafNode<K,V>) rChild;
+            // redistribute
+            boolean canRedistributeLeftChild = canRedistribute(rLeaf);
+            boolean canRedistributeRightChild = canRedistribute(lLeaf);
+            if(canRedistributeLeftChild) {
+                redistributeLeafNodes(lLeaf, rLeaf, false, internal, 0);
+            }
+            else if(canRedistributeRightChild) {
+                redistributeLeafNodes(rLeaf, lLeaf, true, internal, 0);
+            }
+            // merge the two nodes and promote them to root
+            else {
+                mergeLeafNodes(lLeaf, rLeaf);
+                // update new root node
+                lLeaf.setNodeType(BPlusTreeConst.NODE_TYPE_ROOT_LEAF);
+                lLeaf.setNextPageIndex(-1L);
+                lLeaf.setPrevPageIndex(-1L);
+                // delete previous root page
+                releasePage(root.getPageIndex());
+                root = lChild;
+                // update tree file
+                writeFileHeader();
+                writeNodeToFile(lChild);
+                return lChild;
+            }
+
+        }
+        else { // root is an internal node
+            // check if it's time to merge
+            if ((lchildCapacity + rchildCapacity) >= 2 * internalNodeDegree - 1) {
+                // no need to merge to root
+                return node;
+            }
+            // convert type
+            BPlusTreeInternalNode<K,V> internal = (BPlusTreeInternalNode<K,V>)node;
+            BPlusTreeInternalNode<K,V> lInternal = (BPlusTreeInternalNode<K,V>)lChild;
+            BPlusTreeInternalNode<K,V> rInternal = (BPlusTreeInternalNode<K,V>)rChild;
+            // redistribute
+            boolean canRedistributeLeftChild = canRedistribute(rInternal);
+            boolean canRedistributeRightChild = canRedistribute(lInternal);
+            if(canRedistributeLeftChild) {
+                redistributeInternalNodes(lInternal, rInternal, true, internal, 0);
+            }
+            else if(canRedistributeRightChild) {
+                redistributeInternalNodes(rInternal, lInternal, false, internal, 0);
+            }
+            // merge the two nodes and promote them to root
+            else {
+                mergeInternalNodes(lInternal, rInternal, splitNode.keyList.getFirst());
+                // update root node
+                lInternal.setNodeType(BPlusTreeConst.NODE_TYPE_ROOT_INTERNAL);
+                // delete previous root page
+                releasePage(root.getPageIndex());
+                root = lChild;
+                // update tree file
+                writeFileHeader();
+                writeNodeToFile(lChild);
+                return lChild;
+            }
+        }
+        return root;
     }
 
     /**
