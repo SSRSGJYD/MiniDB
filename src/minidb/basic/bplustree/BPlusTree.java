@@ -9,6 +9,7 @@ import java.io.RandomAccessFile;
 
 import minidb.basic.index.Key;
 import minidb.basic.index.Value;
+import minidb.result.DeleteResult;
 import minidb.types.TypeConst;
 import minidb.basic.bplustree.BPlusTreeUtils.*;
 import minidb.result.SearchResult;
@@ -335,7 +336,7 @@ public class BPlusTree<K extends Key, V extends Value> {
      */
     private SearchResult searchByKey(BPlusTreeNode<K,V> node, K key, boolean useAll) throws IOException {
         // search for the key
-        int i = searchNode(node, key, BPlusTreeConst.SEARCH_EXACT, 0, node.getCapacity()-1);
+        int i = searchNode(node, key, BPlusTreeConst.SEARCH_EXACT, 0, node.getCapacity()-1, useAll);
         int nodeType = node.getNodeType();
         if(nodeType == BPlusTreeConst.NODE_TYPE_LEAF_OVERFLOW
                 || nodeType == BPlusTreeConst.NODE_TYPE_LEAF
@@ -413,7 +414,7 @@ public class BPlusTree<K extends Key, V extends Value> {
         LinkedList<Value> rows = new LinkedList<Value>();
         if(uselbound) {
             // search for the key
-            int i = searchNode(node, lbound, BPlusTreeConst.SEARCH_PREV, 0, node.getCapacity()-1);
+            int i = searchNode(node, lbound, BPlusTreeConst.SEARCH_PREV, 0, node.getCapacity()-1, useAll);
             int nodeType = node.getNodeType();
             if(nodeType == BPlusTreeConst.NODE_TYPE_LEAF_OVERFLOW
                     || nodeType == BPlusTreeConst.NODE_TYPE_LEAF
@@ -503,7 +504,7 @@ public class BPlusTree<K extends Key, V extends Value> {
                         rows.addAll(overflowNode.valueList);
                     }
                 }
-                // move on to next leaf node
+                // move on to nextInternal leaf node
                 long nextLeafIndex = leaf.getNextPageIndex();
                 if(nextLeafIndex != -1L) {
                     leaf = (BPlusTreeLeafNode<K,V>)readNodeFromFile(nextLeafIndex);
@@ -545,7 +546,7 @@ public class BPlusTree<K extends Key, V extends Value> {
                     rows.addAll(overflowNode.valueList);
                 }
             }
-            // move on to next leaf node
+            // move on to nextInternal leaf node
             long nextLeafIndex = leaf.getNextPageIndex();
             if(nextLeafIndex != -1L) {
                 leaf = (BPlusTreeLeafNode<K,V>)readNodeFromFile(nextLeafIndex);
@@ -565,10 +566,9 @@ public class BPlusTree<K extends Key, V extends Value> {
      *
      * @param key
      * @param value
-     * @param unique whether allow duplicate value
      * @throws IOException
      */
-    public void insert(K key, V value, boolean unique) throws IOException {
+    public void insert(K key, V value) throws IOException {
 
         assert root != null;
 
@@ -581,10 +581,10 @@ public class BPlusTree<K extends Key, V extends Value> {
             // split old root node
             splitNode(node, childNode, 0);
             writeFileHeader();
-            insertToNode(node, key, value, unique);
+            insertToNode(node, key, value);
         }
         else {
-            insertToNode(root, key, value, unique);
+            insertToNode(root, key, value);
         }
     }
 
@@ -594,13 +594,12 @@ public class BPlusTree<K extends Key, V extends Value> {
      * @param node node to insert into
      * @param key
      * @param value
-     * @param unique whether value is unique
      * @throws IOException
      */
-    private void insertToNode(BPlusTreeNode<K,V> node, K key, V value, boolean unique)
+    private void insertToNode(BPlusTreeNode<K,V> node, K key, V value)
             throws IOException {
         boolean useChild = true;
-        int i = searchNode(node, key, BPlusTreeConst.SEARCH_EXACT, 0, node.getCapacity()-1) + 1;
+        int i = searchNode(node, key, BPlusTreeConst.SEARCH_EXACT, 0, node.getCapacity()-1, true) + 1;
         // check if we have a leaf
         int nodeType = node.getNodeType();
         if(nodeType == BPlusTreeConst.NODE_TYPE_LEAF_OVERFLOW
@@ -611,9 +610,6 @@ public class BPlusTree<K extends Key, V extends Value> {
             int j = (leaf.getCapacity() > 0 && i == 0
                     && leaf.keyList.getFirst().compareTo(key) == 1) ? i : i-1;
             if(leaf.getCapacity() > 0 && leaf.keyList.get(j) == key) { // same value already exists
-                if(unique) {
-                    return;
-                }
                 if(leaf.overflowList.get(j) < 0) { // overflow page does not exist
                     appendOverflowNode(leaf, j, value);
                 }
@@ -625,7 +621,7 @@ public class BPlusTree<K extends Key, V extends Value> {
                             appendOverflowNode(overflowNode, -1, value);
                             return;
                         }
-                        else { // load next overflow page
+                        else { // load nextInternal overflow page
                             overflowNode = (BPlusTreeOverflowNode<K,V>)readNodeFromFile(overflowNode.getNextPageIndex());
                         }
                     }
@@ -655,7 +651,7 @@ public class BPlusTree<K extends Key, V extends Value> {
                     nextChild = readNodeFromFile(internal.ptrList.get(i+1));
                 }
             }
-            insertToNode(useChild ? childNode : nextChild, key, value, unique);
+            insertToNode(useChild ? childNode : nextChild, key, value);
         }
     }
 
@@ -667,46 +663,127 @@ public class BPlusTree<K extends Key, V extends Value> {
      * @throws IOException
      */
     public void update(K key, V value) throws IOException {
-        // TODO
+        if(root == null) {
+            return;
+        }
+        updateToNode(root, key, value);
+    }
+
+    /**
+     * update one value given key, used only for primary index; if no such key, do nothing
+     *
+     * @param node node to deal with
+     * @param key key
+     * @param value new value
+     * @throws IOException
+     */
+    private void updateToNode(BPlusTreeNode<K,V> node, K key, V value) throws IOException {
+        // search for the key
+        int i = searchNode(node, key, BPlusTreeConst.SEARCH_EXACT, 0, node.getCapacity()-1, true);
+        int nodeType = node.getNodeType();
+        if(nodeType == BPlusTreeConst.NODE_TYPE_LEAF_OVERFLOW
+                || nodeType == BPlusTreeConst.NODE_TYPE_LEAF
+                || nodeType == BPlusTreeConst.NODE_TYPE_ROOT_LEAF) { // leaf node
+            BPlusTreeLeafNode<K,V> leaf = (BPlusTreeLeafNode<K,V>)node;
+            if(i >= 0 && i < node.getCapacity() && key.compareTo(leaf.keyList.get(i)) == 0) {
+                leaf.valueList.set(i, value);
+            }
+            else { // key not found
+                return;
+            }
+        }
+        else { // internal node
+            BPlusTreeInternalNode<K,V> internal = (BPlusTreeInternalNode<K,V>)node;
+            // padding to account for the last pointer (if needed)
+            if(i != node.getCapacity() && key.compareTo(internal.keyList.get(i)) == 1) {
+                i++;
+            }
+            BPlusTreeNode<K,V> nextToUpdate = readNodeFromFile(internal.ptrList.get(i));
+            updateToNode(nextToUpdate, key, value);
+        }
     }
 
     /**
      * delete by key
      *
      * @param key
+     * @return a DeleteResult object
      * @throws IOException
      */
-    public void deleteByKey(K key, boolean unique) throws IOException{
-        deleteByKeyAtNode(key, root, null, -1, -1, unique);
+    public DeleteResult deleteByKey(K key) throws IOException{
+        return deleteByKeyAtNode(key, root, null, -1, -1);
     }
 
     /**
-     * delete by key at a node
+     * delete by key at a node; useAll = true
      *
      * @param key key
-     * @param node current node
+     * @param node node node
      * @param parent parent of the node
-     * @param parentPointerIndex
-     * @param parentKeyIndex
-     * @param unique whether value is unique
+     * @param parentPointerIndex index in parent.ptrList
+     * @param parentKeyIndex index in parent.keyList
+     * @return a DeleteResult object
      * @throws IOException
      */
-    private void deleteByKeyAtNode(K key, BPlusTreeNode<K,V> node, BPlusTreeNode<K,V> parent, int parentPointerIndex, int parentKeyIndex, boolean unique)
+    private DeleteResult deleteByKeyAtNode(K key, BPlusTreeNode<K,V> node, BPlusTreeNode<K,V> parent,
+                                           int parentPointerIndex, int parentKeyIndex)
             throws IOException{
-        // TODO
-    }
-
-
-
-    /**
-     * delete by value
-     *
-     *
-     * @throws IOException
-     *
-     */
-    public void deleteByValue() throws IOException {
-        // TODO
+        // check whether need to adjust the node
+        if(node.isSparse(internalNodeDegree, leafNodeDegree)) {
+            int nodeType = node.getNodeType();
+            BPlusTreeNode<K,V> mergedNode = null;
+            switch (nodeType) {
+                case BPlusTreeConst.NODE_TYPE_ROOT_INTERNAL:
+                case BPlusTreeConst.NODE_TYPE_ROOT_LEAF:
+                    mergedNode = adjustRootNode(node);
+                    break;
+                case BPlusTreeConst.NODE_TYPE_INTERNAL:
+                    mergedNode = adjustInternalNode(node, (BPlusTreeInternalNode<K, V>) parent, parentPointerIndex, parentKeyIndex);
+                    break;
+                case BPlusTreeConst.NODE_TYPE_LEAF:
+                    mergedNode = adjustLeafNode(node, (BPlusTreeInternalNode<K, V>) parent, parentPointerIndex, parentKeyIndex);
+                    break;
+                default:
+                    break;
+            }
+            if(mergedNode != null) {
+                node = mergedNode;
+            }
+        }
+        // search key in node
+        int i = searchNode(node, key, BPlusTreeConst.SEARCH_NEXT, 0, node.getCapacity()-1, true);
+        int nodeType = node.getNodeType();
+        if(nodeType == BPlusTreeConst.NODE_TYPE_INTERNAL
+                || nodeType == BPlusTreeConst.NODE_TYPE_ROOT_INTERNAL) { // internal node
+            BPlusTreeInternalNode<K,V> internal = (BPlusTreeInternalNode<K,V>)node;
+            int parentPtrIndex = i;
+            // check if we are at the end of this node
+            if(key.compareTo(internal.keyList.get(i)) >= 0) {
+                parentPtrIndex++;
+            }
+            // deal with next internal node
+            BPlusTreeNode<K,V> nextInternal = readNodeFromFile(internal.ptrList.get(parentPtrIndex));
+            return deleteByKeyAtNode(key, nextInternal, internal, parentPtrIndex, i);
+        }
+        else if(nodeType == BPlusTreeConst.NODE_TYPE_LEAF
+                || nodeType == BPlusTreeConst.NODE_TYPE_ROOT_LEAF) { // leaf node
+            BPlusTreeLeafNode<K,V> leaf = (BPlusTreeLeafNode<K,V>)node;
+            if(i == leaf.getCapacity()) { // key not found
+                return new DeleteResult();
+            }
+            else if(key != leaf.keyList.get(i)) { // key not found
+                return new DeleteResult();
+            }
+            else { // key has been found
+                V valueToDelete = leaf.valueList.remove(i);
+                leaf.keyList.remove(i);
+                leaf.overflowList.remove(i);
+                leaf.decreaseCapacity();
+                writeNodeToFile(leaf);
+                return new DeleteResult(valueToDelete);
+            }
+        }
+        return new DeleteResult();
     }
 
     /**
@@ -798,9 +875,10 @@ public class BPlusTree<K extends Key, V extends Value> {
      * @param l start index of key
      * @param r end index of key
      * @param policy search policy
+     * @param useAll for secondary key
      * @return index of the found key or the bound
      */
-    private int searchNode(BPlusTreeNode<K,V> node, K key, int policy, int l, int r) {
+    private int searchNode(BPlusTreeNode<K,V> node, K key, int policy, int l, int r, boolean useAll) {
         if (l > r) { // search stop here
             switch (policy) {
                 case BPlusTreeConst.SEARCH_PREV:
@@ -821,11 +899,11 @@ public class BPlusTree<K extends Key, V extends Value> {
             else { // internal node
                 midKey = ((BPlusTreeInternalNode<K,V>)node).keyList.get(mid);
             }
-            int compare = midKey.compareTo(key);
+            int compare = midKey.compareTo(key, useAll);
             if (compare == -1) {
-                return searchNode(node, key, policy, mid + 1, r);
+                return searchNode(node, key, policy, mid + 1, r, useAll);
             } else if (compare == 1) {
-                return searchNode(node, key, policy, l, mid - 1);
+                return searchNode(node, key, policy, l, mid - 1, useAll);
             } else { // equal
                 return mid;
             }
@@ -924,6 +1002,49 @@ public class BPlusTree<K extends Key, V extends Value> {
     private void writeNodeToFile(BPlusTreeNode<K,V> node)  throws IOException {
         node.writeNode(fa, pageSize, treeHeaderSize, keyType, keySize);
         return;
+    }
+
+    /**
+     * adjust root node during deletion
+     *
+     * @param node root of the tree
+     * @return adjusted root node
+     * @throws IOException
+     */
+    private BPlusTreeNode<K,V> adjustRootNode(BPlusTreeNode<K,V> node) throws IOException {
+        // TODO
+    }
+
+    /**
+     * adjust internal node during deletion
+     *
+     * @param node internal node to be adjusted
+     * @param parent parent of node
+     * @param parentPointerIndex index in parent.ptrList
+     * @param parentKeyIndex index in parent.keyList
+     * @return adjusted node
+     * @throws IOException
+     */
+    private BPlusTreeNode<K,V> adjustInternalNode(BPlusTreeNode<K,V> node, BPlusTreeInternalNode<K,V> parent,
+                                                  int parentPointerIndex, int parentKeyIndex)
+            throws IOException {
+        // TODO
+    }
+
+    /**
+     * adjust internal node during deletion
+     *
+     * @param node internal node to be adjusted
+     * @param parent parent of node
+     * @param parentPointerIndex index in parent.ptrList
+     * @param parentKeyIndex index in parent.keyList
+     * @return adjusted node
+     * @throws IOException
+     */
+    private BPlusTreeNode<K,V> adjustLeafNode(BPlusTreeNode<K,V> node, BPlusTreeInternalNode<K,V> parent,
+                                                  int parentPointerIndex, int parentKeyIndex)
+            throws IOException {
+        // TODO
     }
 
 }
