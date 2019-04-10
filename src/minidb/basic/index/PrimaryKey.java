@@ -31,4 +31,17 @@ public class PrimaryKey<K extends Comparable<K>> extends Key {
         PrimaryKey<K> key = (PrimaryKey<K>)k;
         return this.key.compareTo(key.getKey());
     }
+
+    /**
+     * compare key
+     *
+     * @param k real type should be PrimaryKey<K>
+     * @param useAll useless for primary key
+     * @return 1 for greater, 0 for equal and -1 for smaller
+     */
+    @Override
+    public int compareTo(Key k, boolean useAll) {
+        PrimaryKey<K> key = (PrimaryKey<K>)k;
+        return this.key.compareTo(key.getKey());
+    }
 }
