@@ -57,6 +57,10 @@ public class BPlusTree<K extends Comparable<K>, V extends RowObject> {
      * constructor
      *
      * @param pageSize size of one page(node)
+     * @param keySize size of key
+     * @param valueSize size of value stored
+     * @param conditionThreshold threshold of re-organize tree
+     * @param path file path of tree file
      * @throws IOException
      */
 	public BPlusTree(int pageSize, int keySize, int valueSize, int conditionThreshold, String path)
@@ -304,6 +308,20 @@ public class BPlusTree<K extends Comparable<K>, V extends RowObject> {
         }
     }
 
+    /**
+     * search by key
+     *
+     * @param key
+     * @return a search result object
+     * @throws IOException
+     */
+    public SearchResult searchByKey(K key) throws IOException {
+        if(this.root == null) { // empty tree
+            return new SearchResult();
+        }
+        return searchByKey(this.root, key);
+    }
+
 
     /**
      * search by key
@@ -313,7 +331,7 @@ public class BPlusTree<K extends Comparable<K>, V extends RowObject> {
      * @return a search result object
      * @throws IOException
      */
-    public SearchResult searchByKey(BPlusTreeNode<K,V> node, K key) throws IOException {
+    private SearchResult searchByKey(BPlusTreeNode<K,V> node, K key) throws IOException {
         // search for the key
         int i = searchNode(node, key, BPlusTreeConst.SEARCH_EXACT, 0, node.getCapacity()-1);
         int nodeType = node.getNodeType();
@@ -359,6 +377,24 @@ public class BPlusTree<K extends Comparable<K>, V extends RowObject> {
     /**
      * search by key in a range
      *
+     * @param lbound lower bound
+     * @param uselbound whether use lower bound or not
+     * @param hbound higher bound
+     * @param usehbound whether use higher bound or not
+     * @return a search result object
+     * @throws IOException
+     */
+    public SearchResult searchByKeyWithRange(K lbound, boolean uselbound, K hbound, boolean usehbound)
+            throws IOException {
+        if(this.root == null) { // empty tree
+            return new SearchResult();
+        }
+        return searchByKeyWithRange(this.root, lbound, uselbound, hbound, usehbound);
+    }
+
+    /**
+     * search by key in a range
+     *
      * @param node node to search
      * @param lbound lower bound
      * @param uselbound whether use lower bound or not
@@ -367,7 +403,7 @@ public class BPlusTree<K extends Comparable<K>, V extends RowObject> {
      * @return a search result object
      * @throws IOException
      */
-    public SearchResult searchByKeyWithRange(BPlusTreeNode<K,V> node, K lbound, boolean uselbound, K hbound, boolean usehbound)
+    private SearchResult searchByKeyWithRange(BPlusTreeNode<K,V> node, K lbound, boolean uselbound, K hbound, boolean usehbound)
             throws IOException {
         assert (uselbound || usehbound);
         LinkedList<RowObject> rows = new LinkedList<RowObject>();
@@ -618,16 +654,39 @@ public class BPlusTree<K extends Comparable<K>, V extends RowObject> {
     }
 
     /**
-     * delete by key at a node
+     * update one value given key, used only for primary index; if no such key, do nothing
+     *
+     * @param key key
+     * @param value new value
+     * @throws IOException
+     */
+    public void update(K key, V value) throws IOException {
+        // TODO
+    }
+
+    /**
+     * delete by key
      *
      * @param key
-     * @param node
+     * @throws IOException
+     */
+    public void deleteByKey(K key, boolean unique) throws IOException{
+        deleteByKeyAtNode(key, root, null, -1, -1, unique);
+    }
+
+    /**
+     * delete by key at a node
+     *
+     * @param key key
+     * @param node current node
      * @param parent parent of the node
      * @param parentPointerIndex
      * @param parentKeyIndex
+     * @param unique whether value is unique
      * @throws IOException
      */
-    public void deleteByKeyAtNode(K key, BPlusTreeNode<K,V> node, BPlusTreeNode<K,V> parent, int parentPointerIndex, int parentKeyIndex) throws IOException{
+    private void deleteByKeyAtNode(K key, BPlusTreeNode<K,V> node, BPlusTreeNode<K,V> parent, int parentPointerIndex, int parentKeyIndex, boolean unique)
+            throws IOException{
         // TODO
     }
 
