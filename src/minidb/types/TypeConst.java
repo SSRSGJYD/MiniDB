@@ -28,15 +28,15 @@ public class TypeConst {
     public static int type2size(int type) {
     	switch(type) {
     	case TypeConst.VALUE_TYPE_INT:
-    		return TypeConst.VALUE_SIZE_INT;
+    		return TypeConst.VALUE_SIZE_INT/8;
     	case TypeConst.VALUE_TYPE_LONG:
-    		return TypeConst.VALUE_SIZE_LONG;
+    		return TypeConst.VALUE_SIZE_LONG/8;
     	case TypeConst.VALUE_TYPE_FLOAT:
-    		return TypeConst.VALUE_SIZE_FLOAT;
+    		return TypeConst.VALUE_SIZE_FLOAT/8;
     	case TypeConst.VALUE_TYPE_DOUBLE:
-    		return TypeConst.VALUE_SIZE_DOUBLE;
+    		return TypeConst.VALUE_SIZE_DOUBLE/8;
     	default:
-    		return TypeConst.VALUE_SIZE_CHAR;
+    		return TypeConst.VALUE_SIZE_CHAR/8;
     	}
     }
 }

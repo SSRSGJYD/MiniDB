@@ -45,8 +45,8 @@ public class DataBase{
 		case Statement.insertA:
 			StatementInsertA sia=(StatementInsertA) st;
 			Table tb=tables.get(sia.tableName);
-			Row row=tb.mkRow(sia.values);
-			tb.simpleInsert(row);
+			Pair<Object,Row> pair=tb.mkRow(sia.values);
+			tb.simpleInsert(pair.l,pair.r);
 			break;
 		}
 	}

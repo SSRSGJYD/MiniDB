@@ -156,7 +156,9 @@ public class MyListener extends MiniSQLBaseListener {
 	@Override 
 	public void enterNotnullattr(MiniSQLParser.NotnullattrContext ctx) { 
 		SchemaDescriptor sd=new SchemaDescriptor();
-		sd.setType(TypeConst.fromString(ctx.type().getText()));
+		int type=TypeConst.fromString(ctx.type().getText());
+		sd.setType(type);
+		sd.setSize(TypeConst.type2size(type));
 		StatementCreate sc=(StatementCreate) st;
 		sd.setNotNull();
 		switch(type) {

@@ -33,9 +33,9 @@ public class SchemaDescriptor implements Serializable{
 		descriptor=(int) descriptor|0b0010;
 	}
 	public void setType(int type) {
-		descriptor=(byte) ((descriptor&0xffffff0f)|type<<4);
+		descriptor=(int) ((descriptor&0xffffff0f)|type<<4);
 	}
 	public void setSize(int size) {
-		descriptor=(byte) ((descriptor&0x0000ffff)|size<<16);
+		descriptor=(int) ((descriptor&0x0000ffff)|size<<16);
 	}
 }
