@@ -1,11 +1,13 @@
 package minidb.basic.index;
 
 import minidb.basic.bplustree.BPlusTree;
+import minidb.basic.bplustree.BPlusTreeUtils;
 import minidb.basic.database.Row;
 import minidb.result.DeleteResult;
 import minidb.result.SearchResult;
 
 import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
 
 
 /**
@@ -26,10 +28,9 @@ public class PrimaryIndex<K extends Comparable<K>> {
      * @param path file path of tree file
      * @throws IOException
      */
-    public PrimaryIndex(int pageSize, int keySize, int valueSize, int conditionThreshold, String path)
+    public PrimaryIndex(int pageSize, int keyType, int keySize, int valueSize, int conditionThreshold, String path)
         throws IOException {
-        this.tree = new BPlusTree<PrimaryKey<K>,Row>(pageSize,keySize,valueSize,conditionThreshold,path);
-
+        this.tree = new BPlusTree<PrimaryKey<K>,Row>(pageSize,keyType,keySize,valueSize,conditionThreshold,path);
     }
 
     /**

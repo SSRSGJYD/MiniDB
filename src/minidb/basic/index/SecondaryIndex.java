@@ -1,6 +1,7 @@
 package minidb.basic.index;
 
 import minidb.basic.bplustree.BPlusTree;
+import minidb.basic.bplustree.BPlusTreeUtils;
 import minidb.basic.database.Row;
 import minidb.basic.index.Value;
 import minidb.result.DeleteResult;
@@ -8,6 +9,7 @@ import minidb.result.SearchResult;
 import minidb.basic.index.SecondaryKey;
 
 import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
 
 /**
  * class of secondary index
@@ -27,9 +29,9 @@ public class SecondaryIndex<K extends Comparable<K>, PK extends Comparable<PK>> 
      * @param path file path of tree file
      * @throws IOException
      */
-    public SecondaryIndex(int pageSize, int keySize, int valueSize, int conditionThreshold, String path)
+    public SecondaryIndex(int pageSize, int keyType, int keySize, int valueSize, int conditionThreshold, String path)
             throws IOException {
-        this.tree = new BPlusTree<SecondaryKey<K,PK>, PrimaryKeyValue>(pageSize,keySize,valueSize,conditionThreshold,path);
+        this.tree = new BPlusTree<SecondaryKey<K,PK>, PrimaryKeyValue>(pageSize,keyType,keySize,valueSize,conditionThreshold,path);
     }
 
     /**
