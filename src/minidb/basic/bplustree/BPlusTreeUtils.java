@@ -28,7 +28,7 @@ public class BPlusTreeUtils {
         switch (keyType) {
             case TypeConst.VALUE_TYPE_INT:
                 return fa.readInt();
-            case TypeConst.VALUE_SIZE_LONG:
+            case TypeConst.VALUE_TYPE_LONG:
                 return fa.readLong();
             case TypeConst.VALUE_TYPE_FLOAT:
                 return fa.readFloat();
@@ -55,7 +55,7 @@ public class BPlusTreeUtils {
             case TypeConst.VALUE_TYPE_INT:
                 fa.writeInt((Integer)key);
                 break;
-            case TypeConst.VALUE_SIZE_LONG:
+            case TypeConst.VALUE_TYPE_LONG:
                 fa.writeLong((Long)key);
                 break;
             case TypeConst.VALUE_TYPE_FLOAT:
