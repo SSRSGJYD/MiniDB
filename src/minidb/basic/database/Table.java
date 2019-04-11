@@ -52,19 +52,19 @@ public class Table implements Serializable{
 	public void createIndex() throws IOException {
 		switch(keyType) {
 		case TypeConst.VALUE_TYPE_INT:
-			index=new PrimaryIndex<Integer>(1024, keySize, valueSize, 1024, tableName.concat(".index"));
+			index=new PrimaryIndex<Integer>(1024, keyType, keySize, valueSize, 1024, tableName.concat(".index"));
 			break;
 		case TypeConst.VALUE_TYPE_LONG:
-			index=new PrimaryIndex<Long>(1024, keySize, valueSize, 1024, tableName.concat(".index"));
+			index=new PrimaryIndex<Long>(1024, keyType, keySize, valueSize, 1024, tableName.concat(".index"));
 			break;
 		case TypeConst.VALUE_TYPE_DOUBLE:
-			index=new PrimaryIndex<Double>(1024, keySize, valueSize, 1024, tableName.concat(".index"));
+			index=new PrimaryIndex<Double>(1024, keyType, keySize, valueSize, 1024, tableName.concat(".index"));
 			break;
 		case TypeConst.VALUE_TYPE_FLOAT:
-			index=new PrimaryIndex<Float>(1024, keySize, valueSize, 1024, tableName.concat(".index"));
+			index=new PrimaryIndex<Float>(1024, keyType, keySize, valueSize, 1024, tableName.concat(".index"));
 			break;
 		case TypeConst.VALUE_TYPE_STRING:
-			index=new PrimaryIndex<String>(1024, keySize, valueSize, 1024, tableName.concat(".index"));
+			index=new PrimaryIndex<String>(1024, keyType, keySize, valueSize, 1024, tableName.concat(".index"));
 			break;
 		}
 	}

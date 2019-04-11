@@ -65,11 +65,9 @@ public class BPlusTree<K extends Key, V extends Value> {
      * @param path file path of tree file
      * @throws IOException
      */
-	public BPlusTree(int pageSize, int keySize, int valueSize, int conditionThreshold, String path)
+	public BPlusTree(int pageSize, int keyType, int keySize, int valueSize, int conditionThreshold, String path)
             throws IOException {
-        ParameterizedType pt = (ParameterizedType) this.getClass().getGenericSuperclass();
-        Class K_class = (Class<K>) pt.getActualTypeArguments()[0];
-        this.keyType = BPlusTreeUtils.getClassType(K_class);
+        this.keyType = keyType;
 
         this.pageSize = pageSize;
         this.keySize = (this.keyType < TypeConst.VALUE_TYPE_STRING)? TypeConst.VALUE_SIZE[this.keyType]:keySize;
@@ -95,15 +93,16 @@ public class BPlusTree<K extends Key, V extends Value> {
         this.conditionThreshold = conditionThreshold;
 
         File f = new File(path);
-        this.fa = new RandomAccessFile(path, "rw");
         if(f.exists()) {
-            System.out.println("File already exists, size: " + fa.length() + " bytes");
+        	this.fa = new RandomAccessFile(path, "rw");
+            System.out.println("File already exists, path: "+path+",size: " + fa.length() + " bytes");
             readHeaderFromFile(fa);
             initializeSlotPage(true);
             System.out.println("Tree file loaded");
         }
         else {
             System.out.println("Creating new tree file");
+            this.fa = new RandomAccessFile(path, "rw");
             fa.setLength(0);
             initializeSlotPage(false);
             createTree();
