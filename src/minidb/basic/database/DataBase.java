@@ -22,13 +22,14 @@ public class DataBase{
 		File file = new File("schema.log"); 
 		if(!file.exists())
 			return;
+		@SuppressWarnings("resource")
 		BufferedReader br = new BufferedReader(new FileReader(file)); 
 		String st; 
 		while ((st = br.readLine()) != null) {
 			Table tb=Table.loadFromFile(st);
+			tb.createIndex();
 			addTable(tb);
 		}
-    	//create index
     }
 	
 	public void execute(Statement st) throws IOException {

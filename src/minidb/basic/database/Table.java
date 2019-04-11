@@ -34,7 +34,6 @@ public class Table implements Serializable{
 		this.tableName=tableName;
 		this.schema=schema;
 
-		//TODO need to recalc valueSize
 		for(Entry<String, SchemaDescriptor> entry:schema.descriptors.entrySet()) {
 			SchemaDescriptor sd=entry.getValue();
 			if(sd.isPrimary()) {
@@ -46,7 +45,11 @@ public class Table implements Serializable{
 		}
 
 		this.schema.keyType=keyType;
+		this.createIndex();
 
+	}
+	
+	public void createIndex() throws IOException {
 		switch(keyType) {
 		case TypeConst.VALUE_TYPE_INT:
 			index=new PrimaryIndex<Integer>(1024, keySize, valueSize, 1024, tableName.concat(".index"));
@@ -64,8 +67,8 @@ public class Table implements Serializable{
 			index=new PrimaryIndex<String>(1024, keySize, valueSize, 1024, tableName.concat(".index"));
 			break;
 		}
-		
 	}
+	
 	public static Table loadFromFile(String path) throws ClassNotFoundException, IOException {
         ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path));
         Table db = (Table)ois.readObject();
@@ -91,29 +94,34 @@ public class Table implements Serializable{
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(outputStream);
 		Row row=new Row();
-		Object key = null;
+		Object res= null;
+		Object key= null;
 		int c=0;
-		for(Entry<String,SchemaDescriptor> vl:schema.descriptors.entrySet()) {
-			SchemaDescriptor s=vl.getValue();
-			if(s.isPrimary()) {
-				key=(Object)vl.getKey();
-			}
+		for(SchemaDescriptor s:schema.descriptors.values()) {
 			switch(s.getType()) {
 			case TypeConst.VALUE_TYPE_INT:
-				dos.write(Integer.parseInt(values.get(c)));
+				res=Integer.parseInt(values.get(c));
+				dos.write((Integer)res);
 				break;
 			case TypeConst.VALUE_TYPE_LONG:
-				dos.writeLong(Long.parseLong(values.get(c)));
+				res=Long.parseLong(values.get(c));
+				dos.writeLong((Long)res);
 				break;
 			case TypeConst.VALUE_TYPE_FLOAT:
-				dos.writeFloat(Float.parseFloat(values.get(c)));
+				res=Float.parseFloat(values.get(c));
+				dos.writeFloat((Float)res);
 				break;
 			case TypeConst.VALUE_TYPE_DOUBLE:
-				dos.writeDouble(Double.parseDouble(values.get(c)));
+				res=Double.parseDouble(values.get(c));
+				dos.writeDouble((Double)res);
 				break;
 			case TypeConst.VALUE_TYPE_STRING:
-				dos.writeChars(values.get(c));
+				res=values.get(c);
+				dos.writeChars((String)res);
 				break;
+			}
+			if(s.isPrimary()) {
+				key=(Object)res;
 			}
 			c++;
 		}
