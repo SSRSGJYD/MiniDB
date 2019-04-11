@@ -1,7 +1,11 @@
 package minidb.basic.database;
 
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -16,17 +20,24 @@ public class DataBase{
 
 	String name;
 	HashMap<String,Table> tables;
-	String currentTable;
 	
 	
-	public DataBase() {
-		// TODO 
+	public DataBase() throws ClassNotFoundException, IOException {
 		tables=new HashMap<String,Table>();
+		open();
 	}
 	
-	public void open() {
-		//load schema from disk to memory
-    	//load index
+	public void open() throws IOException, ClassNotFoundException {
+		File file = new File("schema.log"); 
+		if(!file.exists())
+			return;
+		BufferedReader br = new BufferedReader(new FileReader(file)); 
+		String st; 
+		while ((st = br.readLine()) != null) {
+			Table tb=Table.loadFromFile(st);
+			addTable(tb);
+		}
+    	//create index
     }
 	
 	public void execute(Statement st) throws IOException {
@@ -55,12 +66,23 @@ public class DataBase{
 	
 	public void createTable(String tableName, Schema sa) throws IOException {
 		Table tb =new Table(tableName,sa);
+		tb.storeToFile(tb.tableName.concat(".schema"));
 		addTable(tb);
 	}
 	
-	public void dropTable(String name) {
+	public void dropTable(String name) throws IOException {
 		tables.remove(name);
-		//TODO remove from index and schema file
+		File file = new File(name.concat(".schema"));
+		file.delete();
+		File file2 = new File("schema.log");
+		file2.delete();
+		refreshLog();
+	}
+	
+	protected void refreshLog() throws IOException {
+		for(Table table:tables.values()) {
+			table.logToFile();
+		}
 	}
 	
 }

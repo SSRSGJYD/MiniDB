@@ -138,7 +138,13 @@ public class MyListener extends MiniSQLBaseListener {
 	@Override 
 	public void enterNormalattr(MiniSQLParser.NormalattrContext ctx) { 
 		SchemaDescriptor sd=new SchemaDescriptor();
-		sd.setType(TypeConst.fromString(ctx.type().getText()));
+		int mtype=TypeConst.fromString(ctx.type().getText());
+		sd.setType(mtype);
+		int size=TypeConst.type2size(mtype);
+		if(ctx.type().getText().substring(0, 3).equals("cha")) {
+			size=size*Integer.parseInt(ctx.type().Number().getText());
+		}
+		sd.setSize(size);
 		StatementCreate sc=(StatementCreate) st;
 		switch(type) {
 		case Statement.create:
@@ -152,7 +158,7 @@ public class MyListener extends MiniSQLBaseListener {
 		SchemaDescriptor sd=new SchemaDescriptor();
 		sd.setType(TypeConst.fromString(ctx.type().getText()));
 		StatementCreate sc=(StatementCreate) st;
-		sd.setNotNull(true);
+		sd.setNotNull();
 		switch(type) {
 		case Statement.create:
 			sc.descriptors.put(ctx.Name().getText(), sd);
@@ -164,7 +170,7 @@ public class MyListener extends MiniSQLBaseListener {
 	public void enterPrimarykey(MiniSQLParser.PrimarykeyContext ctx) { 
 		StatementCreate sc=(StatementCreate) st;
 		SchemaDescriptor sd=sc.descriptors.get(ctx.Name().getText());
-		sd.setPrimary(true);
+		sd.setPrimary();
 		sc.descriptors.put(ctx.Name().getText(), sd);
 		
 	}

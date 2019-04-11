@@ -9,7 +9,7 @@ type : 'int'
      | 'long'
      | 'float'
      | 'double'
-     | 'string' 
+     | 'char' '(' Number ')' 
      ;
 
 op : '='|'>'|'<'|'>='|'<='|'<>';

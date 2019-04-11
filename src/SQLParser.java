@@ -26,7 +26,7 @@ public class SQLParser{
 			parser.removeErrorListeners();
 			parser.addErrorListener(ThrowingErrorListener.INSTANCE);
 	
-			try {
+//			try {
 				ParseTree tree = parser.sql(); // begin parsing at rule 'r'
 				
 				MyListener extractor = new MyListener();
@@ -34,10 +34,10 @@ public class SQLParser{
 				walker.walk(extractor, tree);		
 				
 				db.execute(extractor.st);
-			}
-			catch(Exception e) {
-				System.out.println(e);
-			}
+//			}
+//			catch(Exception e) {
+//				System.out.println(e);
+//			}
 
 		}
 	}

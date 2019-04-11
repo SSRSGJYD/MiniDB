@@ -9,8 +9,6 @@ public class TypeConst {
     public static final int VALUE_TYPE_DOUBLE = 3;
     public static final int VALUE_TYPE_STRING = 4;
 
-    public static final int MAX_STRING_LENGTH= 128;
-
 
     public static final int VALUE_SIZE_INT = Integer.SIZE;
     public static final int VALUE_SIZE_LONG = Long.SIZE;
@@ -38,7 +36,7 @@ public class TypeConst {
     	case TypeConst.VALUE_TYPE_DOUBLE:
     		return TypeConst.VALUE_SIZE_DOUBLE;
     	default:
-    		return TypeConst.VALUE_SIZE_CHAR*TypeConst.MAX_STRING_LENGTH;
+    		return TypeConst.VALUE_SIZE_CHAR;
     	}
     }
 }
