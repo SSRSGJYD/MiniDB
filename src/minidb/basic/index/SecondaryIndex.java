@@ -3,6 +3,7 @@ package minidb.basic.index;
 import minidb.basic.bplustree.BPlusTree;
 import minidb.basic.database.Row;
 import minidb.basic.index.Value;
+import minidb.result.DeleteResult;
 import minidb.result.SearchResult;
 import minidb.basic.index.SecondaryKey;
 
@@ -10,7 +11,6 @@ import java.io.IOException;
 
 /**
  * class of secondary index
- *
  *
  */
 public class SecondaryIndex<K extends Comparable<K>, PK extends Comparable<PK>> {
@@ -40,7 +40,7 @@ public class SecondaryIndex<K extends Comparable<K>, PK extends Comparable<PK>> 
      * @throws IOException
      */
     public void insert(SecondaryKey<K,PK> key, PrimaryKeyValue value) throws IOException {
-        tree.insert(key, value, true);
+        tree.insert(key, value);
     }
 
     /**
@@ -86,20 +86,21 @@ public class SecondaryIndex<K extends Comparable<K>, PK extends Comparable<PK>> 
      * delete a (key,value) pair
      *
      * @param key key
+     * @return a DeleteResult object
      * @throws IOException
      */
-    public void delete(SecondaryKey<K,PK> key) throws IOException {
-        tree.deleteByKey(key, true);
+    public DeleteResult delete(SecondaryKey<K,PK> key) throws IOException {
+        return tree.deleteByKey(key);
     }
 
-    /**
-     * update one value given key; if no such key, do nothing
-     *
-     * @param key key
-     * @param value new value
-     * @throws IOException
-     */
-    public void update(SecondaryKey<K,PK> key, PrimaryKeyValue value) throws IOException {
-        tree.update(key, value);
-    }
+//    /**
+//     * update one value given key; if no such key, do nothing
+//     *
+//     * @param key key
+//     * @param value new value
+//     * @throws IOException
+//     */
+//    public void update(SecondaryKey<K,PK> key, PrimaryKeyValue value) throws IOException {
+//        tree.update(key, value);
+//    }
 }
