@@ -1,26 +1,35 @@
 package minidb.basic.database;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 
 public class Schema implements Serializable{
 	
     private static final long serialVersionUID = 1L;
 
-	HashMap<String,Byte> descriptors;
+	LinkedHashMap<String,SchemaDescriptor> descriptors;
+	int keyType;
+	String primaryKey;
 	
 	public Schema() {
-		descriptors=new HashMap<String,Byte>();
+		descriptors=new LinkedHashMap<String,SchemaDescriptor>();
 	}
-	
-
+	public Schema(LinkedHashMap<String,SchemaDescriptor> data) {
+		this.descriptors=data;
+	}
+	public int getPrimaryKeyType() {
+		for (SchemaDescriptor value : descriptors.values()) {
+			if(value.isPrimary()) {
+				return value.getType();
+			}
+		}
+		return 0;
+		
+	}
 
 
 }

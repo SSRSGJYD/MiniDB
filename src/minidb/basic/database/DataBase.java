@@ -1,76 +1,80 @@
 package minidb.basic.database;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap; 
 
-public class DataBase implements Serializable{
+public class DataBase{
 	
-	private static final long serialVersionUID = 1L;
 
 	String name;
 	HashMap<String,Table> tables;
-	transient String currentTable;
 	
 	
-	public DataBase() {
-		// TODO
+	public DataBase() throws ClassNotFoundException, IOException {
 		tables=new HashMap<String,Table>();
+		open();
 	}
 	
-	public void open() {
-		//load schema from disk to memory
-    	//load index
+	public void open() throws IOException, ClassNotFoundException {
+		File file = new File("schema.log"); 
+		if(!file.exists())
+			return;
+		@SuppressWarnings("resource")
+		BufferedReader br = new BufferedReader(new FileReader(file)); 
+		String st; 
+		while ((st = br.readLine()) != null) {
+			Table tb=Table.loadFromFile(st);
+			tb.createIndex();
+			addTable(tb);
+		}
     }
 	
-	protected static DataBase loadFromFile(String path) throws ClassNotFoundException, IOException {
-        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path));
-        DataBase db = (DataBase)ois.readObject();
-        ois.close();
-        return db;
+	public void execute(Statement st) throws IOException {
+		switch(st.type) {
+		case Statement.create:
+			StatementCreate sc=(StatementCreate) st;
+			Schema sa=new Schema(sc.descriptors);
+			this.createTable(sc.tableName,sa);
+			break;
+		case Statement.drop:
+			StatementDrop sd=(StatementDrop) st;
+			dropTable(sd.tableName);
+			break;
+		case Statement.insertA:
+			StatementInsertA sia=(StatementInsertA) st;
+			Table tb=tables.get(sia.tableName);
+			Pair<Object,Row> pair=tb.mkRow(sia.values);
+			tb.simpleInsert(pair.l,pair.r);
+			break;
+		}
 	}
-	
-	protected void storeToFile (String path) throws IOException {
-        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(path));
-        oos.writeObject(this);
-        oos.close();
-	}
-
 	
 	protected void addTable(Table tb) {
 		tables.put(tb.tableName, tb);
 	}
 	
-	public void createTable(String tableName, Schema sc) {
-		Table tb=new Table(tableName,sc);
+	public void createTable(String tableName, Schema sa) throws IOException {
+		Table tb =new Table(tableName,sa);
+		tb.storeToFile(tb.tableName.concat(".schema"));
 		addTable(tb);
-		//TODO insert into schema file
 	}
 	
-	public void dropTable(String name) {
+	public void dropTable(String name) throws IOException {
 		tables.remove(name);
-		//TODO remove from index and schema file
+		File file = new File(name.concat(".schema"));
+		file.delete();
+		File file2 = new File("schema.log");
+		file2.delete();
+		refreshLog();
 	}
-
-	public static void main(String[] args) throws UnsupportedEncodingException, IOException, ClassNotFoundException {
-		Schema sc = new Schema();
-		sc.descriptors.put("1223", (byte)12);
-		sc.descriptors.put("1224", (byte)112);
-		Table tb=new Table("table", sc);
-		DataBase db=new DataBase();
-		db.name="dba";
-		db.tables.put(tb.tableName, tb);
-		db.storeToFile("filea");
-		
-		DataBase db1=DataBase.loadFromFile("filea");
-		return;
-		
+	
+	protected void refreshLog() throws IOException {
+		for(Table table:tables.values()) {
+			table.logToFile();
+		}
 	}
-
 	
 }
