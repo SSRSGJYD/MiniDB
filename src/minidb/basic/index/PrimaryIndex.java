@@ -2,6 +2,7 @@ package minidb.basic.index;
 
 import minidb.basic.bplustree.BPlusTree;
 import minidb.basic.database.Row;
+import minidb.result.DeleteResult;
 import minidb.result.SearchResult;
 
 import java.io.IOException;
@@ -39,7 +40,7 @@ public class PrimaryIndex<K extends Comparable<K>> {
      * @throws IOException
      */
     public void insert(PrimaryKey<K> key, Row value) throws IOException {
-        tree.insert(key, value, true);
+        tree.insert(key, value);
     }
 
     /**
@@ -83,10 +84,11 @@ public class PrimaryIndex<K extends Comparable<K>> {
      * delete a (key,value) pair
      *
      * @param key key
+     * @return a DeleteResult object
      * @throws IOException
      */
-    public void delete(PrimaryKey<K> key) throws IOException {
-        tree.deleteByKey(key, true);
+    public DeleteResult delete(PrimaryKey<K> key) throws IOException {
+        return tree.deleteByKey(key);
     }
 
     /**
