@@ -89,6 +89,8 @@ public class Table implements Serializable{
 	    writer.append('\n');
 	    writer.close();
 	}
+	
+	public 
 
 	public Pair<Object,Row> mkRow(List<String> values) throws NumberFormatException, IOException {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

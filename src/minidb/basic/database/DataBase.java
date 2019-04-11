@@ -49,6 +49,9 @@ public class DataBase{
 			Pair<Object,Row> pair=tb.mkRow(sia.values);
 			tb.simpleInsert(pair.l,pair.r);
 			break;
+		case Statement.selectA:
+			StatementSelectA sla=(StatementSelectA) st;
+			
 		}
 	}
 	
