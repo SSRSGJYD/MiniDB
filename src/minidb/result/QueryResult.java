@@ -10,4 +10,8 @@ public class QueryResult extends Result {
 	public HashMap<String,Integer> types;
 	public QueryResult() {
 	}
+	@Override
+	public void display() {
+		System.out.print(data);
+	}
 }

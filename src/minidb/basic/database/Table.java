@@ -3,6 +3,7 @@ package minidb.basic.database;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -151,8 +152,25 @@ public class Table implements Serializable{
 			SchemaDescriptor sd=e.getValue();
 			byte[] slice = Arrays.copyOfRange(row.array, pos, sd.getSize());
 		    ByteArrayInputStream in = new ByteArrayInputStream(slice);
-		    ObjectInputStream is = new ObjectInputStream(in);
-		    objs.put(e.getKey(),is.readObject());
+		    DataInputStream inst=new DataInputStream(in);
+		    switch(sd.getType()) {
+		    case TypeConst.VALUE_TYPE_INT:
+				objs.put(e.getKey(),(Object)inst.readInt());
+		    	break;
+		    case TypeConst.VALUE_TYPE_LONG:
+				objs.put(e.getKey(),(Object)inst.readLong());
+		    	break;
+		    case TypeConst.VALUE_TYPE_DOUBLE:
+				objs.put(e.getKey(),(Object)inst.readDouble());
+		    	break;
+		    case TypeConst.VALUE_TYPE_FLOAT:
+				objs.put(e.getKey(),(Object)inst.readFloat());
+		    	break;
+		    case TypeConst.VALUE_TYPE_STRING:
+		    	String str=inst.readUTF();
+				objs.put(e.getKey(),(Object)str);
+		    	break;
+		    }
 		}
 		return objs;
 	}
@@ -226,7 +244,7 @@ public class Table implements Serializable{
 				break;
 			case TypeConst.VALUE_TYPE_STRING:
 				res=values.get(c);
-				dos.writeChars((String)res);
+				dos.writeUTF((String)res);
 				break;
 			}
 			if(s.isPrimary()) {

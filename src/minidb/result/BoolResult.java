@@ -8,4 +8,8 @@ public class BoolResult extends Result {
 	void setFalse() {
 		this.isOk=false;
 	}
+	@Override
+	public void display() {
+		System.out.println(isOk);
+	}
 }

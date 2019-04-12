@@ -4,7 +4,8 @@ Name : [a-z]+ ;
 Number : [0-9]+ ;
 String : '\'' (.)+? '\''
 	;
-NEWLINE:[\r\n\t];
+NEWLINE:'\r'?'\n'
+     |EOF;
 
 type : 'int'
      | 'long'
