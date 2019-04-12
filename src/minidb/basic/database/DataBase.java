@@ -4,7 +4,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap; 
+import java.util.HashMap;
+
+import minidb.result.BoolResult;
+import minidb.result.QueryResult;
+import minidb.result.Result; 
 
 public class DataBase{
 	
@@ -32,24 +36,35 @@ public class DataBase{
 		}
     }
 	
-	public void execute(Statement st) throws IOException {
+	public Result execute(Statement st) throws IOException, ClassNotFoundException {
+		Result res = null;
+		Table tb;
 		switch(st.type) {
 		case Statement.create:
 			StatementCreate sc=(StatementCreate) st;
 			Schema sa=new Schema(sc.descriptors);
+			sa.types=sc.types;
 			this.createTable(sc.tableName,sa);
+			res=new BoolResult();
 			break;
 		case Statement.drop:
 			StatementDrop sd=(StatementDrop) st;
 			dropTable(sd.tableName);
+			res=new BoolResult();
 			break;
 		case Statement.insertA:
 			StatementInsertA sia=(StatementInsertA) st;
-			Table tb=tables.get(sia.tableName);
+			tb=tables.get(sia.tableName);
 			Pair<Object,Row> pair=tb.mkRow(sia.values);
 			tb.simpleInsert(pair.l,pair.r);
+			res=new BoolResult();
 			break;
+		case Statement.selectA:
+			StatementSelectA sla=(StatementSelectA) st;
+			tb=tables.get(sla.tableName);
+			res=tb.query(sla.names, sla.existWhere, sla.cdName, sla.cdValue, sla.op);
 		}
+		return res;
 	}
 	
 	protected void addTable(Table tb) {

@@ -4,6 +4,8 @@ Name : [a-z]+ ;
 Number : [0-9]+ ;
 String : '\'' (.)+? '\''
 	;
+NEWLINE:'\r'?'\n'
+     |EOF;
 
 type : 'int'
      | 'long'
@@ -28,6 +30,7 @@ sql : 'create table' Name '(' schema ')' #create
     | 'update' Name 'set' set 'where' condition #update
     | 'select' names 'from' Name ('where' condition)? #selectA
     | 'select' cnames 'from' jnames  ('where' condition)? #selectB
+    | NEWLINE #newline
     ;
     
 
@@ -37,7 +40,7 @@ condition : Name op value
 set : Name '=' value
 	;
 
-names : Name (',' Name)*
+names : Name (',' Name)* 
 	;
 cname: Name'.'Name
 	;

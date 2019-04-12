@@ -1,7 +1,9 @@
 package minidb.basic.database;
 
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -11,12 +13,20 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
+import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
 import minidb.basic.database.Schema;
 import minidb.basic.index.PrimaryIndex;
 import minidb.basic.index.PrimaryKey;
+import minidb.basic.index.Value;
+import minidb.result.QueryResult;
+import minidb.result.SearchResult;
 import minidb.types.TypeConst;
 
 public class Table implements Serializable{
@@ -47,6 +57,122 @@ public class Table implements Serializable{
 		this.schema.keyType=keyType;
 		this.createIndex();
 
+	}
+	
+	
+	protected LinkedHashMap<String,Object> filterNames(List<String> names,LinkedHashMap<String,Object> data){
+		LinkedHashMap<String,Object> res=new LinkedHashMap<String,Object>();
+		for(String name:names) {
+			res.put(name, data.get(name));
+		}
+		return res;
+		
+	}
+
+	protected QueryResult query(List<String> names,Boolean existWhere,String cdName,String cdValue, int op) throws IOException, ClassNotFoundException {
+		LinkedList<Value> rows=index.searchAll().rows;
+		ArrayList<LinkedHashMap<String,Object>> rowl=fromRaw(rows);
+		ArrayList<LinkedHashMap<String,Object>> res=new ArrayList<LinkedHashMap<String,Object>>();
+		if(existWhere) {
+			RowFilter rf= buildFilter(cdName,op,cdValue);
+			for(LinkedHashMap<String,Object> objs:rowl) {
+				if(rf.method(objs)) {
+					LinkedHashMap<String,Object> nobjs=filterNames(names,objs);
+					res.add(nobjs);
+				}
+			}
+		}
+		else{
+			for(LinkedHashMap<String,Object> objs:rowl) {
+				LinkedHashMap<String,Object> nobjs=filterNames(names,objs);
+				res.add(nobjs);
+			}
+		}
+		QueryResult qr=new QueryResult();
+		qr.data=res;
+		qr.types=this.schema.types;
+		return qr;
+	}
+	
+	protected RowFilter buildFilter(String cdName,int op,String cdValue) {
+		SchemaDescriptor sd = this.schema.descriptors.get(cdName);
+		RowFilter rf=(row)->this.compare(op,sd.getType(),row.get(cdName),cdValue);
+		return rf;
+	}
+	
+	protected <T extends Comparable <T>> boolean compareT(int op,T va,T vb) {
+		int res=va.compareTo(vb);
+		switch(op) {
+		case Statement.eq:
+			return res==0;
+		case Statement.lg:
+			return res>0;
+		case Statement.lt:
+			return res<0;
+		case Statement.lge:
+			return res>=0;
+		case Statement.lte:
+			return res<=0;
+		}
+		return true;
+	}
+
+	protected boolean compare(int op,int type,Object va,String vb) {
+		switch(type) {
+		case TypeConst.VALUE_TYPE_INT:
+			return compareT(op,(Integer)va,Integer.parseInt(vb));
+		case TypeConst.VALUE_TYPE_LONG:
+			return compareT(op,(Long)va,Long.parseLong(vb));
+		case TypeConst.VALUE_TYPE_FLOAT:
+			return compareT(op,(Float)va,Float.parseFloat(vb));
+		case TypeConst.VALUE_TYPE_DOUBLE:
+			return compareT(op,(Double)va,Double.parseDouble(vb));
+		case TypeConst.VALUE_TYPE_STRING:
+			return compareT(op,(String)va,(String)vb);
+		}
+		return true;
+		
+	}
+
+	protected ArrayList<LinkedHashMap<String,Object>> fromRaw(LinkedList<Value> rows) throws ClassNotFoundException, IOException{
+		ArrayList<LinkedHashMap<String,Object>> res=new ArrayList<LinkedHashMap<String,Object>>();
+		int c=0;
+		for(Value v:rows) {
+			res.add(extract((Row)v));
+			c++;
+		}
+		return res;
+	}
+	
+	protected LinkedHashMap<String,Object> extract(Row row) throws IOException, ClassNotFoundException{
+		LinkedHashMap<String,Object> objs=new LinkedHashMap<String,Object>();
+		int pos=0;
+		for(Entry<String,SchemaDescriptor> e:this.schema.descriptors.entrySet()) {
+			SchemaDescriptor sd=e.getValue();
+			byte[] slice = Arrays.copyOfRange(row.array, pos, pos+sd.getSize());
+			pos+=sd.getSize();
+		    ByteArrayInputStream in = new ByteArrayInputStream(slice);
+		    DataInputStream inst=new DataInputStream(in);
+		    switch(sd.getType()) {
+		    case TypeConst.VALUE_TYPE_INT:
+				objs.put(e.getKey(),(Object)inst.readInt());
+		    	break;
+		    case TypeConst.VALUE_TYPE_LONG:
+				objs.put(e.getKey(),(Object)inst.readLong());
+		    	break;
+		    case TypeConst.VALUE_TYPE_DOUBLE:
+				objs.put(e.getKey(),(Object)inst.readDouble());
+		    	break;
+		    case TypeConst.VALUE_TYPE_FLOAT:
+				objs.put(e.getKey(),(Object)inst.readFloat());
+		    	break;
+		    case TypeConst.VALUE_TYPE_STRING:
+		    	String str=inst.readUTF();
+				objs.put(e.getKey(),(Object)str);
+		    	break;
+		    }
+		}
+		return objs;
 	}
 	
 	public void createIndex() throws IOException {
@@ -89,6 +215,7 @@ public class Table implements Serializable{
 	    writer.append('\n');
 	    writer.close();
 	}
+	
 
 	public Pair<Object,Row> mkRow(List<String> values) throws NumberFormatException, IOException {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -101,7 +228,7 @@ public class Table implements Serializable{
 			switch(s.getType()) {
 			case TypeConst.VALUE_TYPE_INT:
 				res=Integer.parseInt(values.get(c));
-				dos.write((Integer)res);
+				dos.writeInt((Integer)res);
 				break;
 			case TypeConst.VALUE_TYPE_LONG:
 				res=Long.parseLong(values.get(c));
@@ -117,7 +244,7 @@ public class Table implements Serializable{
 				break;
 			case TypeConst.VALUE_TYPE_STRING:
 				res=values.get(c);
-				dos.writeChars((String)res);
+				dos.writeUTF((String)res);
 				break;
 			}
 			if(s.isPrimary()) {

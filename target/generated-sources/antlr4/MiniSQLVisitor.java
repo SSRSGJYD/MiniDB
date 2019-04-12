@@ -84,6 +84,13 @@ public interface MiniSQLVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitSelectB(MiniSQLParser.SelectBContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code newline}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNewline(MiniSQLParser.NewlineContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link MiniSQLParser#condition}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -127,7 +134,7 @@ public interface MiniSQLVisitor<T> extends ParseTreeVisitor<T> {
 	T visitJnames(MiniSQLParser.JnamesContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code values}
-	 * labeled alternative in {@link MiniSQLParser#sqlsqlsqlsqlsqlsqlsqlsqlschemaattributeattributeconstraint}.
+	 * labeled alternative in {@link MiniSQLParser#sqlsqlsqlsqlsqlsqlsqlsqlsqlschemaattributeattributeconstraint}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */

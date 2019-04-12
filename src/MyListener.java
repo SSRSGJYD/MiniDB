@@ -149,6 +149,7 @@ public class MyListener extends MiniSQLBaseListener {
 		switch(type) {
 		case Statement.create:
 			sc.descriptors.put(ctx.Name().getText(), sd);
+			sc.types.put(ctx.Name().getText(), mtype);
 			break;
 		}
 	}
@@ -156,14 +157,15 @@ public class MyListener extends MiniSQLBaseListener {
 	@Override 
 	public void enterNotnullattr(MiniSQLParser.NotnullattrContext ctx) { 
 		SchemaDescriptor sd=new SchemaDescriptor();
-		int type=TypeConst.fromString(ctx.type().getText());
-		sd.setType(type);
-		sd.setSize(TypeConst.type2size(type));
+		int mtype=TypeConst.fromString(ctx.type().getText());
+		sd.setType(mtype);
+		sd.setSize(TypeConst.type2size(mtype));
 		StatementCreate sc=(StatementCreate) st;
 		sd.setNotNull();
 		switch(type) {
 		case Statement.create:
 			sc.descriptors.put(ctx.Name().getText(), sd);
+			sc.types.put(ctx.Name().getText(), mtype);
 			break;
 		}
 	}
