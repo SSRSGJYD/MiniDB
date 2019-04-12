@@ -3,6 +3,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import org.antlr.v4.runtime.*;
@@ -27,12 +28,17 @@ public class SQLParser{
 	}
 	public static void main( String[] args) throws Exception 
 	{
-		InputStreamReader in=new InputStreamReader(System.in);
+		String cmds="create table play(id int,age int,primary key(id))\n"
+				+ "insert into play values(12,13)\n"
+				+ "insert into play values(13,23)\n"
+				+ "select age from play where age>20\n";
+		InputStream targetStream = new ByteArrayInputStream(cmds.getBytes());
+		InputStreamReader in=new InputStreamReader(targetStream);
 		BufferedReader br=new BufferedReader(in);
 		DataBase db=new DataBase();
 		while(true) {
 			String cmd=br.readLine();
-			if(cmd.length()==0)continue;
+			if(cmd==null || cmd.length()==0)continue;
 			CharStream input = CharStreams.fromString(cmd);
 			MiniSQLLexer lexer = new MiniSQLLexer(input);
 			lexer.removeErrorListeners();

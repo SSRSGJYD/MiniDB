@@ -120,20 +120,15 @@ public class Table implements Serializable{
 	protected boolean compare(int op,int type,Object va,String vb) {
 		switch(type) {
 		case TypeConst.VALUE_TYPE_INT:
-			compareT(op,(Integer)va,Integer.parseInt(vb));
-			break;
+			return compareT(op,(Integer)va,Integer.parseInt(vb));
 		case TypeConst.VALUE_TYPE_LONG:
-			compareT(op,(Long)va,Long.parseLong(vb));
-			break;
+			return compareT(op,(Long)va,Long.parseLong(vb));
 		case TypeConst.VALUE_TYPE_FLOAT:
-			compareT(op,(Float)va,Float.parseFloat(vb));
-			break;
+			return compareT(op,(Float)va,Float.parseFloat(vb));
 		case TypeConst.VALUE_TYPE_DOUBLE:
-			compareT(op,(Double)va,Double.parseDouble(vb));
-			break;
+			return compareT(op,(Double)va,Double.parseDouble(vb));
 		case TypeConst.VALUE_TYPE_STRING:
-			compareT(op,(String)va,(String)vb);
-			break;
+			return compareT(op,(String)va,(String)vb);
 		}
 		return true;
 		

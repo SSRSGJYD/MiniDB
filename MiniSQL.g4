@@ -40,7 +40,7 @@ condition : Name op value
 set : Name '=' value
 	;
 
-names : Name (',' Name)*
+names : Name (',' Name)* 
 	;
 cname: Name'.'Name
 	;
