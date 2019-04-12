@@ -51,7 +51,7 @@ public class BPlusTreeInternalNode<K extends Key, V extends Value> extends BPlus
 
         if(this.getNodeType() == BPlusTreeConst.NODE_TYPE_ROOT_INTERNAL ||
                 this.getNodeType() == BPlusTreeConst.NODE_TYPE_ROOT_LEAF) {
-            fa.seek(headerSize-8);
+            fa.seek(headerSize-16);
             fa.writeLong(getPageIndex());
         }
         fa.seek(getPageIndex());
