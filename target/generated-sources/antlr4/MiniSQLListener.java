@@ -133,6 +133,18 @@ public interface MiniSQLListener extends ParseTreeListener {
 	 */
 	void exitSelectB(MiniSQLParser.SelectBContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code newline}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
+	 * @param ctx the parse tree
+	 */
+	void enterNewline(MiniSQLParser.NewlineContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code newline}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
+	 * @param ctx the parse tree
+	 */
+	void exitNewline(MiniSQLParser.NewlineContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link MiniSQLParser#condition}.
 	 * @param ctx the parse tree
 	 */
@@ -204,13 +216,13 @@ public interface MiniSQLListener extends ParseTreeListener {
 	void exitJnames(MiniSQLParser.JnamesContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code values}
-	 * labeled alternative in {@link MiniSQLParser#sqlsqlsqlsqlsqlsqlsqlsqlschemaattributeattributeconstraint}.
+	 * labeled alternative in {@link MiniSQLParser#sqlsqlsqlsqlsqlsqlsqlsqlsqlschemaattributeattributeconstraint}.
 	 * @param ctx the parse tree
 	 */
 	void enterValues(MiniSQLParser.ValuesContext ctx);
 	/**
 	 * Exit a parse tree produced by the {@code values}
-	 * labeled alternative in {@link MiniSQLParser#sqlsqlsqlsqlsqlsqlsqlsqlschemaattributeattributeconstraint}.
+	 * labeled alternative in {@link MiniSQLParser#sqlsqlsqlsqlsqlsqlsqlsqlsqlschemaattributeattributeconstraint}.
 	 * @param ctx the parse tree
 	 */
 	void exitValues(MiniSQLParser.ValuesContext ctx);

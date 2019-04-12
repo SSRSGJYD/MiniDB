@@ -11,5 +11,6 @@ public class StatementCreate extends Statement {
 	public StatementCreate() {
 		this.type=Statement.create;
 		this.descriptors=new LinkedHashMap<String,SchemaDescriptor>();
+		this.types=new HashMap<String,Integer>();
 	}
 }

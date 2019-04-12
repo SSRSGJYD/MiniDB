@@ -19,9 +19,11 @@ public class Schema implements Serializable{
 	
 	public Schema() {
 		descriptors=new LinkedHashMap<String,SchemaDescriptor>();
+		types=new HashMap<String,Integer>();
 	}
 	public Schema(LinkedHashMap<String,SchemaDescriptor> data) {
 		this.descriptors=data;
+		types=new HashMap<String,Integer>();
 	}
 	public int getPrimaryKeyType() {
 		for (SchemaDescriptor value : descriptors.values()) {

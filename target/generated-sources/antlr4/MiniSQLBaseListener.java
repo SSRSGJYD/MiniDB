@@ -147,6 +147,18 @@ public class MiniSQLBaseListener implements MiniSQLListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterNewline(MiniSQLParser.NewlineContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitNewline(MiniSQLParser.NewlineContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterCondition(MiniSQLParser.ConditionContext ctx) { }
 	/**
 	 * {@inheritDoc}
