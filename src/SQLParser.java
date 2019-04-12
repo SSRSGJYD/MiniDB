@@ -16,12 +16,12 @@ public class SQLParser{
 	public static void mainl( String[] args) throws Exception {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(outputStream);
-		dos.writeUTF("1234");
+		dos.writeInt(1234);
 		byte[]array=outputStream.toByteArray();
 
 		ByteArrayInputStream in = new ByteArrayInputStream(array);
 		DataInputStream inst=new DataInputStream(in);
-		String str=inst.readUTF();
+		int str=inst.readInt();
 		System.out.print(str);
 		
 	}

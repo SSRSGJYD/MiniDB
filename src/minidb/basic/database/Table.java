@@ -82,15 +82,19 @@ public class Table implements Serializable{
 				}
 			}
 		}
-		else
-			res=rowl;
+		else{
+			for(LinkedHashMap<String,Object> objs:rowl) {
+				LinkedHashMap<String,Object> nobjs=filterNames(names,objs);
+				res.add(nobjs);
+			}
+		}
 		QueryResult qr=new QueryResult();
 		qr.data=res;
 		qr.types=this.schema.types;
 		return qr;
 	}
 	
-	protected RowFilter buildFilter(String cdName,int op,Object cdValue) {
+	protected RowFilter buildFilter(String cdName,int op,String cdValue) {
 		SchemaDescriptor sd = this.schema.descriptors.get(cdName);
 		RowFilter rf=(row)->this.compare(op,sd.getType(),row.get(cdName),cdValue);
 		return rf;
@@ -113,19 +117,19 @@ public class Table implements Serializable{
 		return true;
 	}
 
-	protected boolean compare(int op,int type,Object va,Object vb) {
+	protected boolean compare(int op,int type,Object va,String vb) {
 		switch(type) {
 		case TypeConst.VALUE_TYPE_INT:
-			compareT(op,(Integer)va,(Integer)vb);
+			compareT(op,(Integer)va,Integer.parseInt(vb));
 			break;
 		case TypeConst.VALUE_TYPE_LONG:
-			compareT(op,(Long)va,(Long)vb);
+			compareT(op,(Long)va,Long.parseLong(vb));
 			break;
 		case TypeConst.VALUE_TYPE_FLOAT:
-			compareT(op,(Float)va,(Float)vb);
+			compareT(op,(Float)va,Float.parseFloat(vb));
 			break;
 		case TypeConst.VALUE_TYPE_DOUBLE:
-			compareT(op,(Double)va,(Double)vb);
+			compareT(op,(Double)va,Double.parseDouble(vb));
 			break;
 		case TypeConst.VALUE_TYPE_STRING:
 			compareT(op,(String)va,(String)vb);
@@ -150,7 +154,8 @@ public class Table implements Serializable{
 		int pos=0;
 		for(Entry<String,SchemaDescriptor> e:this.schema.descriptors.entrySet()) {
 			SchemaDescriptor sd=e.getValue();
-			byte[] slice = Arrays.copyOfRange(row.array, pos, sd.getSize());
+			byte[] slice = Arrays.copyOfRange(row.array, pos, pos+sd.getSize());
+			pos+=sd.getSize();
 		    ByteArrayInputStream in = new ByteArrayInputStream(slice);
 		    DataInputStream inst=new DataInputStream(in);
 		    switch(sd.getType()) {
@@ -228,7 +233,7 @@ public class Table implements Serializable{
 			switch(s.getType()) {
 			case TypeConst.VALUE_TYPE_INT:
 				res=Integer.parseInt(values.get(c));
-				dos.write((Integer)res);
+				dos.writeInt((Integer)res);
 				break;
 			case TypeConst.VALUE_TYPE_LONG:
 				res=Long.parseLong(values.get(c));
