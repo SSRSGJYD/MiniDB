@@ -245,23 +245,23 @@ public class Table implements Serializable{
 	public void simpleInsert(Object key, Row row) throws IOException {
 		switch(keyType) {
 			case TypeConst.VALUE_TYPE_INT:
-				PrimaryKey<Integer> keyi = new PrimaryKey<Integer>((Integer)key);
+				PrimaryKey<Integer> keyi = new PrimaryKey<Integer>((Integer)key, TypeConst.VALUE_TYPE_INT, TypeConst.VALUE_SIZE_INT);
 				index.insert(keyi, row);	
 				break;
 			case TypeConst.VALUE_TYPE_LONG:
-				PrimaryKey<Long> keyl = new PrimaryKey<Long>((Long)key);
+				PrimaryKey<Long> keyl = new PrimaryKey<Long>((Long)key, TypeConst.VALUE_TYPE_LONG, TypeConst.VALUE_SIZE_LONG);
 				index.insert(keyl, row);	
 				break;
 			case TypeConst.VALUE_TYPE_FLOAT:
-				PrimaryKey<Float> keyf = new PrimaryKey<Float>((Float)key);
+				PrimaryKey<Float> keyf = new PrimaryKey<Float>((Float)key, TypeConst.VALUE_TYPE_FLOAT, TypeConst.VALUE_SIZE_FLOAT);
 				index.insert(keyf, row);	
 				break;
 			case TypeConst.VALUE_TYPE_DOUBLE:
-				PrimaryKey<Double> keyd = new PrimaryKey<Double>((Double)key);
+				PrimaryKey<Double> keyd = new PrimaryKey<Double>((Double)key, TypeConst.VALUE_TYPE_DOUBLE, TypeConst.VALUE_SIZE_DOUBLE);
 				index.insert(keyd, row);	
 				break;
 			case TypeConst.VALUE_TYPE_STRING:
-				PrimaryKey<String> keys = new PrimaryKey<String>((String)key);
+				PrimaryKey<String> keys = new PrimaryKey<String>((String)key, TypeConst.VALUE_TYPE_STRING, keySize);
 				index.insert(keys, row);	
 				break;
 			}

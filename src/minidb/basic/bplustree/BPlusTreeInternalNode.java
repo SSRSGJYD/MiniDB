@@ -51,7 +51,7 @@ public class BPlusTreeInternalNode<K extends Key, V extends Value> extends BPlus
 
         if(this.getNodeType() == BPlusTreeConst.NODE_TYPE_ROOT_INTERNAL ||
                 this.getNodeType() == BPlusTreeConst.NODE_TYPE_ROOT_LEAF) {
-            fa.seek(headerSize-8);
+            fa.seek(headerSize-16);
             fa.writeLong(getPageIndex());
         }
         fa.seek(getPageIndex());
@@ -59,7 +59,7 @@ public class BPlusTreeInternalNode<K extends Key, V extends Value> extends BPlus
         int capacity = getCapacity();
         fa.writeInt(capacity);
         for(int i = 0; i < capacity; i++) {
-            BPlusTreeUtils.writeKeyToFile(fa, keyList.get(i), keyType, keySize);
+            BPlusTreeUtils.writeKeyToFile(fa, keyList.get(i));
             fa.writeLong(ptrList.get(i));   // Pointer
         }
         fa.writeLong(ptrList.get(capacity));

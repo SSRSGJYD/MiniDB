@@ -20,5 +20,5 @@ public class BPlusTreeConst {
     public static final int SEARCH_EXACT = 1;
     public static final int SEARCH_PREV = 2;
     public static final int SEARCH_NEXT = 3;
-
+    public static final int SEARCH_ADD_ONE = 4;
 }
