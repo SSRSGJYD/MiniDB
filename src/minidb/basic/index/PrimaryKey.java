@@ -1,5 +1,10 @@
 package minidb.basic.index;
 
+import minidb.types.TypeConst;
+
+import java.io.IOException;
+import java.io.RandomAccessFile;
+
 /**
  * class of key of primary index
  *
@@ -7,9 +12,13 @@ package minidb.basic.index;
 public class PrimaryKey<K extends Comparable<K>> extends Key {
 
     private K key;
+    private int keyType;
+    private int keySize;
 
-    public PrimaryKey(K  key) {
+    public PrimaryKey(K key, int keyType, int keySize) {
         this.key = key;
+        this.keyType = keyType;
+        this.keySize = keySize;
     }
 
     public K getKey() {
@@ -43,5 +52,29 @@ public class PrimaryKey<K extends Comparable<K>> extends Key {
     public int compareTo(Key k, boolean useAll) {
         PrimaryKey<K> key = (PrimaryKey<K>)k;
         return this.key.compareTo(key.getKey());
+    }
+
+    @Override
+    public void writeToFile(RandomAccessFile fa) throws IOException {
+        switch (keyType) {
+            case TypeConst.VALUE_TYPE_INT:
+                fa.writeInt((Integer)key);
+                break;
+            case TypeConst.VALUE_TYPE_LONG:
+                fa.writeLong((Long)key);
+                break;
+            case TypeConst.VALUE_TYPE_FLOAT:
+                fa.writeFloat((Float)key);
+                break;
+            case TypeConst.VALUE_TYPE_DOUBLE:
+                fa.writeDouble((Double)key);
+                break;
+            default:  //TypeConst.VALUE_TYPE_STRING:
+                fa.writeBytes((String)key);
+                for(int i = ((String) key).length(); i<keySize; i++) {
+                    fa.writeByte(0);
+                }
+                break;
+        }
     }
 }

@@ -23,15 +23,18 @@ public class SecondaryIndex<K extends Comparable<K>, PK extends Comparable<PK>> 
      * constructor
      *
      * @param pageSize size of one page(node)
-     * @param keySize size of key
+     * @param keyType type of attribute
+     * @param attributeSize size of attribute
+     * @param PKType type of primary key
+     * @param PKSize size of primary key
      * @param valueSize size of value stored
      * @param conditionThreshold threshold of re-organize tree
      * @param path file path of tree file
      * @throws IOException
      */
-    public SecondaryIndex(int pageSize, int keyType, int keySize, int valueSize, int conditionThreshold, String path)
+    public SecondaryIndex(int pageSize, int keyType, int attributeSize, int PKType, int PKSize, int valueSize, int conditionThreshold, String path)
             throws IOException {
-        this.tree = new BPlusTree<SecondaryKey<K,PK>, PrimaryKeyValue>(pageSize,keyType,keySize,valueSize,conditionThreshold,path);
+        this.tree = new BPlusTree<SecondaryKey<K,PK>, PrimaryKeyValue>(pageSize,false, attributeSize+PKSize, keyType,attributeSize,PKType, PKSize, valueSize,conditionThreshold,path);
     }
 
     /**

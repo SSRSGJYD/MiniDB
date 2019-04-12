@@ -30,7 +30,7 @@ public class PrimaryIndex<K extends Comparable<K>> {
      */
     public PrimaryIndex(int pageSize, int keyType, int keySize, int valueSize, int conditionThreshold, String path)
         throws IOException {
-        this.tree = new BPlusTree<PrimaryKey<K>,Row>(pageSize,keyType,keySize,valueSize,conditionThreshold,path);
+        this.tree = new BPlusTree<PrimaryKey<K>,Row>(pageSize,true,keySize, keyType,keySize,0,0,valueSize,conditionThreshold,path);
     }
 
     /**
