@@ -12,6 +12,8 @@ public class Schema implements Serializable{
     private static final long serialVersionUID = 1L;
 
 	LinkedHashMap<String,SchemaDescriptor> descriptors;
+	public HashMap<String,Integer> types;
+
 	int keyType;
 	String primaryKey;
 	
