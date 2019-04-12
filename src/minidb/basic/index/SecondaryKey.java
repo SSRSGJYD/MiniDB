@@ -1,5 +1,9 @@
 package minidb.basic.index;
 
+import minidb.types.TypeConst;
+
+import java.io.IOException;
+import java.io.RandomAccessFile;
 
 /**
  * class of key of secondary index
@@ -8,8 +12,22 @@ package minidb.basic.index;
  */
 public class SecondaryKey<K extends Comparable<K>, PK extends Comparable<PK>> extends Key {
 
-    private K key;          // one column of table
-    private PK primaryKey;  // primary key(one column) of table
+    private K key;              // one column of table
+    private int keyType;        // type of attribute
+    private int attributeSize;  // size of attribute
+    private PK primaryKey;      // primary key(one column) of table
+    private int PKType;         // type of primary key
+    private int PKSize;         // size of primary key
+
+    public SecondaryKey(K key, int keyType, int attributeSize,
+                        PK primaryKey, int PKType, int PKSize) {
+        this.key = key;
+        this.keyType = keyType;
+        this.attributeSize = attributeSize;
+        this.primaryKey = primaryKey;
+        this.PKType = PKType;
+        this.PKSize = PKSize;
+    }
 
     public K getKey() {
         return key;
@@ -24,11 +42,6 @@ public class SecondaryKey<K extends Comparable<K>, PK extends Comparable<PK>> ex
     }
 
     public void setPrimaryKey(PK primaryKey) {
-        this.primaryKey = primaryKey;
-    }
-
-    public SecondaryKey(K key, PK primaryKey) {
-        this.key = key;
         this.primaryKey = primaryKey;
     }
 
@@ -58,5 +71,49 @@ public class SecondaryKey<K extends Comparable<K>, PK extends Comparable<PK>> ex
     public int compareTo(Key k, boolean useAll) {
         SecondaryKey<K, PK> key = (SecondaryKey<K, PK>)k;
         return this.key.compareTo(key.getKey());
+    }
+
+    @Override
+    public void writeToFile(RandomAccessFile fa) throws IOException {
+        switch (keyType) {
+            case TypeConst.VALUE_TYPE_INT:
+                fa.writeInt((Integer)key);
+                break;
+            case TypeConst.VALUE_TYPE_LONG:
+                fa.writeLong((Long)key);
+                break;
+            case TypeConst.VALUE_TYPE_FLOAT:
+                fa.writeFloat((Float)key);
+                break;
+            case TypeConst.VALUE_TYPE_DOUBLE:
+                fa.writeDouble((Double)key);
+                break;
+            default:  //TypeConst.VALUE_TYPE_STRING:
+                fa.writeBytes((String)key);
+                for(int i = ((String) key).length(); i<attributeSize; i++) {
+                    fa.writeByte(0);
+                }
+                break;
+        }
+        switch (PKType) {
+            case TypeConst.VALUE_TYPE_INT:
+                fa.writeInt((Integer)primaryKey);
+                break;
+            case TypeConst.VALUE_TYPE_LONG:
+                fa.writeLong((Long)primaryKey);
+                break;
+            case TypeConst.VALUE_TYPE_FLOAT:
+                fa.writeFloat((Float)primaryKey);
+                break;
+            case TypeConst.VALUE_TYPE_DOUBLE:
+                fa.writeDouble((Double)primaryKey);
+                break;
+            default:  //TypeConst.VALUE_TYPE_STRING:
+                fa.writeBytes((String)primaryKey);
+                for(int i = ((String) primaryKey).length(); i<PKSize; i++) {
+                    fa.writeByte(0);
+                }
+                break;
+        }
     }
 }

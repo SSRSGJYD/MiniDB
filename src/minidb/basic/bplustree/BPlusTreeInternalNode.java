@@ -59,7 +59,7 @@ public class BPlusTreeInternalNode<K extends Key, V extends Value> extends BPlus
         int capacity = getCapacity();
         fa.writeInt(capacity);
         for(int i = 0; i < capacity; i++) {
-            BPlusTreeUtils.writeKeyToFile(fa, keyList.get(i), keyType, keySize);
+            BPlusTreeUtils.writeKeyToFile(fa, keyList.get(i));
             fa.writeLong(ptrList.get(i));   // Pointer
         }
         fa.writeLong(ptrList.get(capacity));
