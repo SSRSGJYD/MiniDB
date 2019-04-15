@@ -7,11 +7,13 @@ package minidb.basic.index;
  */
 public class Value {
 
+    public byte[] array;
+
     public Value() {
     }
 
     public Value(byte[] fileContent) {
-
+        this.array = fileContent;
     }
 
 }
