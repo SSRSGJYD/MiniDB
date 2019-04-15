@@ -17,9 +17,9 @@ import minidb.basic.index.Value;
  *      prev page index: 8 bytes(Long.SIZE)
  *      capacity: 4 bytes(Int.SIZE)
  *      key: keySize
- *      overflow node index:8 bytes(Long.SIZE)
+ *      (deprecated!!) overflow node index:8 bytes(Long.SIZE)
  *      value: valueSize
- * layout: (key, overflow node index, value) ...
+ * layout: (key, value) ...
  *
  */
 
@@ -29,7 +29,6 @@ public class BPlusTreeLeafNode<K extends Key, V extends Value> extends BPlusTree
     private long prevPageIndex;
     protected LinkedList<K> keyList;
     protected LinkedList<V> valueList;
-    protected LinkedList<Long> overflowList;  // indexes of overflow pages
 
     /**
      * constructor
@@ -41,7 +40,6 @@ public class BPlusTreeLeafNode<K extends Key, V extends Value> extends BPlusTree
         this.prevPageIndex = prevPageIndex;
         this.keyList = new LinkedList<K>();
         this.valueList = new LinkedList<V>();
-        this.overflowList = new LinkedList<Long>();
     }
 
     public long getNextPageIndex() {
@@ -85,7 +83,6 @@ public class BPlusTreeLeafNode<K extends Key, V extends Value> extends BPlusTree
         fa.writeInt(capacity);
         for(int i = 0; i < capacity; i++) {
             BPlusTreeUtils.writeKeyToFile(fa, keyList.get(i));
-            fa.writeLong(overflowList.get(i));
             BPlusTreeUtils.writeRowToFile(fa, valueList.get(i));
         }
 

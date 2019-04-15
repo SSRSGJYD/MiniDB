@@ -2,26 +2,24 @@ package minidb.result;
 
 import java.util.LinkedList;
 
-import minidb.basic.bplustree.BPlusTreeLeafNode;
-import minidb.basic.database.Row;
 import minidb.basic.index.Value;
 
 
-public class SearchResult {
+public class SearchResult<V extends Value> {
 
-    public LinkedList<Value> rows;
+    public LinkedList<V> rows;
 
     public SearchResult() {
-        this.rows = new LinkedList<Value>();
+        this.rows = new LinkedList<V>();
     }
 
-    public SearchResult(Value row) {
-        this.rows = new LinkedList<Value>();
+    public SearchResult(V row) {
+        this.rows = new LinkedList<V>();
         rows.push(row);
     }
 
 
-    public SearchResult(LinkedList<Value> rows) {
+    public SearchResult(LinkedList<V> rows) {
         this.rows = rows;
     }
 }

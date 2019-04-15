@@ -1,10 +1,7 @@
 package minidb.basic.bplustree;
 
 import minidb.basic.database.Row;
-import minidb.basic.index.Key;
-import minidb.basic.index.PrimaryKey;
-import minidb.basic.index.SecondaryKey;
-import minidb.basic.index.Value;
+import minidb.basic.index.*;
 import minidb.result.DeleteResult;
 import minidb.types.TypeConst;
 
@@ -219,25 +216,6 @@ public class BPlusTreeUtils {
      */
     public static void writeKeyToFile(RandomAccessFile fa, Key key) throws IOException {
         key.writeToFile(fa);
-    }
-
-    /**
-     * read in rows(values) from tree file
-     *
-     * @param fa file access
-     * @param valueSize size of row
-     * @param count number of rows
-     * @return an arraylist of rows
-     * @throws IOException
-     */
-    public static ArrayList<Value> readRowsFromFile(RandomAccessFile fa, int valueSize, int count) throws IOException {
-        byte[] tmp = new byte[valueSize];
-        ArrayList<Value> rows = new ArrayList<Value>();
-        for(int i=0; i<count; ++i) {
-            fa.read(tmp, 0, valueSize);
-            rows.add(new Value(tmp));
-        }
-        return rows;
     }
 
     public static void writeRowToFile(RandomAccessFile fa, Value row)

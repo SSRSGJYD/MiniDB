@@ -56,7 +56,7 @@ public class SecondaryIndex<K extends Comparable<K>, PK extends Comparable<PK>> 
      * @return a SearchResult Object
      * @throws IOException
      */
-    public SearchResult search(SecondaryKey<K,PK> key, boolean useAll) throws IOException {
+    public SearchResult<PrimaryKeyValue> search(SecondaryKey<K,PK> key, boolean useAll) throws IOException {
         return tree.searchByKey(key, useAll);
     }
 
@@ -71,7 +71,7 @@ public class SecondaryIndex<K extends Comparable<K>, PK extends Comparable<PK>> 
      * @return a SearchResult Object
      * @throws IOException
      */
-    public SearchResult searchByRange(SecondaryKey<K,PK> lbound, boolean uselbound, SecondaryKey<K,PK> hbound, boolean usehbound, boolean useAll)
+    public SearchResult<PrimaryKeyValue> searchByRange(SecondaryKey<K,PK> lbound, boolean uselbound, SecondaryKey<K,PK> hbound, boolean usehbound, boolean useAll)
             throws IOException {
         assert uselbound || usehbound;
         return tree.searchByKeyWithRange(lbound, uselbound, hbound, usehbound, useAll);
@@ -83,7 +83,7 @@ public class SecondaryIndex<K extends Comparable<K>, PK extends Comparable<PK>> 
      * @return a SearchResult Object
      * @throws IOException
      */
-    public SearchResult searchAll() throws IOException {
+    public SearchResult<PrimaryKeyValue> searchAll() throws IOException {
         return tree.searchAll();
     }
 

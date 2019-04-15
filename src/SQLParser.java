@@ -32,6 +32,7 @@ public class SQLParser{
 				+ "insert into play values(12,13)\n"
 				+ "insert into play values(13,23)\n"
 				+ "select age from play where age>20\n";
+//		String cmds= "select age from play\n";
 		InputStream targetStream = new ByteArrayInputStream(cmds.getBytes());
 		InputStreamReader in=new InputStreamReader(targetStream);
 		BufferedReader br=new BufferedReader(in);

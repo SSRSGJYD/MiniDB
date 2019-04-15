@@ -51,7 +51,7 @@ public class PrimaryIndex<K extends Comparable<K>> {
      * @return a SearchResult Object
      * @throws IOException
      */
-    public SearchResult search(PrimaryKey<K> key) throws IOException {
+    public SearchResult<Row> search(PrimaryKey<K> key) throws IOException {
         return tree.searchByKey(key, true);
     }
 
@@ -65,7 +65,7 @@ public class PrimaryIndex<K extends Comparable<K>> {
      * @return a SearchResult Object
      * @throws IOException
      */
-    public SearchResult searchByRange(PrimaryKey<K> lbound, boolean uselbound, PrimaryKey<K> hbound, boolean usehbound)
+    public SearchResult<Row> searchByRange(PrimaryKey<K> lbound, boolean uselbound, PrimaryKey<K> hbound, boolean usehbound)
         throws IOException {
         assert uselbound || usehbound;
         return tree.searchByKeyWithRange(lbound, uselbound, hbound, usehbound, true);
@@ -77,8 +77,8 @@ public class PrimaryIndex<K extends Comparable<K>> {
      * @return a SearchResult Object
      * @throws IOException
      */
-    public SearchResult searchAll() throws IOException {
-        return tree.searchAll();
+    public SearchResult<Row> searchAll() throws IOException {
+        return (SearchResult<Row>)tree.searchAll();
     }
 
     /**
