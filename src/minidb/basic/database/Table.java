@@ -69,6 +69,13 @@ public class Table implements Serializable{
 		
 	}
 
+	protected QueryResult queryX(List<String> names,Boolean existWhere,String cdName,String cdValue, int op) throws IOException, ClassNotFoundException {
+		LinkedList<Value> rows=index.searchAll().rows;
+		return null;
+
+//    searchByRange(PrimaryKey<K> lbound, boolean uselbound, PrimaryKey<K> hbound, boolean usehbound)
+		
+	}
 	protected QueryResult query(List<String> names,Boolean existWhere,String cdName,String cdValue, int op) throws IOException, ClassNotFoundException {
 		LinkedList<Value> rows=index.searchAll().rows;
 		ArrayList<LinkedHashMap<String,Object>> rowl=fromRaw(rows);
@@ -228,6 +235,42 @@ public class Table implements Serializable{
 	    writer.close();
 	}
 	
+	public void update(String cdName,String cdValue,int op,String setName,String setValue) throws IOException, ClassNotFoundException {
+		LinkedList<Value> rows=index.searchAll().rows;
+		ArrayList<LinkedHashMap<String,Object>> rowl=fromRaw(rows);
+
+		RowFilter rf= buildFilter(cdName,op,cdValue);
+		for(LinkedHashMap<String,Object> objs:rowl) {
+			if(rf.method(objs)) {
+//				LinkedHashMap<String,Object> nobjs=modify(objs,cdName,cdValue);
+//				Row nrow=toRow(nobjs);
+//				index.update(nobjs.get(this.schema.primaryKey), nrow);
+			}
+		}
+	}
+	
+//	public LinkedHashMap<String,Object> modify(LinkedHashMap<String,Object> objs,String cdName,String cdValue){
+//		switch(this.schema.descriptors.get(cdName).getType()) {
+//			case TypeConst.VALUE_TYPE_INT:
+//			case TypeConst.VALUE_TYPE_LONG:
+//			case TypeConst.VALUE_TYPE_FLOAT:
+//			case TypeConst.VALUE_TYPE_DOUBLE:
+//			case TypeConst.VALUE_TYPE_STRING:
+//		}
+//	}
+
+	public Pair<Object,Row> mkRowB(HashMap<String,String> pairs) throws NumberFormatException, IOException {
+		List<String> values=new ArrayList<String>();
+		for(String key:this.schema.descriptors.keySet()) {
+			if(pairs.containsKey(key)) {
+				values.add(pairs.get(key));
+			}
+			else {
+				values.add(null);
+			}
+		}
+		return mkRow(values);
+	}
 
 	public Pair<Object,Row> mkRow(List<String> values) throws NumberFormatException, IOException {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

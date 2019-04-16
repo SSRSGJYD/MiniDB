@@ -34,8 +34,8 @@ public class SQLParser{
 	{
 		String cmds="create table play(id char(4),age int,primary key(id))\n"
 				+ "insert into play values('1234',13)\n"
-				+ "insert into play values('avcc',null)\n"
-				+ "select age from play\n";
+				+ "insert into play(id) values('avcc')\n"
+				+ "select id,age from play\n";
 		InputStream targetStream = new ByteArrayInputStream(cmds.getBytes());
 		InputStreamReader in=new InputStreamReader(targetStream);
 		BufferedReader br=new BufferedReader(in);

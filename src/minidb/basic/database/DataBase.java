@@ -39,6 +39,7 @@ public class DataBase{
 	public Result execute(Statement st) throws IOException, ClassNotFoundException {
 		Result res = null;
 		Table tb;
+		Pair<Object,Row> pair;
 		switch(st.type) {
 		case Statement.create:
 			StatementCreate sc=(StatementCreate) st;
@@ -55,7 +56,14 @@ public class DataBase{
 		case Statement.insertA:
 			StatementInsertA sia=(StatementInsertA) st;
 			tb=tables.get(sia.tableName);
-			Pair<Object,Row> pair=tb.mkRow(sia.values);
+			pair=tb.mkRow(sia.values);
+			tb.simpleInsert(pair.l,pair.r);
+			res=new BoolResult();
+			break;
+		case Statement.insertB:
+			StatementInsertB sib=(StatementInsertB) st;
+			tb=tables.get(sib.tableName);
+			pair=tb.mkRowB(sib.pairs);
 			tb.simpleInsert(pair.l,pair.r);
 			res=new BoolResult();
 			break;
@@ -63,6 +71,13 @@ public class DataBase{
 			StatementSelectA sla=(StatementSelectA) st;
 			tb=tables.get(sla.tableName);
 			res=tb.query(sla.names, sla.existWhere, sla.cdName, sla.cdValue, sla.op);
+			break;
+		case Statement.update:
+			StatementUpdate su=(StatementUpdate) st;
+			tb=tables.get(su.tableName);
+			tb.update(su.cdName,su.cdValue,su.op,su.setName,su.setValue);
+			res=new BoolResult();
+			break;
 		}
 		return res;
 	}
