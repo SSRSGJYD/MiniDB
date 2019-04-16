@@ -24,6 +24,8 @@ import java.util.Map.Entry;
 import minidb.basic.database.Schema;
 import minidb.basic.index.PrimaryIndex;
 import minidb.basic.index.PrimaryKey;
+import minidb.basic.index.SecondaryIndex;
+import minidb.basic.index.SecondaryKey;
 import minidb.basic.index.Value;
 import minidb.result.QueryResult;
 import minidb.result.SearchResult;
@@ -36,6 +38,7 @@ public class Table implements Serializable{
 	String tableName;
 	Schema schema;
 	transient PrimaryIndex index;
+	transient HashMap<String,SecondaryIndex> indexs;
 	int keySize;
 	int keyType;
 	int valueSize=0;
@@ -43,6 +46,7 @@ public class Table implements Serializable{
 	public Table(String tableName,Schema schema) throws IOException {
 		this.tableName=tableName;
 		this.schema=schema;
+		this.indexs=new HashMap<String,SecondaryIndex>();
 
 		for(Entry<String, SchemaDescriptor> entry:schema.descriptors.entrySet()) {
 			SchemaDescriptor sd=entry.getValue();
@@ -50,13 +54,95 @@ public class Table implements Serializable{
 				keyType=sd.getType();
 				this.schema.primaryKey=entry.getKey();
 				keySize=sd.getSize();
+				this.createPrimaryIndex();
+			}else {
+				this.createSecondaryIndex(entry);
 			}
+
 			valueSize+=sd.getSize()+TypeConst.VALUE_SIZE_NULL;
 		}
 
 		this.schema.keyType=keyType;
-		this.createIndex();
 
+	}
+	
+	public void createSecondaryIndex(Entry<String, SchemaDescriptor> entry) throws IOException {
+		SchemaDescriptor sd=entry.getValue();
+		SecondaryIndex si=null;
+		si=new SecondaryIndex(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
+//
+//		switch(sd.getType()) {
+//		case TypeConst.VALUE_TYPE_INT:
+//			switch(keyType) {
+//			case TypeConst.VALUE_TYPE_INT:
+//				si=new SecondaryIndex<Integer,Integer>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
+//			case TypeConst.VALUE_TYPE_LONG:
+//				si=new SecondaryIndex<Integer,Long>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
+//			case TypeConst.VALUE_TYPE_FLOAT:
+//				si=new SecondaryIndex<Integer,Float>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
+//			case TypeConst.VALUE_TYPE_DOUBLE:
+//				si=new SecondaryIndex<Integer,Double>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
+//			case TypeConst.VALUE_TYPE_STRING:
+//				si=new SecondaryIndex<Integer,String>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
+//			}
+//			
+//		case TypeConst.VALUE_TYPE_LONG:
+//			switch(keyType) {
+//			case TypeConst.VALUE_TYPE_INT:
+//				si=new SecondaryIndex<Long,Integer>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
+//			case TypeConst.VALUE_TYPE_LONG:
+//				si=new SecondaryIndex<Long,Long>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
+//			case TypeConst.VALUE_TYPE_FLOAT:
+//				si=new SecondaryIndex<Long,Float>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
+//			case TypeConst.VALUE_TYPE_DOUBLE:
+//				si=new SecondaryIndex<Long,Double>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
+//			case TypeConst.VALUE_TYPE_STRING:
+//				si=new SecondaryIndex<Long,String>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
+//			}
+//
+//		case TypeConst.VALUE_TYPE_FLOAT:
+//			switch(keyType) {
+//			case TypeConst.VALUE_TYPE_INT:
+//				si=new SecondaryIndex<Float,Integer>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
+//			case TypeConst.VALUE_TYPE_LONG:
+//				si=new SecondaryIndex<Float,Long>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
+//			case TypeConst.VALUE_TYPE_FLOAT:
+//				si=new SecondaryIndex<Float,Float>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
+//			case TypeConst.VALUE_TYPE_DOUBLE:
+//				si=new SecondaryIndex<Float,Double>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
+//			case TypeConst.VALUE_TYPE_STRING:
+//				si=new SecondaryIndex<Float,String>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
+//			}
+//		case TypeConst.VALUE_TYPE_DOUBLE:
+//			switch(keyType) {
+//			case TypeConst.VALUE_TYPE_INT:
+//				si=new SecondaryIndex<Double,Integer>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
+//			case TypeConst.VALUE_TYPE_LONG:
+//				si=new SecondaryIndex<Double,Long>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
+//			case TypeConst.VALUE_TYPE_FLOAT:
+//				si=new SecondaryIndex<Double,Float>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
+//			case TypeConst.VALUE_TYPE_DOUBLE:
+//				si=new SecondaryIndex<Double,Double>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
+//			case TypeConst.VALUE_TYPE_STRING:
+//				si=new SecondaryIndex<Double,String>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
+//			}
+//		case TypeConst.VALUE_TYPE_STRING:
+//			switch(keyType) {
+//			case TypeConst.VALUE_TYPE_INT:
+//				si=new SecondaryIndex<String,Integer>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
+//			case TypeConst.VALUE_TYPE_LONG:
+//				si=new SecondaryIndex<String,Long>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
+//			case TypeConst.VALUE_TYPE_FLOAT:
+//				si=new SecondaryIndex<String,Float>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
+//			case TypeConst.VALUE_TYPE_DOUBLE:
+//				si=new SecondaryIndex<String,Double>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
+//			case TypeConst.VALUE_TYPE_STRING:
+//				si=new SecondaryIndex<String,String>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
+//			}
+//		}
+		if(indexs==null)
+			this.indexs=new HashMap<String,SecondaryIndex>();
+		indexs.put(entry.getKey(), si);	
 	}
 	
 	
@@ -69,14 +155,95 @@ public class Table implements Serializable{
 		
 	}
 
-	protected QueryResult queryX(List<String> names,Boolean existWhere,String cdName,String cdValue, int op) throws IOException, ClassNotFoundException {
-		LinkedList<Value> rows=index.searchAll().rows;
+	@SuppressWarnings("unchecked")
+	protected QueryResult queryx(List<String> names,Boolean existWhere,String cdName,String cdValue, int op) throws IOException, ClassNotFoundException {
+		LinkedList<Row> rows=null;
+		if(!existWhere) {
+			rows=index.searchAll().rows;
+			QueryResult qr=new QueryResult();
+			ArrayList<LinkedHashMap<String,Object>> rowl=fromRaw(rows);
+			qr.data=rowl;
+			qr.types=this.schema.types;
+			return qr;
+		}
+		if(this.schema.primaryKey.equalsIgnoreCase(cdName)) {
+			@SuppressWarnings("rawtypes")
+			PrimaryKey keyi;
+			switch(this.keyType) {
+			case TypeConst.VALUE_TYPE_INT:
+				keyi= new PrimaryKey<Integer>(Integer.parseInt(cdValue), TypeConst.VALUE_TYPE_INT, TypeConst.VALUE_SIZE_INT);
+				rows=searchByOp(keyi,op);
+				break;
+			case TypeConst.VALUE_TYPE_LONG:
+				keyi= new PrimaryKey<Long>(Long.parseLong(cdValue), TypeConst.VALUE_TYPE_LONG, TypeConst.VALUE_SIZE_LONG);
+				rows=searchByOp(keyi,op);
+				break;
+			case TypeConst.VALUE_TYPE_FLOAT:
+				keyi= new PrimaryKey<Float>(Float.parseFloat(cdValue), TypeConst.VALUE_TYPE_FLOAT, TypeConst.VALUE_SIZE_FLOAT);
+				rows=searchByOp(keyi,op);
+				break;
+			case TypeConst.VALUE_TYPE_DOUBLE:
+				keyi= new PrimaryKey<Double>(Double.parseDouble(cdValue), TypeConst.VALUE_TYPE_DOUBLE, TypeConst.VALUE_SIZE_DOUBLE);
+				rows=searchByOp(keyi,op);
+				break;
+			case TypeConst.VALUE_TYPE_STRING:
+				keyi= new PrimaryKey<String>(cdValue, TypeConst.VALUE_TYPE_STRING, keySize);
+				rows=searchByOp(keyi,op);
+				break;
+			}
+		}else {
+//
+//			SchemaDescriptor sd=this.schema.descriptors.get(cdName);
+//			SecondaryKey keyr;
+//			switch(sd.getType()) {
+//			case TypeConst.VALUE_TYPE_INT:
+//				keyr= new SecondaryKey(Integer.parseInt(cdValue), TypeConst.VALUE_TYPE_INT, TypeConst.VALUE_SIZE_INT);
+//				rows=searchByOp(keyi,op);
+//				break;
+//			case TypeConst.VALUE_TYPE_LONG:
+//				keyi= new PrimaryKey<Long>(Long.parseLong(cdValue), TypeConst.VALUE_TYPE_LONG, TypeConst.VALUE_SIZE_LONG);
+//				rows=searchByOp(keyi,op);
+//				break;
+//			case TypeConst.VALUE_TYPE_FLOAT:
+//				keyi= new PrimaryKey<Float>(Float.parseFloat(cdValue), TypeConst.VALUE_TYPE_FLOAT, TypeConst.VALUE_SIZE_FLOAT);
+//				rows=searchByOp(keyi,op);
+//				break;
+//			case TypeConst.VALUE_TYPE_DOUBLE:
+//				keyi= new PrimaryKey<Double>(Double.parseDouble(cdValue), TypeConst.VALUE_TYPE_DOUBLE, TypeConst.VALUE_SIZE_DOUBLE);
+//				rows=searchByOp(keyi,op);
+//				break;
+//			case TypeConst.VALUE_TYPE_STRING:
+//				keyi= new PrimaryKey<String>(cdValue, TypeConst.VALUE_TYPE_STRING, keySize);
+//				rows=searchByOp(keyi,op);
+//				break;
+//			}
+//
+		}
+		QueryResult qr=new QueryResult();
+		ArrayList<LinkedHashMap<String,Object>> rowl=fromRaw(rows);
+		qr.data=rowl;
+		qr.types=this.schema.types;
+		return qr;
+	}
+	
+	@SuppressWarnings("unchecked")
+	protected LinkedList<Row> searchByOp(@SuppressWarnings("rawtypes") PrimaryKey key,int op) throws IOException{
+		switch(op) {
+		case Statement.lg:
+			return index.searchByRange(key, true, true, null, false, true).rows;
+		case Statement.lt:
+			return index.searchByRange(null, false, true,key, true, true).rows;
+		case Statement.lge:
+			return index.searchByRange(key, true, false, null, false, true).rows;
+		case Statement.lte:
+			return index.searchByRange(null, false, true,key, true, false).rows;
+		case Statement.eq:
+			return index.search(key).rows;
+		}
 		return null;
-
-//    searchByRange(PrimaryKey<K> lbound, boolean uselbound, PrimaryKey<K> hbound, boolean usehbound)
-		
 	}
 	protected QueryResult query(List<String> names,Boolean existWhere,String cdName,String cdValue, int op) throws IOException, ClassNotFoundException {
+		@SuppressWarnings("unchecked")
 		LinkedList<Row> rows=index.searchAll().rows;
 		ArrayList<LinkedHashMap<String,Object>> rowl=fromRaw(rows);
 		ArrayList<LinkedHashMap<String,Object>> res=new ArrayList<LinkedHashMap<String,Object>>();
@@ -157,7 +324,7 @@ public class Table implements Serializable{
 		for(Entry<String,SchemaDescriptor> e:this.schema.descriptors.entrySet()) {
 			SchemaDescriptor sd=e.getValue();
 			byte[] nulls = Arrays.copyOfRange(row.array, pos, pos+2);
-			byte[] slice = Arrays.copyOfRange(row.array, pos+2, pos+2+sd.getSize()+2);
+			byte[] slice = Arrays.copyOfRange(row.array, pos+2, pos+2+sd.getSize());
 			pos+=sd.getSize()+2;
 		    ByteArrayInputStream in = new ByteArrayInputStream(slice);
 		    DataInputStream inst=new DataInputStream(in);
@@ -194,7 +361,7 @@ public class Table implements Serializable{
 		return objs;
 	}
 	
-	public void createIndex() throws IOException {
+	public void createPrimaryIndex() throws IOException {
 		switch(keyType) {
 		case TypeConst.VALUE_TYPE_INT:
 			index=new PrimaryIndex<Integer>(1024, keyType, keySize, valueSize, 1024, tableName.concat(".index"));

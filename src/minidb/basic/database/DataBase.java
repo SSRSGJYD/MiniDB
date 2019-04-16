@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 import minidb.result.BoolResult;
 import minidb.result.QueryResult;
@@ -29,11 +30,21 @@ public class DataBase{
 		@SuppressWarnings("resource")
 		BufferedReader br = new BufferedReader(new FileReader(file)); 
 		String st; 
+
 		while ((st = br.readLine()) != null) {
 			Table tb=Table.loadFromFile(st);
-			tb.createIndex();
+			tb.createPrimaryIndex();
+
+			for(Entry<String, SchemaDescriptor> entry:tb.schema.descriptors.entrySet()) {
+				SchemaDescriptor sd=entry.getValue();
+				if(!sd.isPrimary()) {
+					tb.createSecondaryIndex(entry);
+				}
+			}
+
 			addTable(tb);
 		}
+
     }
 	
 	public Result execute(Statement st) throws IOException, ClassNotFoundException {
