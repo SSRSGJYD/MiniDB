@@ -65,16 +65,18 @@ public class SecondaryIndex<K extends Comparable<K>, PK extends Comparable<PK>> 
      *
      * @param lbound lower bound
      * @param uselbound whether use lower bound or not
+     * @param lstrict whether lower bound is strict
      * @param hbound higher bound
      * @param usehbound whether use higher bound or not
+     * @param hstrict whether higher bound is strict
      * @param useAll whether compare using all keys or just non-primary attribute
      * @return a SearchResult Object
      * @throws IOException
      */
-    public SearchResult<PrimaryKeyValue> searchByRange(SecondaryKey<K,PK> lbound, boolean uselbound, SecondaryKey<K,PK> hbound, boolean usehbound, boolean useAll)
+    public SearchResult<PrimaryKeyValue> searchByRange(SecondaryKey<K,PK> lbound, boolean uselbound, boolean lstrict, SecondaryKey<K,PK> hbound, boolean usehbound, boolean hstrict, boolean useAll)
             throws IOException {
         assert uselbound || usehbound;
-        return tree.searchByKeyWithRange(lbound, uselbound, hbound, usehbound, useAll);
+        return tree.searchByKeyWithRange(lbound, uselbound, lstrict, hbound, usehbound, hstrict, true);
     }
 
     /**
