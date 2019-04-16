@@ -32,10 +32,11 @@ public class SQLParser{
 	}
 	public static void main( String[] args) throws Exception 
 	{
-		String cmds="create table play(id int,age int,primary key(id))\n"
-				+ "insert into play values(1234,13)\n"
-				+ "insert into play(id,age) values(44,28)\n"
-				+ "select id,age from play where age>20 \n";
+		String cmds="create table plays(id int,age int,primary key(id))\n"
+				+ "insert into plays values(1234,199)\n"
+				+ "insert into plays(id,age) values(44,288)\n"
+				+ "insert into plays(id,age) values(55,288)\n"
+				+ "select id,age from plays where age>50 \n";
 		InputStream targetStream = new ByteArrayInputStream(cmds.getBytes());
 		InputStreamReader in=new InputStreamReader(targetStream);
 		BufferedReader br=new BufferedReader(in);

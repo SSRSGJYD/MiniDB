@@ -54,9 +54,11 @@ public class DataBase{
 		switch(st.type) {
 		case Statement.create:
 			StatementCreate sc=(StatementCreate) st;
-			Schema sa=new Schema(sc.descriptors);
-			sa.types=sc.types;
-			this.createTable(sc.tableName,sa);
+			if(!tables.containsKey(sc.tableName)) {
+				Schema sa=new Schema(sc.descriptors);
+				sa.types=sc.types;
+				this.createTable(sc.tableName,sa);
+			}
 			res=new BoolResult();
 			break;
 		case Statement.drop:
