@@ -596,7 +596,7 @@ public class BPlusTree<K extends Key, V extends Value> {
             BPlusTreeLeafNode<K,V> leaf = (BPlusTreeLeafNode<K,V>)node;
             int j = (leaf.getCapacity() > 0 && i == 0
                     && leaf.keyList.getFirst().compareTo(key) == 1) ? i : i-1;
-            if(leaf.getCapacity() > 0 && leaf.keyList.get(j) == key) { // same value already exists
+            if(leaf.getCapacity() > 0 && leaf.keyList.get(j).compareTo(key) == 0) { // same value already exists
                 return; // should not have same key
             }
             else { // a new key

@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 
+import org.antlr.v4.parse.ANTLRParser.v3tokenSpec_return;
+
 /**
  * Util class for B+ tree
  *
@@ -220,7 +222,7 @@ public class BPlusTreeUtils {
 
     public static void writeRowToFile(RandomAccessFile fa, Value row)
         throws IOException {
-        // TODO
+        fa.write(row.array);
     }
 
     /**
