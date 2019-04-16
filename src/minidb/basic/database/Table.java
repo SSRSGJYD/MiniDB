@@ -156,7 +156,7 @@ public class Table implements Serializable{
 	}
 
 	@SuppressWarnings("unchecked")
-	protected QueryResult queryx(List<String> names,Boolean existWhere,String cdName,String cdValue, int op) throws IOException, ClassNotFoundException {
+	protected QueryResult query(List<String> names,Boolean existWhere,String cdName,String cdValue, int op) throws IOException, ClassNotFoundException {
 		LinkedList<Row> rows=null;
 		if(!existWhere) {
 			rows=index.searchAll().rows;
@@ -192,32 +192,32 @@ public class Table implements Serializable{
 				break;
 			}
 		}else {
-//
-//			SchemaDescriptor sd=this.schema.descriptors.get(cdName);
-//			SecondaryKey keyr;
-//			switch(sd.getType()) {
-//			case TypeConst.VALUE_TYPE_INT:
-//				keyr= new SecondaryKey(Integer.parseInt(cdValue), TypeConst.VALUE_TYPE_INT, TypeConst.VALUE_SIZE_INT);
-//				rows=searchByOp(keyi,op);
-//				break;
-//			case TypeConst.VALUE_TYPE_LONG:
-//				keyi= new PrimaryKey<Long>(Long.parseLong(cdValue), TypeConst.VALUE_TYPE_LONG, TypeConst.VALUE_SIZE_LONG);
-//				rows=searchByOp(keyi,op);
-//				break;
-//			case TypeConst.VALUE_TYPE_FLOAT:
-//				keyi= new PrimaryKey<Float>(Float.parseFloat(cdValue), TypeConst.VALUE_TYPE_FLOAT, TypeConst.VALUE_SIZE_FLOAT);
-//				rows=searchByOp(keyi,op);
-//				break;
-//			case TypeConst.VALUE_TYPE_DOUBLE:
-//				keyi= new PrimaryKey<Double>(Double.parseDouble(cdValue), TypeConst.VALUE_TYPE_DOUBLE, TypeConst.VALUE_SIZE_DOUBLE);
-//				rows=searchByOp(keyi,op);
-//				break;
-//			case TypeConst.VALUE_TYPE_STRING:
-//				keyi= new PrimaryKey<String>(cdValue, TypeConst.VALUE_TYPE_STRING, keySize);
-//				rows=searchByOp(keyi,op);
-//				break;
-//			}
-//
+
+			SchemaDescriptor sd=this.schema.descriptors.get(cdName);
+			SecondaryKey keyr;
+			switch(sd.getType()) {
+			case TypeConst.VALUE_TYPE_INT:
+				keyr= new SecondaryKey(Integer.parseInt(cdValue), TypeConst.VALUE_TYPE_INT, TypeConst.VALUE_SIZE_INT,null,keyType,keySize);
+				rows=searchByOpS(keyr,cdName,op);
+				break;
+			case TypeConst.VALUE_TYPE_LONG:
+				keyr= new SecondaryKey(Long.parseLong(cdValue), TypeConst.VALUE_TYPE_LONG, TypeConst.VALUE_SIZE_LONG,null,keyType,keySize);
+				rows=searchByOpS(keyr,cdName,op);
+				break;
+			case TypeConst.VALUE_TYPE_FLOAT:
+				keyr= new SecondaryKey(Float.parseFloat(cdValue), TypeConst.VALUE_TYPE_FLOAT, TypeConst.VALUE_SIZE_FLOAT,null,keyType,keySize);
+				rows=searchByOpS(keyr,cdName,op);
+				break;
+			case TypeConst.VALUE_TYPE_DOUBLE:
+				keyr= new SecondaryKey(Double.parseDouble(cdValue), TypeConst.VALUE_TYPE_DOUBLE, TypeConst.VALUE_SIZE_DOUBLE,null,keyType,keySize);
+				rows=searchByOpS(keyr,cdName,op);
+				break;
+			case TypeConst.VALUE_TYPE_STRING:
+				keyr= new SecondaryKey(cdValue, TypeConst.VALUE_TYPE_STRING, sd.getSize(),null,keyType,keySize);
+				rows=searchByOpS(keyr,cdName,op);
+				break;
+			}
+
 		}
 		QueryResult qr=new QueryResult();
 		ArrayList<LinkedHashMap<String,Object>> rowl=fromRaw(rows);
@@ -225,7 +225,24 @@ public class Table implements Serializable{
 		qr.types=this.schema.types;
 		return qr;
 	}
-	
+		@SuppressWarnings("unchecked")
+	protected LinkedList<Row> searchByOpS(@SuppressWarnings("rawtypes") SecondaryKey key,String keyName,int op) throws IOException{
+		SecondaryIndex indext=indexs.get(keyName);
+		switch(op) {
+		case Statement.lg:
+			return indext.searchByRange(key, true, true, null, false, true,false).rows;
+		case Statement.lt:
+			return indext.searchByRange(null, false, true,key, true, true,false).rows;
+		case Statement.lge:
+			return indext.searchByRange(key, true, false, null, false, true,false).rows;
+		case Statement.lte:
+			return indext.searchByRange(null, false, true,key, true, false,false).rows;
+		case Statement.eq:
+			return indext.search(key,false).rows;
+		}
+		return null;
+	}
+
 	@SuppressWarnings("unchecked")
 	protected LinkedList<Row> searchByOp(@SuppressWarnings("rawtypes") PrimaryKey key,int op) throws IOException{
 		switch(op) {
@@ -242,7 +259,7 @@ public class Table implements Serializable{
 		}
 		return null;
 	}
-	protected QueryResult query(List<String> names,Boolean existWhere,String cdName,String cdValue, int op) throws IOException, ClassNotFoundException {
+	protected QueryResult queryx(List<String> names,Boolean existWhere,String cdName,String cdValue, int op) throws IOException, ClassNotFoundException {
 		@SuppressWarnings("unchecked")
 		LinkedList<Row> rows=index.searchAll().rows;
 		ArrayList<LinkedHashMap<String,Object>> rowl=fromRaw(rows);
