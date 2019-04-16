@@ -8,11 +8,14 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 import minidb.basic.index.Key;
+import minidb.basic.index.PrimaryKeyValue;
 import minidb.basic.index.Value;
 import minidb.result.DeleteResult;
 import minidb.types.TypeConst;
 import minidb.basic.bplustree.BPlusTreeUtils.*;
 import minidb.result.SearchResult;
+
+import minidb.basic.database.Row;
 
 /**
  * Generic class of B+ Tree for all value types (int, long, float, double, string)
@@ -200,19 +203,6 @@ public class BPlusTree<K extends Key, V extends Value> {
                 node.setValid(true);
                 return node;
             }
-            case BPlusTreeConst.NODE_TYPE_LEAF_OVERFLOW: {
-                long nextptr = fa.readLong();
-                long prevptr = fa.readLong();
-                int curCapacity = fa.readInt();
-                BPlusTreeOverflowNode<K,V> node = createOverflowNode(index, nextptr, prevptr);
-                // read in rows
-                ArrayList<Value> rows = BPlusTreeUtils.readRowsFromFile(fa, valueSize, curCapacity);
-                for (Value row: rows) {
-                    node.valueList.add((V)row);
-                }
-                node.setCapacity(curCapacity);
-                return node;
-            }
             case BPlusTreeConst.NODE_TYPE_LEAF:
             case BPlusTreeConst.NODE_TYPE_ROOT_LEAF: {
                 long nextptr = fa.readLong();
@@ -223,15 +213,13 @@ public class BPlusTree<K extends Key, V extends Value> {
                 if(isPrimaryIndex) {
                     for (int i = 0; i < curCapacity; i++) {
                         node.keyList.add(i, (K)BPlusTreeUtils.readPrimaryKeyFromFile(fa, keyType, keySize));
-                        node.overflowList.add(i, fa.readLong());
-                        node.valueList.add(i, (V)BPlusTreeUtils.readRowsFromFile(fa, valueSize, 1).get(0));
+                        node.valueList.add(i, (V)readRowFromFile(fa, valueSize));
                     }
                 }
                 else { // secondary index
                     for (int i = 0; i < curCapacity; i++) {
                         node.keyList.add(i, (K)BPlusTreeUtils.readSecondaryKeyFromFile(fa, keyType, attributeSize, PKType, PKSize));
-                        node.overflowList.add(i, fa.readLong());
-                        node.valueList.add(i, (V)BPlusTreeUtils.readRowsFromFile(fa, valueSize, 1).get(0));
+                        node.valueList.add(i, (V)readPKValueFromFile(fa, valueSize));
                     }
                 }
                 node.setCapacity(curCapacity);
@@ -348,9 +336,9 @@ public class BPlusTree<K extends Key, V extends Value> {
      * @return a search result object
      * @throws IOException
      */
-    public SearchResult searchByKey(K key, boolean useAll) throws IOException {
+    public SearchResult<V> searchByKey(K key, boolean useAll) throws IOException {
         if(this.root == null) { // empty tree
-            return new SearchResult();
+            return new SearchResult<V>();
         }
         return searchByKey(this.root, key, useAll);
     }
@@ -365,7 +353,7 @@ public class BPlusTree<K extends Key, V extends Value> {
      * @return a search result object
      * @throws IOException
      */
-    private SearchResult searchByKey(BPlusTreeNode<K,V> node, K key, boolean useAll) throws IOException {
+    private SearchResult<V> searchByKey(BPlusTreeNode<K,V> node, K key, boolean useAll) throws IOException {
         // search for the key
         int i = searchNode(node, key, BPlusTreeConst.SEARCH_EXACT, 0, node.getCapacity()-1, useAll);
         int nodeType = node.getNodeType();
@@ -374,27 +362,10 @@ public class BPlusTree<K extends Key, V extends Value> {
                 || nodeType == BPlusTreeConst.NODE_TYPE_ROOT_LEAF) { // leaf node
             BPlusTreeLeafNode<K,V> leaf = (BPlusTreeLeafNode<K,V>)node;
             if(i >= 0 && i < node.getCapacity() && key.compareTo(leaf.keyList.get(i), useAll) == 0) {
-                if(leaf.overflowList.get(i) == -1L ) { // no overflow node
-                    return new SearchResult(leaf.valueList.get(i));
-                }
-                else { // deal node overflow node
-                    BPlusTreeOverflowNode<K,V> overflowNode = (BPlusTreeOverflowNode<K,V>)readNodeFromFile(leaf.overflowList.get(i));
-                    LinkedList<Value> valueList = new LinkedList<Value>();
-                    valueList.add(leaf.valueList.get(i));
-                    int j = 0;
-                    while(j < overflowNode.getCapacity()) {
-                        valueList.add(overflowNode.valueList.get(j));
-                        ++j;
-                        if(j == overflowNode.getCapacity() && overflowNode.getNextPageIndex() != -1L) {
-                            overflowNode = (BPlusTreeOverflowNode<K,V>)readNodeFromFile(overflowNode.getNextPageIndex());
-                            j = 0;
-                        }
-                    }
-                    return new SearchResult(valueList);
-                }
+                return new SearchResult<V>(leaf.valueList.get(i));
             }
             else { // key not found
-                return new SearchResult();
+                return new SearchResult<V>();
             }
         }
         else { // internal node
@@ -413,18 +384,20 @@ public class BPlusTree<K extends Key, V extends Value> {
      *
      * @param lbound lower bound
      * @param uselbound whether use lower bound or not
+     * @param lstrict whether lower bound is strict
      * @param hbound higher bound
      * @param usehbound whether use higher bound or not
+     * @param hstrict whether higher bound is strict
      * @param useAll for secondary key
      * @return a search result object
      * @throws IOException
      */
-    public SearchResult searchByKeyWithRange(K lbound, boolean uselbound, K hbound, boolean usehbound, boolean useAll)
+    public SearchResult<V> searchByKeyWithRange(K lbound, boolean uselbound, boolean lstrict, K hbound, boolean usehbound, boolean hstrict, boolean useAll)
             throws IOException {
         if(this.root == null) { // empty tree
-            return new SearchResult();
+            return new SearchResult<V>();
         }
-        return searchByKeyWithRange(this.root, lbound, uselbound, hbound, usehbound, useAll);
+        return searchByKeyWithRange(this.root, lbound, uselbound, lstrict, hbound, usehbound, hstrict, useAll);
     }
 
     /**
@@ -433,16 +406,18 @@ public class BPlusTree<K extends Key, V extends Value> {
      * @param node node to search
      * @param lbound lower bound
      * @param uselbound whether use lower bound or not
+     * @param lstrict whether lower bound is strict
      * @param hbound higher bound
      * @param usehbound whether use higher bound or not
+     * @param hstrict whether higher bound is strict
      * @param useAll for secondary key
      * @return a search result object
      * @throws IOException
      */
-    private SearchResult searchByKeyWithRange(BPlusTreeNode<K,V> node, K lbound, boolean uselbound, K hbound, boolean usehbound, boolean useAll)
+    private SearchResult<V> searchByKeyWithRange(BPlusTreeNode<K,V> node, K lbound, boolean uselbound, boolean lstrict, K hbound, boolean usehbound, boolean hstrict, boolean useAll)
             throws IOException {
         assert (uselbound || usehbound);
-        LinkedList<Value> rows = new LinkedList<Value>();
+        LinkedList<V> rows = new LinkedList<V>();
         if(uselbound) {
             // search for the key
             int i = searchNode(node, lbound, BPlusTreeConst.SEARCH_PREV, 0, node.getCapacity()-1, useAll);
@@ -452,7 +427,8 @@ public class BPlusTree<K extends Key, V extends Value> {
                     || nodeType == BPlusTreeConst.NODE_TYPE_ROOT_LEAF) { // leaf node
                 BPlusTreeLeafNode<K, V> leaf = (BPlusTreeLeafNode<K, V>) node;
                 // find first key bigger than lower bound
-                while(leaf.keyList.get(i).compareTo(lbound, useAll) == -1) {
+                int lcondition = lstrict ? 0 : -1;
+                while(leaf.keyList.get(i).compareTo(lbound, useAll) <= lcondition) {
                     if(i < leaf.getCapacity() - 1) {
                         i++;
                     }
@@ -463,13 +439,9 @@ public class BPlusTree<K extends Key, V extends Value> {
                 }
                 // save values
                 if(usehbound) {
-                    while(leaf.keyList.get(i).compareTo(hbound, useAll) == -1) {
+                    int hcondition = hstrict ? -1 : 0;
+                    while(leaf.keyList.get(i).compareTo(hbound, useAll) <= hcondition) {
                         rows.add(leaf.valueList.get(i));
-                        long overflowIndex = leaf.overflowList.get(i);
-                        if(overflowIndex != -1L) {
-                            BPlusTreeOverflowNode<K,V> overflowNode = (BPlusTreeOverflowNode<K,V>)readNodeFromFile(overflowIndex);
-                            rows.addAll(overflowNode.valueList);
-                        }
                         if(i < leaf.getCapacity() - 1) {
                             i++;
                         }
@@ -478,18 +450,13 @@ public class BPlusTree<K extends Key, V extends Value> {
                             i = 0;
                         }
                         else {
-                            return new SearchResult(rows);
+                            return new SearchResult<V>(rows);
                         }
                     }
                 }
                 else { // no higher bound
                     while(true) {
                         rows.add(leaf.valueList.get(i));
-                        long overflowIndex = leaf.overflowList.get(i);
-                        if(overflowIndex != -1L) {
-                            BPlusTreeOverflowNode<K,V> overflowNode = (BPlusTreeOverflowNode<K,V>)readNodeFromFile(overflowIndex);
-                            rows.addAll(overflowNode.valueList);
-                        }
                         if(i < leaf.getCapacity() - 1) {
                             i++;
                         }
@@ -498,7 +465,7 @@ public class BPlusTree<K extends Key, V extends Value> {
                             i = 0;
                         }
                         else {
-                            return new SearchResult(rows);
+                            return new SearchResult<V>(rows);
                         }
                     }
                 }
@@ -506,34 +473,29 @@ public class BPlusTree<K extends Key, V extends Value> {
             else { // internal node
                 BPlusTreeInternalNode<K,V> internal = (BPlusTreeInternalNode<K,V>)node;
                 BPlusTreeNode<K,V> nextToSearch = readNodeFromFile(internal.ptrList.get(i));
-                return searchByKeyWithRange(nextToSearch, lbound, uselbound, hbound, usehbound, useAll);
+                return searchByKeyWithRange(nextToSearch, lbound, uselbound, lstrict, hbound, usehbound, hstrict, useAll);
             }
         }
         else { // only use higher bound, node must be root now
             assert node == root;
             if(root == null) {
-                return new SearchResult();
+                return new SearchResult<V>();
             }
             BPlusTreeNode<K,V> iterator = root;
             while(iterator.getNodeType() != BPlusTreeConst.NODE_TYPE_LEAF
                     && iterator.getNodeType() != BPlusTreeConst.NODE_TYPE_ROOT_LEAF) {
                 iterator = readNodeFromFile(((BPlusTreeInternalNode<K,V>) iterator).ptrList.getFirst());
             }
+            int hcondition = hstrict ? -1 : 0;
             // now iterator is at left-bottom leaf node
             BPlusTreeLeafNode<K,V> leaf = (BPlusTreeLeafNode<K,V>)iterator;
             while(true) {
                 int capacity = leaf.getCapacity();
                 for(int i=0; i<capacity; i++) {
-                    if(leaf.keyList.get(i).compareTo(hbound, useAll) == 1) {
-                        return new SearchResult(rows);
+                    if(leaf.keyList.get(i).compareTo(hbound, useAll) > hcondition) {
+                        return new SearchResult<V>(rows);
                     }
                     rows.push(leaf.valueList.get(i));
-                    // add values in overflow node
-                    long overflowIndex = leaf.overflowList.get(i);
-                    if(overflowIndex != -1L) {
-                        BPlusTreeOverflowNode<K,V> overflowNode = (BPlusTreeOverflowNode<K,V>)readNodeFromFile(overflowIndex);
-                        rows.addAll(overflowNode.valueList);
-                    }
                 }
                 // move on to nextInternal leaf node
                 long nextLeafIndex = leaf.getNextPageIndex();
@@ -541,11 +503,11 @@ public class BPlusTree<K extends Key, V extends Value> {
                     leaf = (BPlusTreeLeafNode<K,V>)readNodeFromFile(nextLeafIndex);
                 }
                 else{
-                    return new SearchResult(rows);
+                    return new SearchResult<V>(rows);
                 }
             }
         }
-        return new SearchResult();
+        return new SearchResult<V>();
     }
 
     /**
@@ -554,11 +516,11 @@ public class BPlusTree<K extends Key, V extends Value> {
      * @return a search result object
      * @throws IOException
      */
-    public SearchResult searchAll() throws IOException {
+    public SearchResult<V> searchAll() throws IOException {
         if(root == null) {
-            return new SearchResult();
+            return new SearchResult<V>();
         }
-        LinkedList<Value> rows = new LinkedList<Value>();
+        LinkedList<V> rows = new LinkedList<V>();
         BPlusTreeNode<K,V> iterator = root;
         while(iterator.getNodeType() != BPlusTreeConst.NODE_TYPE_LEAF
             && iterator.getNodeType() != BPlusTreeConst.NODE_TYPE_ROOT_LEAF) {
@@ -569,13 +531,7 @@ public class BPlusTree<K extends Key, V extends Value> {
         while(true) {
             int capacity = leaf.getCapacity();
             for(int i=0; i<capacity; i++) {
-                rows.push(leaf.valueList.get(i));
-                // add values in overflow node
-                long overflowIndex = leaf.overflowList.get(i);
-                if(overflowIndex != -1L) {
-                    BPlusTreeOverflowNode<K,V> overflowNode = (BPlusTreeOverflowNode<K,V>)readNodeFromFile(overflowIndex);
-                    rows.addAll(overflowNode.valueList);
-                }
+            	rows.push(leaf.valueList.get(i));
             }
             // move on to nextInternal leaf node
             long nextLeafIndex = leaf.getNextPageIndex();
@@ -587,7 +543,7 @@ public class BPlusTree<K extends Key, V extends Value> {
             }
         }
 
-        return new SearchResult(rows);
+        return new SearchResult<V>(rows);
     }
 
 
@@ -641,31 +597,11 @@ public class BPlusTree<K extends Key, V extends Value> {
             int j = (leaf.getCapacity() > 0 && i == 0
                     && leaf.keyList.getFirst().compareTo(key) == 1) ? i : i-1;
             if(leaf.getCapacity() > 0 && leaf.keyList.get(j) == key) { // same value already exists
-                if(leaf.overflowList.get(j) < 0) { // overflow page does not exist
-                    appendOverflowNode(leaf, j, value);
-                }
-                else { // overflow page exists
-                    BPlusTreeOverflowNode<K,V> overflowNode =
-                            (BPlusTreeOverflowNode<K,V>)readNodeFromFile(leaf.overflowList.get(j));
-                    while(isFullNode(overflowNode)) {
-                        if(overflowNode.getNextPageIndex() < 0) { // have to create overflow page
-                            appendOverflowNode(overflowNode, -1, value);
-                            return;
-                        }
-                        else { // load nextInternal overflow page
-                            overflowNode = (BPlusTreeOverflowNode<K,V>)readNodeFromFile(overflowNode.getNextPageIndex());
-                        }
-                    }
-                    // add value to overflow page
-                    overflowNode.valueList.push(value);
-                    overflowNode.increaseCapacity();
-                    writeNodeToFile(overflowNode);
-                }
+                return; // should not have same key
             }
             else { // a new key
                 leaf.keyList.add(i, key);
                 leaf.valueList.add(i, value);
-                leaf.overflowList.add(i, -1L); // create a NULL overflow pointer
                 leaf.increaseCapacity();
                 writeNodeToFile(leaf);
             }
@@ -809,7 +745,6 @@ public class BPlusTree<K extends Key, V extends Value> {
             else { // key has been found
                 V valueToDelete = leaf.valueList.remove(i);
                 leaf.keyList.remove(i);
-                leaf.overflowList.remove(i);
                 leaf.decreaseCapacity();
                 writeNodeToFile(leaf);
                 return new DeleteResult(valueToDelete);
@@ -875,7 +810,6 @@ public class BPlusTree<K extends Key, V extends Value> {
             for(int i = 0; i < splitAt; i++) {
                 leafToAdd.keyList.push(leafToSplit.keyList.removeLast());
                 leafToAdd.valueList.push(leafToSplit.valueList.removeLast());
-                leafToAdd.overflowList.push(leafToSplit.overflowList.removeLast());
                 leafToAdd.increaseCapacity();
                 leafToSplit.decreaseCapacity();
             }
@@ -962,58 +896,10 @@ public class BPlusTree<K extends Key, V extends Value> {
     }
 
     /**
-     * leaf overflow node factory
-     */
-    private BPlusTreeOverflowNode<K,V> createOverflowNode(long pageIndex, long nextPage, long prevPage) {
-        return new BPlusTreeOverflowNode<K,V>(BPlusTreeConst.NODE_TYPE_LEAF_OVERFLOW, getFreeSlot(), valueSize, nextPage, prevPage);
-    }
-
-    /**
      * slot node factory
      */
     private BPlusTreeSlotNode<K,V> createSlotNode(long pageIndex, long nextPage) {
         return new BPlusTreeSlotNode<K,V>(BPlusTreeConst.NODE_TYPE_SLOT_OVERFLOW, getFreeSlot(), valueSize, nextPage);
-    }
-
-    /**
-     * append new overflow page to leaf node or overflow node
-     *
-     * @param node node to append at
-     * @param leafIndex index of key in leaf node
-     * @param value value to write into overflow node
-     */
-    private void appendOverflowNode(BPlusTreeNode<K,V> node, int leafIndex, V value)
-        throws IOException {
-        BPlusTreeOverflowNode<K,V> newOverflowNode;
-        int nodeType = node.getNodeType();
-        if(nodeType == BPlusTreeConst.NODE_TYPE_ROOT_LEAF
-            || nodeType == BPlusTreeConst.NODE_TYPE_LEAF) { // leaf node
-            BPlusTreeLeafNode<K,V> leaf = (BPlusTreeLeafNode<K,V>)node; // convert type
-            // create new overflow node and insert value
-            newOverflowNode = createOverflowNode(getFreeSlot(), -1L, leaf.getPageIndex());
-            newOverflowNode.valueList.push(value);
-            newOverflowNode.increaseCapacity();
-            leaf.overflowList.set(leafIndex, newOverflowNode.getPageIndex());
-            newOverflowNode.setValid(true);
-            // update node info in tree file
-            writeNodeToFile(newOverflowNode);
-            writeNodeToFile(leaf);
-        }
-        else { //BPlusTreeConst.NODE_TYPE_LEAF_OVERFLOW
-            BPlusTreeOverflowNode<K,V> overflowNode = (BPlusTreeOverflowNode<K,V>)node;
-            newOverflowNode = createOverflowNode(getFreeSlot(), -1L, overflowNode.getPageIndex());
-            newOverflowNode.valueList.push(value);
-            newOverflowNode.increaseCapacity();
-            overflowNode.setNextPageIndex(newOverflowNode.getPageIndex());
-            newOverflowNode.setValid(true);
-            // update node info in tree file
-            writeNodeToFile(newOverflowNode);
-            writeNodeToFile(overflowNode);
-        }
-        // update info in tree file
-        fa.seek(treeHeaderSize-32);
-        fa.writeLong(totalPageNum); // update page count
-        fa.writeLong(maxPageNumber); // update max page number
     }
 
     /**
@@ -1171,7 +1057,6 @@ public class BPlusTree<K extends Key, V extends Value> {
             throws IOException {
         K key; // need to pass to parent node
         if(leftToRight) { // move (key,value) from left to right leaf
-            to.overflowList.push(from.overflowList.removeLast());
             to.valueList.push(from.valueList.removeLast());
             to.keyList.push(from.keyList.removeLast());
             to.increaseCapacity();
@@ -1179,7 +1064,6 @@ public class BPlusTree<K extends Key, V extends Value> {
             key = to.keyList.get(0);
         }
         else { // move (key,value) from right to left leaf
-            to.overflowList.addLast(from.overflowList.pop());
             to.valueList.addLast(from.valueList.pop());
             to.keyList.addLast(from.keyList.pop());
             to.increaseCapacity();
@@ -1245,7 +1129,6 @@ public class BPlusTree<K extends Key, V extends Value> {
         for(int i=0; i<capacity; i++) {
             left.keyList.addLast(right.keyList.pop());
             left.valueList.addLast(right.valueList.pop());
-            left.overflowList.addLast(right.overflowList.pop());
             left.increaseCapacity();
             right.decreaseCapacity();
         }
@@ -1283,7 +1166,6 @@ public class BPlusTree<K extends Key, V extends Value> {
         for(int i=0; i<capacity; i++) {
             left.keyList.addLast(right.keyList.pop());
             left.valueList.addLast(right.valueList.pop());
-            left.overflowList.addLast(right.overflowList.pop());
             left.increaseCapacity();
             right.decreaseCapacity();
         }
@@ -1653,6 +1535,34 @@ public class BPlusTree<K extends Key, V extends Value> {
             }
         }
         return node;
+    }
+
+    /**
+     * read in a row from tree file
+     *
+     * @param fa file access
+     * @param valueSize size of row
+     * @return a row
+     * @throws IOException
+     */
+    private Row readRowFromFile(RandomAccessFile fa, int valueSize) throws IOException {
+        byte[] tmp = new byte[valueSize];
+        fa.read(tmp, 0, valueSize);
+        return new Row(tmp);
+    }
+
+    /**
+     * read in a primary key from tree file
+     *
+     * @param fa file access
+     * @param valueSize size of key
+     * @return a value
+     * @throws IOException
+     */
+    private PrimaryKeyValue readPKValueFromFile(RandomAccessFile fa, int valueSize) throws IOException {
+        byte[] tmp = new byte[valueSize];
+        fa.read(tmp, 0, valueSize);
+        return new PrimaryKeyValue(tmp, PKType);
     }
 
 }

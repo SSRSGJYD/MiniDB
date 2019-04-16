@@ -77,7 +77,7 @@ public class Table implements Serializable{
 		
 	}
 	protected QueryResult query(List<String> names,Boolean existWhere,String cdName,String cdValue, int op) throws IOException, ClassNotFoundException {
-		LinkedList<Value> rows=index.searchAll().rows;
+		LinkedList<Row> rows=index.searchAll().rows;
 		ArrayList<LinkedHashMap<String,Object>> rowl=fromRaw(rows);
 		ArrayList<LinkedHashMap<String,Object>> res=new ArrayList<LinkedHashMap<String,Object>>();
 		if(existWhere) {
@@ -141,11 +141,11 @@ public class Table implements Serializable{
 		
 	}
 
-	protected ArrayList<LinkedHashMap<String,Object>> fromRaw(LinkedList<Value> rows) throws ClassNotFoundException, IOException{
+	protected ArrayList<LinkedHashMap<String,Object>> fromRaw(LinkedList<Row> rows) throws ClassNotFoundException, IOException{
 		ArrayList<LinkedHashMap<String,Object>> res=new ArrayList<LinkedHashMap<String,Object>>();
 		int c=0;
-		for(Value v:rows) {
-			res.add(extract((Row)v));
+		for(Row v:rows) {
+			res.add(extract(v));
 			c++;
 		}
 		return res;
@@ -235,19 +235,19 @@ public class Table implements Serializable{
 	    writer.close();
 	}
 	
-	public void update(String cdName,String cdValue,int op,String setName,String setValue) throws IOException, ClassNotFoundException {
-		LinkedList<Value> rows=index.searchAll().rows;
-		ArrayList<LinkedHashMap<String,Object>> rowl=fromRaw(rows);
+//	public void update(String cdName,String cdValue,int op,String setName,String setValue) throws IOException, ClassNotFoundException {
+//		LinkedList<Value> rows=index.searchAll().rows;
+//		ArrayList<LinkedHashMap<String,Object>> rowl=fromRaw(rows);
 
-		RowFilter rf= buildFilter(cdName,op,cdValue);
-		for(LinkedHashMap<String,Object> objs:rowl) {
-			if(rf.method(objs)) {
+//		RowFilter rf= buildFilter(cdName,op,cdValue);
+//		for(LinkedHashMap<String,Object> objs:rowl) {
+//			if(rf.method(objs)) {
 //				LinkedHashMap<String,Object> nobjs=modify(objs,cdName,cdValue);
 //				Row nrow=toRow(nobjs);
 //				index.update(nobjs.get(this.schema.primaryKey), nrow);
-			}
-		}
-	}
+//			}
+//		}
+//	}
 	
 //	public LinkedHashMap<String,Object> modify(LinkedHashMap<String,Object> objs,String cdName,String cdValue){
 //		switch(this.schema.descriptors.get(cdName).getType()) {

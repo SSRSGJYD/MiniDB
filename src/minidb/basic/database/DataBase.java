@@ -72,12 +72,14 @@ public class DataBase{
 			tb=tables.get(sla.tableName);
 			res=tb.query(sla.names, sla.existWhere, sla.cdName, sla.cdValue, sla.op);
 			break;
-		case Statement.update:
-			StatementUpdate su=(StatementUpdate) st;
-			tb=tables.get(su.tableName);
-			tb.update(su.cdName,su.cdValue,su.op,su.setName,su.setValue);
-			res=new BoolResult();
-			break;
+
+//		case statement.update:
+//			statementupdate su=(statementupdate) st;
+//			tb=tables.get(su.tablename);
+//			tb.update(su.cdname,su.cdvalue,su.op,su.setname,su.setvalue);
+//			res=new boolresult();
+//			break;
+
 		}
 		return res;
 	}
