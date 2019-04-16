@@ -6,6 +6,7 @@ String : '\'' (.)+? '\''
 	;
 NEWLINE:'\r'?'\n'
      |EOF;
+   
 
 type : 'int'
      | 'long'
@@ -18,6 +19,7 @@ op : '='|'>'|'<'|'>='|'<='|'<>';
 
 value : Number
       | String
+      | 'null'
 	;
 
 WS: [ \t\r\n]+ -> skip;

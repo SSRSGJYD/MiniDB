@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 import minidb.result.BoolResult;
 import minidb.result.QueryResult;
@@ -29,22 +30,35 @@ public class DataBase{
 		@SuppressWarnings("resource")
 		BufferedReader br = new BufferedReader(new FileReader(file)); 
 		String st; 
+
 		while ((st = br.readLine()) != null) {
 			Table tb=Table.loadFromFile(st);
-			tb.createIndex();
+			tb.createPrimaryIndex();
+
+			for(Entry<String, SchemaDescriptor> entry:tb.schema.descriptors.entrySet()) {
+				SchemaDescriptor sd=entry.getValue();
+				if(!sd.isPrimary()) {
+					tb.createSecondaryIndex(entry);
+				}
+			}
+
 			addTable(tb);
 		}
+
     }
 	
 	public Result execute(Statement st) throws IOException, ClassNotFoundException {
 		Result res = null;
 		Table tb;
+		Pair<Object,Row> pair;
 		switch(st.type) {
 		case Statement.create:
 			StatementCreate sc=(StatementCreate) st;
-			Schema sa=new Schema(sc.descriptors);
-			sa.types=sc.types;
-			this.createTable(sc.tableName,sa);
+			if(!tables.containsKey(sc.tableName)) {
+				Schema sa=new Schema(sc.descriptors);
+				sa.types=sc.types;
+				this.createTable(sc.tableName,sa);
+			}
 			res=new BoolResult();
 			break;
 		case Statement.drop:
@@ -55,7 +69,14 @@ public class DataBase{
 		case Statement.insertA:
 			StatementInsertA sia=(StatementInsertA) st;
 			tb=tables.get(sia.tableName);
-			Pair<Object,Row> pair=tb.mkRow(sia.values);
+			pair=tb.mkRow(sia.values);
+			tb.simpleInsert(pair.l,pair.r);
+			res=new BoolResult();
+			break;
+		case Statement.insertB:
+			StatementInsertB sib=(StatementInsertB) st;
+			tb=tables.get(sib.tableName);
+			pair=tb.mkRowB(sib.pairs);
 			tb.simpleInsert(pair.l,pair.r);
 			res=new BoolResult();
 			break;
@@ -63,6 +84,15 @@ public class DataBase{
 			StatementSelectA sla=(StatementSelectA) st;
 			tb=tables.get(sla.tableName);
 			res=tb.query(sla.names, sla.existWhere, sla.cdName, sla.cdValue, sla.op);
+			break;
+
+//		case statement.update:
+//			statementupdate su=(statementupdate) st;
+//			tb=tables.get(su.tablename);
+//			tb.update(su.cdname,su.cdvalue,su.op,su.setname,su.setvalue);
+//			res=new boolresult();
+//			break;
+
 		}
 		return res;
 	}

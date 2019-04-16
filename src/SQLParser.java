@@ -17,22 +17,26 @@ public class SQLParser{
 	public static void mainl( String[] args) throws Exception {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(outputStream);
-		dos.writeInt(1234);
+		dos.writeChars("1234");
 		byte[]array=outputStream.toByteArray();
 
 		ByteArrayInputStream in = new ByteArrayInputStream(array);
 		DataInputStream inst=new DataInputStream(in);
-		int str=inst.readInt();
+		String str="";
+		for(int i=0;i<4;i++) {
+			char s=inst.readChar();
+			str+=s;
+		}
 		System.out.print(str);
 		
 	}
 	public static void main( String[] args) throws Exception 
 	{
-		String cmds="create table play(id int,age int,primary key(id))\n"
-				+ "insert into play values(12,13)\n"
-				+ "insert into play values(13,23)\n"
-				+ "select age from play where age>20\n";
-//		String cmds= "select age from play\n";
+		String cmds="create table plays(id int,age int,primary key(id))\n"
+				+ "insert into plays values(1234,199)\n"
+				+ "insert into plays(id,age) values(44,288)\n"
+				+ "insert into plays(id,age) values(55,288)\n"
+				+ "select id,age from plays where age>50 \n";
 		InputStream targetStream = new ByteArrayInputStream(cmds.getBytes());
 		InputStreamReader in=new InputStreamReader(targetStream);
 		BufferedReader br=new BufferedReader(in);

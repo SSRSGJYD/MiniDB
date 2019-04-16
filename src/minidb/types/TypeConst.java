@@ -14,6 +14,7 @@ public class TypeConst {
     public static final int VALUE_SIZE_FLOAT = Float.BYTES;
     public static final int VALUE_SIZE_DOUBLE = Double.BYTES;
     public static final int VALUE_SIZE_CHAR = Character.BYTES;
+    public static final int VALUE_SIZE_NULL = Character.BYTES;
 
     public static final int VALUE_SIZE[] = {Integer.BYTES, Long.BYTES, Float.BYTES, Double.BYTES, Character.BYTES};
 

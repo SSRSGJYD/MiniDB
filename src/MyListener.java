@@ -92,7 +92,15 @@ public class MyListener extends MiniSQLBaseListener {
 		type=Statement.insertB;
 		sib.tableName=ctx.Name().getText();
 		for(int i=0;i<ctx.values().value().size();i++) {
-			sib.pairs.put(ctx.names().Name(i).getText(), ctx.values().value(i).getText());
+			if(ctx.values().value(i).Number()!=null)
+				sib.pairs.put(ctx.names().Name(i).getText(), ctx.values().value(i).getText());
+			else if(ctx.values().value(i).String()!=null) {
+				String str=ctx.values().value(i).getText();
+				String res=str.substring(1, str.length()-1);
+				sib.pairs.put(ctx.names().Name(i).getText(), res);
+			}else {
+				sib.pairs.put(ctx.names().Name(i).getText(), null);
+			}
 		}
 	}
 	
@@ -104,7 +112,16 @@ public class MyListener extends MiniSQLBaseListener {
 		type=Statement.insertA;
 		sia.tableName=ctx.Name().getText();
 		for(int i=0;i<ctx.values().value().size();i++) {
-			sia.values.add(ctx.values().value(i).getText());
+			if(ctx.values().value(i).Number()!=null)
+				sia.values.add(ctx.values().value(i).getText());
+			else if(ctx.values().value(i).String()!=null) {
+				String str=ctx.values().value(i).getText();
+				String res=str.substring(1, str.length()-1);
+				sia.values.add(res);
+			}else {
+				sia.values.add(null);
+			}
+				
 		}
 	}
 	@Override 
