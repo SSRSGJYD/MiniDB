@@ -60,15 +60,17 @@ public class PrimaryIndex<K extends Comparable<K>> {
      *
      * @param lbound lower bound
      * @param uselbound whether use lower bound or not
+     * @param lstrict whether lower bound is strict
      * @param hbound higher bound
      * @param usehbound whether use higher bound or not
+     * @param hstrict whether higher bound is strict
      * @return a SearchResult Object
      * @throws IOException
      */
-    public SearchResult<Row> searchByRange(PrimaryKey<K> lbound, boolean uselbound, PrimaryKey<K> hbound, boolean usehbound)
+    public SearchResult<Row> searchByRange(PrimaryKey<K> lbound, boolean uselbound, boolean lstrict, PrimaryKey<K> hbound, boolean usehbound, boolean hstrict)
         throws IOException {
         assert uselbound || usehbound;
-        return tree.searchByKeyWithRange(lbound, uselbound, hbound, usehbound, true);
+        return tree.searchByKeyWithRange(lbound, uselbound, lstrict, hbound, usehbound, hstrict, true);
     }
 
     /**
