@@ -384,18 +384,20 @@ public class BPlusTree<K extends Key, V extends Value> {
      *
      * @param lbound lower bound
      * @param uselbound whether use lower bound or not
+     * @param lstrict whether lower bound is strict
      * @param hbound higher bound
      * @param usehbound whether use higher bound or not
+     * @param hstrict whether higher bound is strict
      * @param useAll for secondary key
      * @return a search result object
      * @throws IOException
      */
-    public SearchResult<V> searchByKeyWithRange(K lbound, boolean uselbound, K hbound, boolean usehbound, boolean useAll)
+    public SearchResult<V> searchByKeyWithRange(K lbound, boolean uselbound, boolean lstrict, K hbound, boolean usehbound, boolean hstrict, boolean useAll)
             throws IOException {
         if(this.root == null) { // empty tree
             return new SearchResult<V>();
         }
-        return searchByKeyWithRange(this.root, lbound, uselbound, hbound, usehbound, useAll);
+        return searchByKeyWithRange(this.root, lbound, uselbound, lstrict, hbound, usehbound, hstrict, useAll);
     }
 
     /**
@@ -404,13 +406,15 @@ public class BPlusTree<K extends Key, V extends Value> {
      * @param node node to search
      * @param lbound lower bound
      * @param uselbound whether use lower bound or not
+     * @param lstrict whether lower bound is strict
      * @param hbound higher bound
      * @param usehbound whether use higher bound or not
+     * @param hstrict whether higher bound is strict
      * @param useAll for secondary key
      * @return a search result object
      * @throws IOException
      */
-    private SearchResult<V> searchByKeyWithRange(BPlusTreeNode<K,V> node, K lbound, boolean uselbound, K hbound, boolean usehbound, boolean useAll)
+    private SearchResult<V> searchByKeyWithRange(BPlusTreeNode<K,V> node, K lbound, boolean uselbound, boolean lstrict, K hbound, boolean usehbound, boolean hstrict, boolean useAll)
             throws IOException {
         assert (uselbound || usehbound);
         LinkedList<V> rows = new LinkedList<V>();
@@ -423,7 +427,8 @@ public class BPlusTree<K extends Key, V extends Value> {
                     || nodeType == BPlusTreeConst.NODE_TYPE_ROOT_LEAF) { // leaf node
                 BPlusTreeLeafNode<K, V> leaf = (BPlusTreeLeafNode<K, V>) node;
                 // find first key bigger than lower bound
-                while(leaf.keyList.get(i).compareTo(lbound, useAll) == -1) {
+                int lcondition = lstrict ? 0 : -1;
+                while(leaf.keyList.get(i).compareTo(lbound, useAll) <= lcondition) {
                     if(i < leaf.getCapacity() - 1) {
                         i++;
                     }
@@ -434,7 +439,8 @@ public class BPlusTree<K extends Key, V extends Value> {
                 }
                 // save values
                 if(usehbound) {
-                    while(leaf.keyList.get(i).compareTo(hbound, useAll) == -1) {
+                    int hcondition = hstrict ? -1 : 0;
+                    while(leaf.keyList.get(i).compareTo(hbound, useAll) <= hcondition) {
                         rows.add(leaf.valueList.get(i));
                         if(i < leaf.getCapacity() - 1) {
                             i++;
@@ -467,7 +473,7 @@ public class BPlusTree<K extends Key, V extends Value> {
             else { // internal node
                 BPlusTreeInternalNode<K,V> internal = (BPlusTreeInternalNode<K,V>)node;
                 BPlusTreeNode<K,V> nextToSearch = readNodeFromFile(internal.ptrList.get(i));
-                return searchByKeyWithRange(nextToSearch, lbound, uselbound, hbound, usehbound, useAll);
+                return searchByKeyWithRange(nextToSearch, lbound, uselbound, lstrict, hbound, usehbound, hstrict, useAll);
             }
         }
         else { // only use higher bound, node must be root now
@@ -480,12 +486,13 @@ public class BPlusTree<K extends Key, V extends Value> {
                     && iterator.getNodeType() != BPlusTreeConst.NODE_TYPE_ROOT_LEAF) {
                 iterator = readNodeFromFile(((BPlusTreeInternalNode<K,V>) iterator).ptrList.getFirst());
             }
+            int hcondition = hstrict ? -1 : 0;
             // now iterator is at left-bottom leaf node
             BPlusTreeLeafNode<K,V> leaf = (BPlusTreeLeafNode<K,V>)iterator;
             while(true) {
                 int capacity = leaf.getCapacity();
                 for(int i=0; i<capacity; i++) {
-                    if(leaf.keyList.get(i).compareTo(hbound, useAll) == 1) {
+                    if(leaf.keyList.get(i).compareTo(hbound, useAll) > hcondition) {
                         return new SearchResult<V>(rows);
                     }
                     rows.push(leaf.valueList.get(i));
