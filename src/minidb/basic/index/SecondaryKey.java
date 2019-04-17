@@ -68,10 +68,13 @@ public class SecondaryKey<K extends Comparable<K>, PK extends Comparable<PK>> ex
      * @param useAll whether compare using all keys or just non-primary attribute
      * @return 1 for greater, 0 for equal and -1 for smaller
      */
-    public int compareTo(Key k, boolean useAll) {
-        SecondaryKey<K, PK> key = (SecondaryKey<K, PK>)k;
-        return this.key.compareTo(key.getKey());
-    }
+	public int compareTo(Key k, boolean useAll) {
+		SecondaryKey<K, PK> key = (SecondaryKey<K, PK>)k;
+		if(useAll) {
+			return this.compareTo(k);
+		}
+		return this.key.compareTo(key.getKey());
+	}
 
     @Override
     public void writeToFile(RandomAccessFile fa) throws IOException {

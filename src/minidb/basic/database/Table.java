@@ -530,6 +530,12 @@ public class Table implements Serializable{
 	
 	public void update(String cdName,String cdValue,int op,String setName,String setValue) throws IOException, ClassNotFoundException {
 		LinkedList<Row> rows=searchRows(cdName,cdValue,op);
+		if(setName.equals(this.schema.primaryKey)) {
+			//TODO
+		}
+	}
+	public void updatex(String cdName,String cdValue,int op,String setName,String setValue) throws IOException, ClassNotFoundException {
+		LinkedList<Row> rows=searchRows(cdName,cdValue,op);
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(outputStream);
 		int pos=0;
