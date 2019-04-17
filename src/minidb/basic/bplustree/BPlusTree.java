@@ -337,7 +337,7 @@ public class BPlusTree<K extends Key, V extends Value> {
      * @throws IOException
      */
     public SearchResult<V> searchByKey(K key, boolean useAll) throws IOException {
-        if(this.root == null) { // empty tree
+        if(this.root == null || this.root.getCapacity() == 0) { // empty tree
             return new SearchResult<V>();
         }
         return searchByKey(this.root, key, useAll);
@@ -394,7 +394,7 @@ public class BPlusTree<K extends Key, V extends Value> {
      */
     public SearchResult<V> searchByKeyWithRange(K lbound, boolean uselbound, boolean lstrict, K hbound, boolean usehbound, boolean hstrict, boolean useAll)
             throws IOException {
-        if(this.root == null) { // empty tree
+        if(this.root == null || root.getCapacity() == 0) { // empty tree
             return new SearchResult<V>();
         }
         return searchByKeyWithRange(this.root, lbound, uselbound, lstrict, hbound, usehbound, hstrict, useAll);
