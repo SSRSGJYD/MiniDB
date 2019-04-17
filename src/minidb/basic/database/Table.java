@@ -24,6 +24,7 @@ import java.util.Map.Entry;
 import minidb.basic.database.Schema;
 import minidb.basic.index.PrimaryIndex;
 import minidb.basic.index.PrimaryKey;
+import minidb.basic.index.PrimaryKeyValue;
 import minidb.basic.index.SecondaryIndex;
 import minidb.basic.index.SecondaryKey;
 import minidb.basic.index.Value;
@@ -145,6 +146,45 @@ public class Table implements Serializable{
 		indexs.put(entry.getKey(), si);	
 	}
 	
+	public void insertIndexs(Object key,List<String> values) throws IOException {
+		int c=0;
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		DataOutputStream dos = new DataOutputStream(outputStream);
+		switch(this.keyType){
+		case TypeConst.VALUE_TYPE_INT:
+			dos.writeInt((Integer)key);
+			break;
+		case TypeConst.VALUE_TYPE_LONG:
+			dos.writeLong((Long)key);
+			break;
+		case TypeConst.VALUE_TYPE_FLOAT:
+			dos.writeFloat((Float)key);
+			break;
+		case TypeConst.VALUE_TYPE_DOUBLE:
+			dos.writeDouble((Double)key);
+			break;
+		case TypeConst.VALUE_TYPE_STRING:
+			dos.writeChars((String)key);
+			break;
+		}
+		dos.flush();
+		byte[] array=outputStream.toByteArray();
+		for(Entry<String,SchemaDescriptor> entry:this.schema.descriptors.entrySet()) {
+			if(entry.getValue().isPrimary())continue;
+			this.insertSecondaryIndex(entry.getKey(), entry.getValue(), values.get(c), array);
+			c++;
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	protected void insertSecondaryIndex(String name,SchemaDescriptor sd,String value ,byte[] kvalue) throws IOException {
+		@SuppressWarnings("rawtypes")
+		SecondaryKey key=constructSecondaryKey(sd.getType(),sd.getSize(),value);
+		PrimaryKeyValue kv=new PrimaryKeyValue(kvalue,this.keyType);
+		@SuppressWarnings("rawtypes")
+		SecondaryIndex index= indexs.get(name);
+		index.insert(key, kv);
+	}
 	
 	protected LinkedHashMap<String,Object> filterNames(List<String> names,LinkedHashMap<String,Object> data){
 		LinkedHashMap<String,Object> res=new LinkedHashMap<String,Object>();
@@ -153,6 +193,68 @@ public class Table implements Serializable{
 		}
 		return res;
 		
+	}
+	
+	protected PrimaryKey constructPrimaryKey(String cdValue) {
+		PrimaryKey keyi=null;
+		switch(this.keyType) {
+			case TypeConst.VALUE_TYPE_INT:
+				keyi= new PrimaryKey<Integer>(Integer.parseInt(cdValue), TypeConst.VALUE_TYPE_INT, TypeConst.VALUE_SIZE_INT);
+				break;
+			case TypeConst.VALUE_TYPE_LONG:
+				keyi= new PrimaryKey<Long>(Long.parseLong(cdValue), TypeConst.VALUE_TYPE_LONG, TypeConst.VALUE_SIZE_LONG);
+				break;
+			case TypeConst.VALUE_TYPE_FLOAT:
+				keyi= new PrimaryKey<Float>(Float.parseFloat(cdValue), TypeConst.VALUE_TYPE_FLOAT, TypeConst.VALUE_SIZE_FLOAT);
+				break;
+			case TypeConst.VALUE_TYPE_DOUBLE:
+				keyi= new PrimaryKey<Double>(Double.parseDouble(cdValue), TypeConst.VALUE_TYPE_DOUBLE, TypeConst.VALUE_SIZE_DOUBLE);
+				break;
+			case TypeConst.VALUE_TYPE_STRING:
+				keyi= new PrimaryKey<String>(cdValue, TypeConst.VALUE_TYPE_STRING, keySize);
+				break;
+			}
+		return keyi;
+
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	protected SecondaryKey constructSecondaryKey(int type,int size,String cdValue) {
+			SecondaryKey keyr = null;
+			switch(type) {
+			case TypeConst.VALUE_TYPE_INT:
+				keyr= new SecondaryKey(Integer.parseInt(cdValue), TypeConst.VALUE_TYPE_INT, TypeConst.VALUE_SIZE_INT,null,keyType,keySize);
+				break;
+			case TypeConst.VALUE_TYPE_LONG:
+				keyr= new SecondaryKey(Long.parseLong(cdValue), TypeConst.VALUE_TYPE_LONG, TypeConst.VALUE_SIZE_LONG,null,keyType,keySize);
+				break;
+			case TypeConst.VALUE_TYPE_FLOAT:
+				keyr= new SecondaryKey(Float.parseFloat(cdValue), TypeConst.VALUE_TYPE_FLOAT, TypeConst.VALUE_SIZE_FLOAT,null,keyType,keySize);
+				break;
+			case TypeConst.VALUE_TYPE_DOUBLE:
+				keyr= new SecondaryKey(Double.parseDouble(cdValue), TypeConst.VALUE_TYPE_DOUBLE, TypeConst.VALUE_SIZE_DOUBLE,null,keyType,keySize);
+				break;
+			case TypeConst.VALUE_TYPE_STRING:
+				keyr= new SecondaryKey(cdValue, TypeConst.VALUE_TYPE_STRING, size,null,keyType,keySize);
+				break;
+			}
+
+			return keyr;
+	}
+	protected LinkedList<Row> searchRows(String cdName,String cdValue, int op) throws IOException{
+		LinkedList<Row> rows=null;
+		if(this.schema.primaryKey.equalsIgnoreCase(cdName)) {
+				@SuppressWarnings("rawtypes")
+				PrimaryKey keyi=constructPrimaryKey(cdValue);
+				rows=searchByOp(keyi,op);
+			}else {
+			SchemaDescriptor sd=this.schema.descriptors.get(cdName);
+			@SuppressWarnings("rawtypes")
+			SecondaryKey keyr=constructSecondaryKey(sd.getType(),sd.getSize(),cdValue);
+			rows=searchByOpS(keyr,cdName,op);
+		}
+		return rows;
+
 	}
 
 	@SuppressWarnings("unchecked")
@@ -166,62 +268,17 @@ public class Table implements Serializable{
 			qr.types=this.schema.types;
 			return qr;
 		}
-		if(this.schema.primaryKey.equalsIgnoreCase(cdName)) {
-			@SuppressWarnings("rawtypes")
-			PrimaryKey keyi;
-			switch(this.keyType) {
-			case TypeConst.VALUE_TYPE_INT:
-				keyi= new PrimaryKey<Integer>(Integer.parseInt(cdValue), TypeConst.VALUE_TYPE_INT, TypeConst.VALUE_SIZE_INT);
-				rows=searchByOp(keyi,op);
-				break;
-			case TypeConst.VALUE_TYPE_LONG:
-				keyi= new PrimaryKey<Long>(Long.parseLong(cdValue), TypeConst.VALUE_TYPE_LONG, TypeConst.VALUE_SIZE_LONG);
-				rows=searchByOp(keyi,op);
-				break;
-			case TypeConst.VALUE_TYPE_FLOAT:
-				keyi= new PrimaryKey<Float>(Float.parseFloat(cdValue), TypeConst.VALUE_TYPE_FLOAT, TypeConst.VALUE_SIZE_FLOAT);
-				rows=searchByOp(keyi,op);
-				break;
-			case TypeConst.VALUE_TYPE_DOUBLE:
-				keyi= new PrimaryKey<Double>(Double.parseDouble(cdValue), TypeConst.VALUE_TYPE_DOUBLE, TypeConst.VALUE_SIZE_DOUBLE);
-				rows=searchByOp(keyi,op);
-				break;
-			case TypeConst.VALUE_TYPE_STRING:
-				keyi= new PrimaryKey<String>(cdValue, TypeConst.VALUE_TYPE_STRING, keySize);
-				rows=searchByOp(keyi,op);
-				break;
-			}
-		}else {
-
-			SchemaDescriptor sd=this.schema.descriptors.get(cdName);
-			SecondaryKey keyr;
-			switch(sd.getType()) {
-			case TypeConst.VALUE_TYPE_INT:
-				keyr= new SecondaryKey(Integer.parseInt(cdValue), TypeConst.VALUE_TYPE_INT, TypeConst.VALUE_SIZE_INT,null,keyType,keySize);
-				rows=searchByOpS(keyr,cdName,op);
-				break;
-			case TypeConst.VALUE_TYPE_LONG:
-				keyr= new SecondaryKey(Long.parseLong(cdValue), TypeConst.VALUE_TYPE_LONG, TypeConst.VALUE_SIZE_LONG,null,keyType,keySize);
-				rows=searchByOpS(keyr,cdName,op);
-				break;
-			case TypeConst.VALUE_TYPE_FLOAT:
-				keyr= new SecondaryKey(Float.parseFloat(cdValue), TypeConst.VALUE_TYPE_FLOAT, TypeConst.VALUE_SIZE_FLOAT,null,keyType,keySize);
-				rows=searchByOpS(keyr,cdName,op);
-				break;
-			case TypeConst.VALUE_TYPE_DOUBLE:
-				keyr= new SecondaryKey(Double.parseDouble(cdValue), TypeConst.VALUE_TYPE_DOUBLE, TypeConst.VALUE_SIZE_DOUBLE,null,keyType,keySize);
-				rows=searchByOpS(keyr,cdName,op);
-				break;
-			case TypeConst.VALUE_TYPE_STRING:
-				keyr= new SecondaryKey(cdValue, TypeConst.VALUE_TYPE_STRING, sd.getSize(),null,keyType,keySize);
-				rows=searchByOpS(keyr,cdName,op);
-				break;
-			}
-
-		}
+		else
+			rows=searchRows(cdName,cdValue,op);
 		QueryResult qr=new QueryResult();
+		ArrayList<LinkedHashMap<String,Object>> res=new ArrayList<LinkedHashMap<String,Object>>();
 		ArrayList<LinkedHashMap<String,Object>> rowl=fromRaw(rows);
-		qr.data=rowl;
+		for(LinkedHashMap<String,Object> objs:rowl) {
+			LinkedHashMap<String,Object> nobjs=filterNames(names,objs);
+			res.add(nobjs);
+		}
+	
+		qr.data=res;
 		qr.types=this.schema.types;
 		return qr;
 	}
@@ -419,19 +476,95 @@ public class Table implements Serializable{
 	    writer.close();
 	}
 	
-//	public void update(String cdName,String cdValue,int op,String setName,String setValue) throws IOException, ClassNotFoundException {
-//		LinkedList<Value> rows=index.searchAll().rows;
-//		ArrayList<LinkedHashMap<String,Object>> rowl=fromRaw(rows);
+	public void update(String cdName,String cdValue,int op,String setName,String setValue) throws IOException, ClassNotFoundException {
+		LinkedList<Row> rows=searchRows(cdName,cdValue,op);
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		DataOutputStream dos = new DataOutputStream(outputStream);
+		int pos=0;
+		int keypos=0;
+		int keysize=0;
+		int ktype = 0;
+		int ksize=0;
+		for(Entry<String,SchemaDescriptor> entry:this.schema.descriptors.entrySet()) {
+			if(entry.getValue().isPrimary()) {
+				keysize=entry.getValue().getSize();
+				break;
+			}else {
+				keypos+=2+entry.getValue().getSize();
+			}
+		}
+		for(Entry<String,SchemaDescriptor> entry:this.schema.descriptors.entrySet()) {
+			if(entry.getKey().equals(setName)) {
+				ktype=entry.getValue().getType();
+				ksize=entry.getValue().getSize();
+				break;
+			}else {
+				pos+=2+entry.getValue().getSize();
+			}
+		}
+		dos.writeChar(0);
+		Object res;
+		switch(ktype) {
+		case TypeConst.VALUE_TYPE_INT:
+				res=Integer.parseInt(setValue);
+				dos.writeInt((Integer)res);
+			break;
+		case TypeConst.VALUE_TYPE_LONG:
+				res=Long.parseLong(setValue);
+				dos.writeLong((Long)res);
+			break;
+		case TypeConst.VALUE_TYPE_FLOAT:
+				res=Float.parseFloat(setValue);
+				dos.writeFloat((Float)res);
+			break;
+		case TypeConst.VALUE_TYPE_DOUBLE:
+				res=Double.parseDouble(setValue);
+				dos.writeDouble((Double)res);
+			break;
+		case TypeConst.VALUE_TYPE_STRING:
+				dos.writeChars((String)setValue);
+				for(int i=0;i<ksize/TypeConst.VALUE_SIZE_CHAR-setValue.length();i++) {
+					dos.writeChar(0);
+				}
+			break;
+		}
 
-//		RowFilter rf= buildFilter(cdName,op,cdValue);
-//		for(LinkedHashMap<String,Object> objs:rowl) {
-//			if(rf.method(objs)) {
-//				LinkedHashMap<String,Object> nobjs=modify(objs,cdName,cdValue);
-//				Row nrow=toRow(nobjs);
-//				index.update(nobjs.get(this.schema.primaryKey), nrow);
-//			}
-//		}
-//	}
+		dos.flush();
+		byte[] array=outputStream.toByteArray();
+
+		for(Row row:rows) {
+			for(int i=pos;i<pos+ksize+2;i++) {
+				row.array[i]=array[i];
+			}
+			byte[] slice = Arrays.copyOfRange(row.array, keypos+2, keysize);
+			ByteArrayInputStream in = new ByteArrayInputStream(slice);
+			DataInputStream inst=new DataInputStream(in);
+			Object key=null;
+			switch(keyType) {
+			case TypeConst.VALUE_TYPE_INT:
+				key=(Object)inst.readInt();
+				break;
+			case TypeConst.VALUE_TYPE_LONG:
+				key=(Object)inst.readLong();
+				break;
+			case TypeConst.VALUE_TYPE_FLOAT:
+				key=(Object)inst.readFloat();
+				break;
+			case TypeConst.VALUE_TYPE_DOUBLE:
+				key=(Object)inst.readDouble();
+				break;
+			case TypeConst.VALUE_TYPE_STRING:
+				String str="";
+				int len=keySize/TypeConst.VALUE_SIZE_CHAR;
+		    	for(int i=0;i<len;i++) {
+		    		str+=inst.readChar();
+		    	}
+		    	key=(Object)str;
+				break;
+			}
+			this.simpleInsert(key, row);
+		}
+	}
 	
 //	public LinkedHashMap<String,Object> modify(LinkedHashMap<String,Object> objs,String cdName,String cdValue){
 //		switch(this.schema.descriptors.get(cdName).getType()) {
