@@ -70,7 +70,7 @@ public class Table implements Serializable{
 	public void createSecondaryIndex(Entry<String, SchemaDescriptor> entry) throws IOException {
 		SchemaDescriptor sd=entry.getValue();
 		SecondaryIndex si=null;
-		si=new SecondaryIndex(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
+		si=new SecondaryIndex(1024, sd.getType(), sd.getSize(), keyType, keySize, keySize, 1024, tableName+"_"+entry.getKey()+".index");
 		if(indexs==null)
 			this.indexs=new HashMap<String,SecondaryIndex>();
 		indexs.put(entry.getKey(), si);	
