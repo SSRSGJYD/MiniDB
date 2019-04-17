@@ -100,7 +100,10 @@ public class Table implements Serializable{
 		dos.flush();
 		byte[] array=outputStream.toByteArray();
 		for(Entry<String,SchemaDescriptor> entry:this.schema.descriptors.entrySet()) {
-			if(entry.getValue().isPrimary())continue;
+			if(entry.getValue().isPrimary()) {
+				c++;
+				continue;
+			}
 			this.insertSecondaryIndex(entry.getKey(), entry.getValue(), values.get(c), key,array);
 			c++;
 		}
