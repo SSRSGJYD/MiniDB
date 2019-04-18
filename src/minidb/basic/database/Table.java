@@ -76,6 +76,18 @@ public class Table implements Serializable{
 		indexs.put(entry.getKey(), si);	
 	}
 	
+	public void insertIndexsB(Object key,HashMap<String, String> pairs) throws IOException {
+		List<String> values=new ArrayList<String>();
+		for(String Skey:this.schema.descriptors.keySet()) {
+			if(pairs.containsKey(Skey)) {
+				values.add(pairs.get(Skey));
+			}
+			else {
+				values.add(null);
+			}
+		}
+		insertIndexs(key,values);
+	}
 	public void insertIndexs(Object key,List<String> values) throws IOException {
 		int c=0;
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

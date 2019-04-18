@@ -81,7 +81,7 @@ public class DataBase{
 			tb=tables.get(sib.tableName);
 			pair=tb.mkRowB(sib.pairs);
 			tb.simpleInsert(pair.l,pair.r);
-//			tb.insertIndexs(pair.l, sib.values);
+			tb.insertIndexsB(pair.l, sib.pairs);
 			res=new BoolResult();
 			break;
 		case Statement.selectA:
