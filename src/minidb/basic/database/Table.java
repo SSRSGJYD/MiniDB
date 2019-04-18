@@ -55,13 +55,16 @@ public class Table implements Serializable{
 				keyType=sd.getType();
 				this.schema.primaryKey=entry.getKey();
 				keySize=sd.getSize();
-				this.createPrimaryIndex();
-			}else {
-				this.createSecondaryIndex(entry);
 			}
-
 			valueSize+=sd.getSize()+TypeConst.VALUE_SIZE_NULL;
 		}
+		for(Entry<String, SchemaDescriptor> entry:schema.descriptors.entrySet()) {
+			SchemaDescriptor sd=entry.getValue();
+			if(!sd.isPrimary()) {
+				this.createSecondaryIndex(entry);
+			}
+		}
+		this.createPrimaryIndex();
 
 		this.schema.keyType=keyType;
 
@@ -87,6 +90,7 @@ public class Table implements Serializable{
 			}
 		}
 		insertIndexs(key,values);
+
 	}
 	public void insertIndexs(Object key,List<String> values) throws IOException {
 		int c=0;
