@@ -38,9 +38,12 @@ public class BPlusTreeUtils {
             case TypeConst.VALUE_TYPE_DOUBLE:
                 return new PrimaryKey<Double>(fa.readDouble(), TypeConst.VALUE_TYPE_DOUBLE, keySize);
             default:  //TypeConst.VALUE_TYPE_STRING:
-                byte[] tmp = new byte[keySize+1];
-                fa.read(tmp,0, keySize);
-                return new PrimaryKey<String>(new String(tmp), TypeConst.VALUE_TYPE_STRING, keySize);
+            	String primaryKey = "";
+				int len = keySize / TypeConst.VALUE_SIZE_CHAR;
+		    	for(int i=0; i<len; i++) {
+		    		primaryKey += fa.readChar();
+		    	}
+                return new PrimaryKey<String>(primaryKey, TypeConst.VALUE_TYPE_STRING, keySize);
         }
     }
 
@@ -81,9 +84,11 @@ public class BPlusTreeUtils {
                         return new SecondaryKey<Integer, Double>(key, keyType, keySize, primaryKey, PKType, PKSize);
                     }
                     default: { //TypeConst.VALUE_TYPE_STRING:
-                        byte[] tmp = new byte[PKSize + 1];
-                        fa.read(tmp, 0, PKSize);
-                        String primaryKey = new String(tmp);
+                    	String primaryKey = "";
+        				int len = PKSize / TypeConst.VALUE_SIZE_CHAR;
+        		    	for(int i=0; i<len; i++) {
+        		    		primaryKey += fa.readChar();
+        		    	}
                         return new SecondaryKey<Integer, String>(key, keyType, keySize, primaryKey, PKType, PKSize);
                     }
                 }
@@ -110,9 +115,11 @@ public class BPlusTreeUtils {
                         return new SecondaryKey<Long, Double>(key, keyType, keySize, primaryKey, PKType, PKSize);
                     }
                     default: { //TypeConst.VALUE_TYPE_STRING:
-                        byte[] tmp = new byte[PKSize + 1];
-                        fa.read(tmp, 0, PKSize);
-                        String primaryKey = new String(tmp);
+                    	String primaryKey = "";
+        				int len = PKSize / TypeConst.VALUE_SIZE_CHAR;
+        		    	for(int i=0; i<len; i++) {
+        		    		primaryKey += fa.readChar();
+        		    	}
                         return new SecondaryKey<Long, String>(key, keyType, keySize, primaryKey, PKType, PKSize);
                     }
                 }
@@ -139,9 +146,11 @@ public class BPlusTreeUtils {
                         return new SecondaryKey<Float, Double>(key, keyType, keySize, primaryKey, PKType, PKSize);
                     }
                     default: { //TypeConst.VALUE_TYPE_STRING:
-                        byte[] tmp = new byte[PKSize + 1];
-                        fa.read(tmp, 0, PKSize);
-                        String primaryKey = new String(tmp);
+                    	String primaryKey = "";
+        				int len = PKSize / TypeConst.VALUE_SIZE_CHAR;
+        		    	for(int i=0; i<len; i++) {
+        		    		primaryKey += fa.readChar();
+        		    	}
                         return new SecondaryKey<Float, String>(key, keyType, keySize, primaryKey, PKType, PKSize);
                     }
                 }
@@ -168,18 +177,22 @@ public class BPlusTreeUtils {
                         return new SecondaryKey<Double, Double>(key, keyType, keySize, primaryKey, PKType, PKSize);
                     }
                     default: { //TypeConst.VALUE_TYPE_STRING:
-                        byte[] tmp = new byte[PKSize + 1];
-                        fa.read(tmp, 0, PKSize);
-                        String primaryKey = new String(tmp);
+                    	String primaryKey = "";
+        				int len = PKSize / TypeConst.VALUE_SIZE_CHAR;
+        		    	for(int i=0; i<len; i++) {
+        		    		primaryKey += fa.readChar();
+        		    	}
                         return new SecondaryKey<Double, String>(key, keyType, keySize, primaryKey, PKType, PKSize);
                     }
                 }
             }
             default:  //TypeConst.VALUE_TYPE_STRING:
             {
-                byte[] tmp = new byte[keySize+1];
-                fa.read(tmp,0, keySize);
-                String key = new String(tmp);
+            	String key = "";
+				int len = keySize / TypeConst.VALUE_SIZE_CHAR;
+		    	for(int i=0; i<len; i++) {
+		    		key += fa.readChar();
+		    	}
                 // primary key
                 switch (PKType) {
                     case TypeConst.VALUE_TYPE_INT: {
@@ -199,9 +212,11 @@ public class BPlusTreeUtils {
                         return new SecondaryKey<String, Double>(key, keyType, keySize, primaryKey, PKType, PKSize);
                     }
                     default: { //TypeConst.VALUE_TYPE_STRING:
-                        byte[] tmp2 = new byte[PKSize + 1];
-                        fa.read(tmp2, 0, PKSize);
-                        String primaryKey = new String(tmp2);
+                    	String primaryKey = "";
+        				int length = PKSize / TypeConst.VALUE_SIZE_CHAR;
+        		    	for(int i=0; i<length; i++) {
+        		    		primaryKey += fa.readChar();
+        		    	}
                         return new SecondaryKey<String, String>(key, keyType, keySize, primaryKey, PKType, PKSize);
                     }
                 }

@@ -92,10 +92,7 @@ public class SecondaryKey<K extends Comparable<K>, PK extends Comparable<PK>> ex
                 fa.writeDouble((Double)key);
                 break;
             default:  //TypeConst.VALUE_TYPE_STRING:
-                fa.writeBytes((String)key);
-                for(int i = ((String) key).length(); i<attributeSize; i++) {
-                    fa.writeByte(0);
-                }
+            	fa.writeChars((String)key);
                 break;
         }
         switch (PKType) {
@@ -112,10 +109,7 @@ public class SecondaryKey<K extends Comparable<K>, PK extends Comparable<PK>> ex
                 fa.writeDouble((Double)primaryKey);
                 break;
             default:  //TypeConst.VALUE_TYPE_STRING:
-                fa.writeBytes((String)primaryKey);
-                for(int i = ((String) primaryKey).length(); i<PKSize; i++) {
-                    fa.writeByte(0);
-                }
+            	fa.writeChars((String)primaryKey);
                 break;
         }
     }
