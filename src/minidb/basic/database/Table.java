@@ -95,6 +95,10 @@ public class Table implements Serializable{
 			break;
 		case TypeConst.VALUE_TYPE_STRING:
 			dos.writeChars((String)key);
+			int len=((String)key).length();
+			for(int i=0;i<keySize/TypeConst.VALUE_SIZE_CHAR-len;i++) {
+				dos.writeChar(0);
+			}
 			break;
 		}
 		dos.flush();
