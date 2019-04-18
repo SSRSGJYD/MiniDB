@@ -135,8 +135,8 @@ public class Table implements Serializable{
 		SecondaryKey key=constructSecondaryKey(sd.getType(),sd.getSize(),value,okvalue);
 		PrimaryKeyValue kv=new PrimaryKeyValue(kvalue,this.keyType);
 		@SuppressWarnings("rawtypes")
-		SecondaryIndex index= indexs.get(name);
-		index.insert(key, kv);
+		SecondaryIndex indext= indexs.get(name);
+		indext.insert(key, kv);
 	}
 	
 	protected LinkedHashMap<String,Object> filterNames(List<String> names,LinkedHashMap<String,Object> data){
@@ -175,7 +175,6 @@ public class Table implements Serializable{
 				break;
 			}
 		return keyi;
-
 	}
 
 	protected PrimaryKey constructPrimaryKey(String cdValue) {
@@ -298,7 +297,6 @@ public class Table implements Serializable{
 					break;
 				}
 			}
-
 			return keyr;
 	}
 	protected LinkedList<Row> searchRows(String cdName,String cdValue, int op) throws IOException{
@@ -314,7 +312,6 @@ public class Table implements Serializable{
 			rows=searchByOpS(keyr,cdName,op);
 		}
 		return rows;
-
 	}
 
 	@SuppressWarnings("unchecked")
