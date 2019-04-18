@@ -12,6 +12,7 @@ import minidb.basic.index.PrimaryKeyValue;
 import minidb.basic.index.Value;
 import minidb.result.DeleteResult;
 import minidb.types.TypeConst;
+import minidb.basic.bplustree.Cache;
 import minidb.basic.bplustree.BPlusTreeUtils.*;
 import minidb.result.SearchResult;
 
@@ -60,6 +61,12 @@ public class BPlusTree<K extends Key, V extends Value> {
     // for conditioning
     private int deleteCount;          // count for delete operation
     private int conditionThreshold;   // iterations to perform conditioning
+
+    // node cache
+    private Cache<BPlusTreeInternalNode<K,V>> internalNodeCache;
+    private Cache<BPlusTreeLeafNode<K,V>> leafNodeCache;
+    private int internalCacheSize = 1000;
+    private int leafCacheSize = 1000;
 
     /**
      * constructor
@@ -126,6 +133,10 @@ public class BPlusTree<K extends Key, V extends Value> {
             writeFileHeader();
             System.out.println("Tree file created");
         }
+
+        // initialize node cache
+        internalNodeCache = new Cache<>(internalCacheSize);
+        leafNodeCache = new Cache<>(leafCacheSize);
     }
 
     /**
@@ -184,6 +195,11 @@ public class BPlusTree<K extends Key, V extends Value> {
         switch (nodeType) {
             case BPlusTreeConst.NODE_TYPE_INTERNAL:
             case BPlusTreeConst.NODE_TYPE_ROOT_INTERNAL: {
+                // try to find in cache
+                if(internalNodeCache.containsKey(index)) {
+                    return internalNodeCache.get(index);
+                }
+                // not in cache
                 BPlusTreeInternalNode<K,V> node = new BPlusTreeInternalNode<K,V>(nodeType, index, valueSize);
                 int curCapacity = fa.readInt();
                 if(isPrimaryIndex) {
@@ -201,10 +217,17 @@ public class BPlusTree<K extends Key, V extends Value> {
                 node.ptrList.add(curCapacity, fa.readLong());
                 node.setCapacity(curCapacity);
                 node.setValid(true);
+                // put node into cache
+                internalNodeCache.put(index, node);
                 return node;
             }
             case BPlusTreeConst.NODE_TYPE_LEAF:
             case BPlusTreeConst.NODE_TYPE_ROOT_LEAF: {
+                // try to find in cache
+                if(leafNodeCache.containsKey(index)) {
+                    return leafNodeCache.get(index);
+                }
+                // not in cache
                 long nextptr = fa.readLong();
                 long prevptr = fa.readLong();
                 int curCapacity = fa.readInt();
@@ -224,6 +247,8 @@ public class BPlusTree<K extends Key, V extends Value> {
                 }
                 node.setCapacity(curCapacity);
                 node.setValid(true);
+                // put into cache
+                leafNodeCache.put(index, node);
                 return node;
             }
             default: //BPlusTreeConst.NODE_TYPE_SLOT_OVERFLOW
@@ -923,6 +948,22 @@ public class BPlusTree<K extends Key, V extends Value> {
      * @throws IOException
      */
     private void writeNodeToFile(BPlusTreeNode<K,V> node)  throws IOException {
+        // update node cache
+        switch (node.getNodeType()) {
+            case BPlusTreeConst.NODE_TYPE_ROOT_INTERNAL:
+            case BPlusTreeConst.NODE_TYPE_INTERNAL:
+                if(internalNodeCache.containsKey(node.getPageIndex())) {
+                    internalNodeCache.put(node.getPageIndex(), (BPlusTreeInternalNode<K,V>)node);
+                }
+                break;
+            case BPlusTreeConst.NODE_TYPE_ROOT_LEAF:
+            case BPlusTreeConst.NODE_TYPE_LEAF:
+                if(leafNodeCache.containsKey(node.getPageIndex())) {
+                    leafNodeCache.put(node.getPageIndex(), (BPlusTreeLeafNode<K,V>)node);
+                }
+                break;
+        }
+        // write to file
         node.writeNode(fa, pageSize, treeHeaderSize, keyType, keySize);
         return;
     }
