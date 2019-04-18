@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="43c67142-9d44-4c9f-a619-7046cf477623" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/minidb/basic/bplustree/Cache.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/minidb/basic/bplustree/BPlusTree.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/minidb/basic/bplustree/BPlusTree.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/bin/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -14,20 +12,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="450">
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/minidb/basic/bplustree/BPlusTree.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="277">
-              <caret line="962" column="17" lean-forward="true" selection-start-line="962" selection-start-column="17" selection-end-line="962" selection-end-column="17" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="450" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -109,7 +94,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="master" />
+        <entry key="$PROJECT_DIR$" value="zzp" />
       </map>
     </option>
   </component>
@@ -185,6 +170,7 @@
     </navigator>
     <panes>
       <pane id="Scope" />
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -222,12 +208,11 @@
           <select />
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1555555218224" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../大学/大三下/计算机系统软件(2)/HSQLDB/hsqldb-2.4.0" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="project.structure.last.edited" value="SDKs" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.2" />
@@ -441,7 +426,14 @@
       <option name="project" value="LOCAL" />
       <updated>1555376612971</updated>
     </task>
-    <option name="localTasksCounter" value="27" />
+    <task id="LOCAL-00027" summary="fix bug">
+      <created>1555572283905</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1555572283905</updated>
+    </task>
+    <option name="localTasksCounter" value="28" />
     <servers />
   </component>
   <component name="TodoView">
@@ -455,15 +447,14 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1295" height="735" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info id="Designer" order="0" />
       <window_info id="UI Designer" order="1" />
       <window_info id="Capture Tool" order="2" />
       <window_info id="Favorites" order="3" side_tool="true" />
       <window_info id="Image Layers" order="4" />
-      <window_info content_ui="combo" id="Project" order="5" sideWeight="0.6968085" weight="0.25308135" />
-      <window_info id="Structure" order="6" sideWeight="0.30319148" side_tool="true" weight="0.24157766" />
+      <window_info content_ui="combo" id="Project" order="5" sideWeight="0.6947935" weight="0.25308135" />
+      <window_info id="Structure" order="6" sideWeight="0.30520648" side_tool="true" weight="0.25308135" />
       <window_info anchor="bottom" id="Terminal" order="0" weight="0.32854578" />
       <window_info anchor="bottom" id="Event Log" order="1" side_tool="true" weight="0.32854578" />
       <window_info anchor="bottom" id="Messages" order="2" weight="0.32781458" />
@@ -490,8 +481,8 @@
       <window_info id="Capture Tool" order="2" />
       <window_info id="Favorites" order="3" side_tool="true" />
       <window_info id="Image Layers" order="4" />
-      <window_info content_ui="combo" id="Project" order="5" sideWeight="0.6968085" weight="0.25308135" />
-      <window_info active="true" id="Structure" order="6" sideWeight="0.30319148" side_tool="true" visible="true" weight="0.24157766" />
+      <window_info active="true" content_ui="combo" id="Project" order="5" sideWeight="0.6947935" visible="true" weight="0.25308135" />
+      <window_info id="Structure" order="6" sideWeight="0.30520648" side_tool="true" visible="true" weight="0.25308135" />
       <window_info anchor="bottom" id="Terminal" order="0" weight="0.32854578" />
       <window_info anchor="bottom" id="Event Log" order="1" side_tool="true" weight="0.32854578" />
       <window_info anchor="bottom" id="Messages" order="2" weight="0.32781458" />
@@ -533,7 +524,8 @@
     <MESSAGE value="fix bugs" />
     <MESSAGE value="support strict and non-strict range search policy" />
     <MESSAGE value="update" />
-    <option name="LAST_COMMIT_MESSAGE" value="update" />
+    <MESSAGE value="fix bug" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix bug" />
   </component>
   <component name="antWorkspaceConfiguration">
     <option name="IS_AUTOSCROLL_TO_SOURCE" value="false" />
@@ -636,19 +628,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/minidb/basic/index/Key.class">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/minidb/basic/index/PrimaryIndex.class">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/minidb/basic/index/SecondaryIndex.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="408">
-          <caret line="17" column="18" lean-forward="true" selection-start-line="17" selection-start-column="18" selection-end-line="17" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/minidb/basic/index/Key.class" />
+    <entry file="file://$PROJECT_DIR$/src/minidb/basic/index/PrimaryIndex.class" />
+    <entry file="file://$PROJECT_DIR$/src/minidb/basic/index/SecondaryIndex.class" />
     <entry file="file://$PROJECT_DIR$/src/minidb/basic/index/SecondaryKey.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1200">
@@ -779,9 +761,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/minidb/basic/database/StatementUpdate.class">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/minidb/basic/database/StatementUpdate.class" />
     <entry file="file://$PROJECT_DIR$/src/minidb/basic/database/StatementUpdate.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="58">
@@ -838,22 +818,18 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/minidb/basic/bplustree/Cache.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="812">
-          <caret line="55" column="5" lean-forward="true" selection-start-line="55" selection-start-column="5" selection-end-line="55" selection-end-column="5" />
+        <state relative-caret-position="116">
+          <caret line="4" selection-start-line="4" selection-end-line="4" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#292#293#0" expanded="true" />
-            <element signature="e#332#333#0" expanded="true" />
-            <element signature="e#702#703#0" expanded="true" />
-            <element signature="e#732#733#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/minidb/basic/bplustree/BPlusTree.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="277">
-          <caret line="962" column="17" lean-forward="true" selection-start-line="962" selection-start-column="17" selection-end-line="962" selection-end-column="17" />
+        <state relative-caret-position="247">
+          <caret line="128" column="9" lean-forward="true" selection-start-line="128" selection-start-column="9" selection-end-line="128" selection-end-column="9" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

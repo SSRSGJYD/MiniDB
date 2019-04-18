@@ -395,7 +395,7 @@ public class BPlusTree<K extends Key, V extends Value> {
         else { // internal node
             BPlusTreeInternalNode<K,V> internal = (BPlusTreeInternalNode<K,V>)node;
             // padding to account for the last pointer (if needed)
-            if(i != node.getCapacity() && key.compareTo(internal.keyList.get(i), useAll) == 1) {
+            if(i != node.getCapacity() && key.compareTo(internal.keyList.get(i), useAll) > 0) {
                 i++;
             }
             BPlusTreeNode<K,V> nextToSearch = readNodeFromFile(internal.ptrList.get(i));
@@ -619,7 +619,7 @@ public class BPlusTree<K extends Key, V extends Value> {
 
             BPlusTreeLeafNode<K,V> leaf = (BPlusTreeLeafNode<K,V>)node;
             int j = (leaf.getCapacity() > 0 && i == 0
-                    && leaf.keyList.getFirst().compareTo(key) == 1) ? i : i-1;
+                    && leaf.keyList.getFirst().compareTo(key) > 0) ? i : i-1;
             if(leaf.getCapacity() > 0 && leaf.keyList.get(j).compareTo(key) == 0) { // same value already exists
                 return; // should not have same key
             }
@@ -637,7 +637,7 @@ public class BPlusTree<K extends Key, V extends Value> {
             BPlusTreeNode<K,V> nextChild = null;
             if(isFullNode(childNode)) {
                 splitNode(internal, childNode, i);
-                if (internal.keyList.get(i).compareTo(key) == -1) {
+                if (internal.keyList.get(i).compareTo(key) < 0) {
                     useChild = false;
                     nextChild = readNodeFromFile(internal.ptrList.get(i+1));
                 }
@@ -686,7 +686,7 @@ public class BPlusTree<K extends Key, V extends Value> {
         else { // internal node
             BPlusTreeInternalNode<K,V> internal = (BPlusTreeInternalNode<K,V>)node;
             // padding to account for the last pointer (if needed)
-            if(i != node.getCapacity() && key.compareTo(internal.keyList.get(i)) == 1) {
+            if(i != node.getCapacity() && key.compareTo(internal.keyList.get(i)) > 0) {
                 i++;
             }
             BPlusTreeNode<K,V> nextToUpdate = readNodeFromFile(internal.ptrList.get(i));
@@ -890,10 +890,10 @@ public class BPlusTree<K extends Key, V extends Value> {
                 midKey = ((BPlusTreeInternalNode<K,V>)node).keyList.get(mid);
             }
             int compare = midKey.compareTo(key, useAll);
-            if (compare == -1) {
+            if (compare < 0) {
                 return searchNode(node, key, policy, mid + 1, r, useAll);
             } 
-            else if (compare == 1) {
+            else if (compare > 0) {
                 return searchNode(node, key, policy, l, mid - 1, useAll);
             } 
             else if (policy == BPlusTreeConst.SEARCH_ADD_ONE){ // equal

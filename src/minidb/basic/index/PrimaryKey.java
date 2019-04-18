@@ -1,6 +1,7 @@
 package minidb.basic.index;
 
 import minidb.types.TypeConst;
+import java.nio.charset.StandardCharsets;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -70,10 +71,7 @@ public class PrimaryKey<K extends Comparable<K>> extends Key {
                 fa.writeDouble((Double)key);
                 break;
             default:  //TypeConst.VALUE_TYPE_STRING:
-                fa.writeBytes((String)key);
-                for(int i = ((String) key).length(); i<keySize; i++) {
-                    fa.writeByte(0);
-                }
+            	fa.writeChars((String)key);
                 break;
         }
     }
