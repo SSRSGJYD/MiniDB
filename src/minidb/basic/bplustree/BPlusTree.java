@@ -115,6 +115,9 @@ public class BPlusTree<K extends Key, V extends Value> {
         this.maxPageNumber = 0L;
         this.deleteCount = 0;
         this.conditionThreshold = conditionThreshold;
+        // initialize node cache
+        internalNodeCache = new Cache<>(internalCacheSize);
+        leafNodeCache = new Cache<>(leafCacheSize);
 
         File f = new File(path);
         if(f.exists()) {
@@ -133,10 +136,6 @@ public class BPlusTree<K extends Key, V extends Value> {
             writeFileHeader();
             System.out.println("Tree file created");
         }
-
-        // initialize node cache
-        internalNodeCache = new Cache<>(internalCacheSize);
-        leafNodeCache = new Cache<>(leafCacheSize);
     }
 
     /**

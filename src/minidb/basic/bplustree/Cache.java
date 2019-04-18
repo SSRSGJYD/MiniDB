@@ -11,6 +11,9 @@ public class Cache<T> {
 
     public Cache(int capacity) {
         this.capacity = capacity;
+        this.valueMap = new HashMap<>();
+        this.indexMap = new HashMap<>();
+        this.keyList = new LinkedList<>();
     }
 
     public void put(Long key, T value) {
