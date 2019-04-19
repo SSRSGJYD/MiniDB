@@ -28,15 +28,15 @@ public class SQLParser{
 			str+=s;
 		}
 		System.out.print(str);
-		
 	}
+
 	public static void main( String[] args) throws Exception 
 	{
-		String cmds="create table plays(id int,age int,primary key(id))\n"
-				+ "insert into plays values(1234,199)\n"
-				+ "insert into plays(id,age) values(44,288)\n"
-				+ "insert into plays(id,age) values(55,288)\n"
-				+ "select id,age from plays where age>50 \n";
+		String cmds="create table playt(id int,age int,primary key(id))\n"
+				+ "insert into playt values(1834,199)\n"
+				+ "insert into playt values(134,299)\n"
+				+ "update playt set id=100 where id>134\n"
+				+ "select * from playt\n";
 		InputStream targetStream = new ByteArrayInputStream(cmds.getBytes());
 		InputStreamReader in=new InputStreamReader(targetStream);
 		BufferedReader br=new BufferedReader(in);

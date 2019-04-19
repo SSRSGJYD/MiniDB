@@ -24,6 +24,7 @@ import java.util.Map.Entry;
 import minidb.basic.database.Schema;
 import minidb.basic.index.PrimaryIndex;
 import minidb.basic.index.PrimaryKey;
+import minidb.basic.index.PrimaryKeyValue;
 import minidb.basic.index.SecondaryIndex;
 import minidb.basic.index.SecondaryKey;
 import minidb.basic.index.Value;
@@ -54,13 +55,16 @@ public class Table implements Serializable{
 				keyType=sd.getType();
 				this.schema.primaryKey=entry.getKey();
 				keySize=sd.getSize();
-				this.createPrimaryIndex();
-			}else {
-				this.createSecondaryIndex(entry);
 			}
-
 			valueSize+=sd.getSize()+TypeConst.VALUE_SIZE_NULL;
 		}
+		for(Entry<String, SchemaDescriptor> entry:schema.descriptors.entrySet()) {
+			SchemaDescriptor sd=entry.getValue();
+			if(!sd.isPrimary()) {
+				this.createSecondaryIndex(entry);
+			}
+		}
+		this.createPrimaryIndex();
 
 		this.schema.keyType=keyType;
 
@@ -69,82 +73,78 @@ public class Table implements Serializable{
 	public void createSecondaryIndex(Entry<String, SchemaDescriptor> entry) throws IOException {
 		SchemaDescriptor sd=entry.getValue();
 		SecondaryIndex si=null;
-		si=new SecondaryIndex(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
-//
-//		switch(sd.getType()) {
-//		case TypeConst.VALUE_TYPE_INT:
-//			switch(keyType) {
-//			case TypeConst.VALUE_TYPE_INT:
-//				si=new SecondaryIndex<Integer,Integer>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
-//			case TypeConst.VALUE_TYPE_LONG:
-//				si=new SecondaryIndex<Integer,Long>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
-//			case TypeConst.VALUE_TYPE_FLOAT:
-//				si=new SecondaryIndex<Integer,Float>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
-//			case TypeConst.VALUE_TYPE_DOUBLE:
-//				si=new SecondaryIndex<Integer,Double>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
-//			case TypeConst.VALUE_TYPE_STRING:
-//				si=new SecondaryIndex<Integer,String>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
-//			}
-//			
-//		case TypeConst.VALUE_TYPE_LONG:
-//			switch(keyType) {
-//			case TypeConst.VALUE_TYPE_INT:
-//				si=new SecondaryIndex<Long,Integer>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
-//			case TypeConst.VALUE_TYPE_LONG:
-//				si=new SecondaryIndex<Long,Long>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
-//			case TypeConst.VALUE_TYPE_FLOAT:
-//				si=new SecondaryIndex<Long,Float>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
-//			case TypeConst.VALUE_TYPE_DOUBLE:
-//				si=new SecondaryIndex<Long,Double>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
-//			case TypeConst.VALUE_TYPE_STRING:
-//				si=new SecondaryIndex<Long,String>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
-//			}
-//
-//		case TypeConst.VALUE_TYPE_FLOAT:
-//			switch(keyType) {
-//			case TypeConst.VALUE_TYPE_INT:
-//				si=new SecondaryIndex<Float,Integer>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
-//			case TypeConst.VALUE_TYPE_LONG:
-//				si=new SecondaryIndex<Float,Long>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
-//			case TypeConst.VALUE_TYPE_FLOAT:
-//				si=new SecondaryIndex<Float,Float>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
-//			case TypeConst.VALUE_TYPE_DOUBLE:
-//				si=new SecondaryIndex<Float,Double>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
-//			case TypeConst.VALUE_TYPE_STRING:
-//				si=new SecondaryIndex<Float,String>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
-//			}
-//		case TypeConst.VALUE_TYPE_DOUBLE:
-//			switch(keyType) {
-//			case TypeConst.VALUE_TYPE_INT:
-//				si=new SecondaryIndex<Double,Integer>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
-//			case TypeConst.VALUE_TYPE_LONG:
-//				si=new SecondaryIndex<Double,Long>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
-//			case TypeConst.VALUE_TYPE_FLOAT:
-//				si=new SecondaryIndex<Double,Float>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
-//			case TypeConst.VALUE_TYPE_DOUBLE:
-//				si=new SecondaryIndex<Double,Double>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
-//			case TypeConst.VALUE_TYPE_STRING:
-//				si=new SecondaryIndex<Double,String>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
-//			}
-//		case TypeConst.VALUE_TYPE_STRING:
-//			switch(keyType) {
-//			case TypeConst.VALUE_TYPE_INT:
-//				si=new SecondaryIndex<String,Integer>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
-//			case TypeConst.VALUE_TYPE_LONG:
-//				si=new SecondaryIndex<String,Long>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
-//			case TypeConst.VALUE_TYPE_FLOAT:
-//				si=new SecondaryIndex<String,Float>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
-//			case TypeConst.VALUE_TYPE_DOUBLE:
-//				si=new SecondaryIndex<String,Double>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
-//			case TypeConst.VALUE_TYPE_STRING:
-//				si=new SecondaryIndex<String,String>(1024, sd.getType(), sd.getSize(), keyType, keySize, valueSize, 1024, tableName+"_"+entry.getKey()+".index");
-//			}
-//		}
+		si=new SecondaryIndex(1024, sd.getType(), sd.getSize(), keyType, keySize, keySize, 1024, tableName+"_"+entry.getKey()+".index");
 		if(indexs==null)
 			this.indexs=new HashMap<String,SecondaryIndex>();
 		indexs.put(entry.getKey(), si);	
 	}
 	
+	public void insertIndexsB(Object key,HashMap<String, String> pairs) throws IOException {
+		List<String> values=new ArrayList<String>();
+		for(String Skey:this.schema.descriptors.keySet()) {
+			if(pairs.containsKey(Skey)) {
+				values.add(pairs.get(Skey));
+			}
+			else {
+				values.add(null);
+			}
+		}
+		insertIndexs(key,values);
+
+	}
+	
+	protected byte[] getKeyArray(Object key) throws IOException {
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		DataOutputStream dos = new DataOutputStream(outputStream);
+		switch(this.keyType){
+		case TypeConst.VALUE_TYPE_INT:
+			dos.writeInt((Integer)key);
+			break;
+		case TypeConst.VALUE_TYPE_LONG:
+			dos.writeLong((Long)key);
+			break;
+		case TypeConst.VALUE_TYPE_FLOAT:
+			dos.writeFloat((Float)key);
+			break;
+		case TypeConst.VALUE_TYPE_DOUBLE:
+			dos.writeDouble((Double)key);
+			break;
+		case TypeConst.VALUE_TYPE_STRING:
+			dos.writeChars((String)key);
+			int len=((String)key).length();
+			for(int i=0;i<keySize/TypeConst.VALUE_SIZE_CHAR-len;i++) {
+				dos.writeChar(0);
+			}
+			break;
+		}
+		dos.flush();
+		byte[] array=outputStream.toByteArray();
+		return array;
+	}
+	
+	
+	public void insertIndexs(Object key,List<String> values) throws IOException {
+		byte[] array=this.getKeyArray(key);
+		int c=0;
+		for(Entry<String,SchemaDescriptor> entry:this.schema.descriptors.entrySet()) {
+			if(entry.getValue().isPrimary()) {
+				c++;
+				continue;
+			}
+			this.insertSecondaryIndex(entry.getKey(), entry.getValue(), values.get(c), key,array);
+			c++;
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	protected void insertSecondaryIndex(String name,SchemaDescriptor sd,String value ,Object okvalue,byte[] kvalue) throws IOException {
+		@SuppressWarnings("rawtypes")
+		SecondaryKey key=constructSecondaryKey(sd.getType(),sd.getSize(),value,okvalue);
+		PrimaryKeyValue kv=new PrimaryKeyValue(kvalue,this.keyType);
+		@SuppressWarnings("rawtypes")
+		SecondaryIndex indext= indexs.get(name);
+		indext.insert(key, kv);
+	}
 	
 	protected LinkedHashMap<String,Object> filterNames(List<String> names,LinkedHashMap<String,Object> data){
 		LinkedHashMap<String,Object> res=new LinkedHashMap<String,Object>();
@@ -153,6 +153,293 @@ public class Table implements Serializable{
 		}
 		return res;
 		
+	}
+		
+	protected PrimaryKey constructPrimaryKeyB(byte[] cdValue) throws IOException {
+		PrimaryKey keyi=null;
+		ByteArrayInputStream in = new ByteArrayInputStream(cdValue);
+		DataInputStream inst=new DataInputStream(in);
+		switch(this.keyType) {
+			case TypeConst.VALUE_TYPE_INT:
+				keyi= new PrimaryKey<Integer>(inst.readInt(), TypeConst.VALUE_TYPE_INT, TypeConst.VALUE_SIZE_INT);
+				break;
+			case TypeConst.VALUE_TYPE_LONG:
+				keyi= new PrimaryKey<Long>(inst.readLong(), TypeConst.VALUE_TYPE_LONG, TypeConst.VALUE_SIZE_LONG);
+				break;
+			case TypeConst.VALUE_TYPE_FLOAT:
+				keyi= new PrimaryKey<Float>(inst.readFloat(), TypeConst.VALUE_TYPE_FLOAT, TypeConst.VALUE_SIZE_FLOAT);
+				break;
+			case TypeConst.VALUE_TYPE_DOUBLE:
+				keyi= new PrimaryKey<Double>(inst.readDouble(), TypeConst.VALUE_TYPE_DOUBLE, TypeConst.VALUE_SIZE_DOUBLE);
+				break;
+			case TypeConst.VALUE_TYPE_STRING:
+				String str="";
+				int len=this.keySize/TypeConst.VALUE_SIZE_CHAR;
+		    	for(int i=0;i<len;i++) {
+		    		str+=inst.readChar();
+		    	}
+				keyi= new PrimaryKey<String>(str, TypeConst.VALUE_TYPE_STRING, this.keySize);
+				break;
+			}
+		return keyi;
+	}
+	protected PrimaryKey constructPrimaryKey(String cdValue) {
+		PrimaryKey keyi=null;
+		switch(this.keyType) {
+			case TypeConst.VALUE_TYPE_INT:
+				keyi= new PrimaryKey<Integer>(Integer.parseInt(cdValue), TypeConst.VALUE_TYPE_INT, TypeConst.VALUE_SIZE_INT);
+				break;
+			case TypeConst.VALUE_TYPE_LONG:
+				keyi= new PrimaryKey<Long>(Long.parseLong(cdValue), TypeConst.VALUE_TYPE_LONG, TypeConst.VALUE_SIZE_LONG);
+				break;
+			case TypeConst.VALUE_TYPE_FLOAT:
+				keyi= new PrimaryKey<Float>(Float.parseFloat(cdValue), TypeConst.VALUE_TYPE_FLOAT, TypeConst.VALUE_SIZE_FLOAT);
+				break;
+			case TypeConst.VALUE_TYPE_DOUBLE:
+				keyi= new PrimaryKey<Double>(Double.parseDouble(cdValue), TypeConst.VALUE_TYPE_DOUBLE, TypeConst.VALUE_SIZE_DOUBLE);
+				break;
+			case TypeConst.VALUE_TYPE_STRING:
+				keyi= new PrimaryKey<String>(cdValue, TypeConst.VALUE_TYPE_STRING, keySize);
+				break;
+			}
+		return keyi;
+
+	}
+
+	protected PrimaryKey constructPrimaryKeyO(Object cdValue) {
+		PrimaryKey keyi=null;
+		switch(this.keyType) {
+			case TypeConst.VALUE_TYPE_INT:
+				keyi= new PrimaryKey<Integer>((Integer)(cdValue), TypeConst.VALUE_TYPE_INT, TypeConst.VALUE_SIZE_INT);
+				break;
+			case TypeConst.VALUE_TYPE_LONG:
+				keyi= new PrimaryKey<Long>((Long)(cdValue), TypeConst.VALUE_TYPE_LONG, TypeConst.VALUE_SIZE_LONG);
+				break;
+			case TypeConst.VALUE_TYPE_FLOAT:
+				keyi= new PrimaryKey<Float>((Float)(cdValue), TypeConst.VALUE_TYPE_FLOAT, TypeConst.VALUE_SIZE_FLOAT);
+				break;
+			case TypeConst.VALUE_TYPE_DOUBLE:
+				keyi= new PrimaryKey<Double>((Double)(cdValue), TypeConst.VALUE_TYPE_DOUBLE, TypeConst.VALUE_SIZE_DOUBLE);
+				break;
+			case TypeConst.VALUE_TYPE_STRING:
+				keyi= new PrimaryKey<String>((String)cdValue, TypeConst.VALUE_TYPE_STRING, keySize);
+				break;
+			}
+		return keyi;
+
+	}
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+	protected SecondaryKey constructSecondaryKeyO(int type,int size,Object cdValue, Object keyValue) {
+			SecondaryKey keyr = null;
+			switch(type) {
+			case TypeConst.VALUE_TYPE_INT:
+				switch(keyType) {
+				case TypeConst.VALUE_TYPE_INT:
+					keyr= new SecondaryKey((Integer)(cdValue), TypeConst.VALUE_TYPE_INT, TypeConst.VALUE_SIZE_INT,(Integer)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_LONG:
+					keyr= new SecondaryKey((Integer)(cdValue), TypeConst.VALUE_TYPE_INT, TypeConst.VALUE_SIZE_INT,(Long)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_FLOAT:
+					keyr= new SecondaryKey((Integer)(cdValue), TypeConst.VALUE_TYPE_INT, TypeConst.VALUE_SIZE_INT,(Float)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_DOUBLE:
+					keyr= new SecondaryKey((Integer)(cdValue), TypeConst.VALUE_TYPE_INT, TypeConst.VALUE_SIZE_INT,(Double)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_STRING:
+					keyr= new SecondaryKey((Integer)(cdValue), TypeConst.VALUE_TYPE_INT, TypeConst.VALUE_SIZE_INT,(String)keyValue,keyType,keySize);
+					break;
+				}
+				break;
+			case TypeConst.VALUE_TYPE_LONG:
+				switch(keyType) {
+				case TypeConst.VALUE_TYPE_INT:
+					keyr= new SecondaryKey((Long)(cdValue), TypeConst.VALUE_TYPE_LONG, TypeConst.VALUE_SIZE_LONG,(Integer)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_LONG:
+					keyr= new SecondaryKey((Long)(cdValue), TypeConst.VALUE_TYPE_LONG, TypeConst.VALUE_SIZE_LONG,(Long)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_FLOAT:
+					keyr= new SecondaryKey((Long)(cdValue), TypeConst.VALUE_TYPE_LONG, TypeConst.VALUE_SIZE_LONG,(Float)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_DOUBLE:
+					keyr= new SecondaryKey((Long)(cdValue), TypeConst.VALUE_TYPE_LONG, TypeConst.VALUE_SIZE_LONG,(Double)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_STRING:
+					keyr= new SecondaryKey((Long)(cdValue), TypeConst.VALUE_TYPE_LONG, TypeConst.VALUE_SIZE_LONG,(String)keyValue,keyType,keySize);
+					break;
+				}
+				break;
+			case TypeConst.VALUE_TYPE_FLOAT:
+				switch(keyType) {
+				case TypeConst.VALUE_TYPE_INT:
+					keyr= new SecondaryKey((Float)(cdValue), TypeConst.VALUE_TYPE_FLOAT, TypeConst.VALUE_SIZE_FLOAT,(Integer)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_LONG:
+					keyr= new SecondaryKey((Float)(cdValue), TypeConst.VALUE_TYPE_FLOAT, TypeConst.VALUE_SIZE_FLOAT,(Long)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_FLOAT:
+					keyr= new SecondaryKey((Float)(cdValue), TypeConst.VALUE_TYPE_FLOAT, TypeConst.VALUE_SIZE_FLOAT,(Float)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_DOUBLE:
+					keyr= new SecondaryKey((Float)(cdValue), TypeConst.VALUE_TYPE_FLOAT, TypeConst.VALUE_SIZE_FLOAT,(Double)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_STRING:
+					keyr= new SecondaryKey((Float)(cdValue), TypeConst.VALUE_TYPE_FLOAT, TypeConst.VALUE_SIZE_FLOAT,(String)keyValue,keyType,keySize);
+					break;
+				}
+			case TypeConst.VALUE_TYPE_DOUBLE:
+				switch(keyType) {
+				case TypeConst.VALUE_TYPE_INT:
+					keyr= new SecondaryKey((Double)(cdValue), TypeConst.VALUE_TYPE_DOUBLE, TypeConst.VALUE_SIZE_DOUBLE,(Integer)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_LONG:
+					keyr= new SecondaryKey((Double)(cdValue), TypeConst.VALUE_TYPE_DOUBLE, TypeConst.VALUE_SIZE_DOUBLE,(Long)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_FLOAT:
+					keyr= new SecondaryKey((Double)(cdValue), TypeConst.VALUE_TYPE_DOUBLE, TypeConst.VALUE_SIZE_DOUBLE,(Float)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_DOUBLE:
+					keyr= new SecondaryKey((Double)(cdValue), TypeConst.VALUE_TYPE_DOUBLE, TypeConst.VALUE_SIZE_DOUBLE,(Double)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_STRING:
+					keyr= new SecondaryKey((Double)(cdValue), TypeConst.VALUE_TYPE_DOUBLE, TypeConst.VALUE_SIZE_DOUBLE,(String)keyValue,keyType,keySize);
+					break;
+				}
+			case TypeConst.VALUE_TYPE_STRING:
+				switch(keyType) {
+				case TypeConst.VALUE_TYPE_INT:
+					keyr= new SecondaryKey((String)cdValue, TypeConst.VALUE_TYPE_STRING, size,(Integer)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_LONG:
+					keyr= new SecondaryKey((String)cdValue, TypeConst.VALUE_TYPE_STRING, size,(Long)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_FLOAT:
+					keyr= new SecondaryKey((String)cdValue, TypeConst.VALUE_TYPE_STRING, size,(Float)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_DOUBLE:
+					keyr= new SecondaryKey((String)cdValue, TypeConst.VALUE_TYPE_STRING, size,(Double)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_STRING:
+					keyr= new SecondaryKey((String)cdValue, TypeConst.VALUE_TYPE_STRING, size,(String)keyValue,keyType,keySize);
+					break;
+				}
+			}
+			return keyr;
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	protected SecondaryKey constructSecondaryKey(int type,int size,String cdValue, Object keyValue) {
+			SecondaryKey keyr = null;
+			switch(type) {
+			case TypeConst.VALUE_TYPE_INT:
+				switch(keyType) {
+				case TypeConst.VALUE_TYPE_INT:
+					keyr= new SecondaryKey(Integer.parseInt(cdValue), TypeConst.VALUE_TYPE_INT, TypeConst.VALUE_SIZE_INT,(Integer)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_LONG:
+					keyr= new SecondaryKey(Integer.parseInt(cdValue), TypeConst.VALUE_TYPE_INT, TypeConst.VALUE_SIZE_INT,(Long)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_FLOAT:
+					keyr= new SecondaryKey(Integer.parseInt(cdValue), TypeConst.VALUE_TYPE_INT, TypeConst.VALUE_SIZE_INT,(Float)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_DOUBLE:
+					keyr= new SecondaryKey(Integer.parseInt(cdValue), TypeConst.VALUE_TYPE_INT, TypeConst.VALUE_SIZE_INT,(Double)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_STRING:
+					keyr= new SecondaryKey(Integer.parseInt(cdValue), TypeConst.VALUE_TYPE_INT, TypeConst.VALUE_SIZE_INT,(String)keyValue,keyType,keySize);
+					break;
+				}
+				break;
+			case TypeConst.VALUE_TYPE_LONG:
+				switch(keyType) {
+				case TypeConst.VALUE_TYPE_INT:
+					keyr= new SecondaryKey(Long.parseLong(cdValue), TypeConst.VALUE_TYPE_LONG, TypeConst.VALUE_SIZE_LONG,(Integer)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_LONG:
+					keyr= new SecondaryKey(Long.parseLong(cdValue), TypeConst.VALUE_TYPE_LONG, TypeConst.VALUE_SIZE_LONG,(Long)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_FLOAT:
+					keyr= new SecondaryKey(Long.parseLong(cdValue), TypeConst.VALUE_TYPE_LONG, TypeConst.VALUE_SIZE_LONG,(Float)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_DOUBLE:
+					keyr= new SecondaryKey(Long.parseLong(cdValue), TypeConst.VALUE_TYPE_LONG, TypeConst.VALUE_SIZE_LONG,(Double)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_STRING:
+					keyr= new SecondaryKey(Long.parseLong(cdValue), TypeConst.VALUE_TYPE_LONG, TypeConst.VALUE_SIZE_LONG,(String)keyValue,keyType,keySize);
+					break;
+				}
+				break;
+			case TypeConst.VALUE_TYPE_FLOAT:
+				switch(keyType) {
+				case TypeConst.VALUE_TYPE_INT:
+					keyr= new SecondaryKey(Float.parseFloat(cdValue), TypeConst.VALUE_TYPE_FLOAT, TypeConst.VALUE_SIZE_FLOAT,(Integer)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_LONG:
+					keyr= new SecondaryKey(Float.parseFloat(cdValue), TypeConst.VALUE_TYPE_FLOAT, TypeConst.VALUE_SIZE_FLOAT,(Long)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_FLOAT:
+					keyr= new SecondaryKey(Float.parseFloat(cdValue), TypeConst.VALUE_TYPE_FLOAT, TypeConst.VALUE_SIZE_FLOAT,(Float)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_DOUBLE:
+					keyr= new SecondaryKey(Float.parseFloat(cdValue), TypeConst.VALUE_TYPE_FLOAT, TypeConst.VALUE_SIZE_FLOAT,(Double)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_STRING:
+					keyr= new SecondaryKey(Float.parseFloat(cdValue), TypeConst.VALUE_TYPE_FLOAT, TypeConst.VALUE_SIZE_FLOAT,(String)keyValue,keyType,keySize);
+					break;
+				}
+			case TypeConst.VALUE_TYPE_DOUBLE:
+				switch(keyType) {
+				case TypeConst.VALUE_TYPE_INT:
+					keyr= new SecondaryKey(Double.parseDouble(cdValue), TypeConst.VALUE_TYPE_DOUBLE, TypeConst.VALUE_SIZE_DOUBLE,(Integer)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_LONG:
+					keyr= new SecondaryKey(Double.parseDouble(cdValue), TypeConst.VALUE_TYPE_DOUBLE, TypeConst.VALUE_SIZE_DOUBLE,(Long)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_FLOAT:
+					keyr= new SecondaryKey(Double.parseDouble(cdValue), TypeConst.VALUE_TYPE_DOUBLE, TypeConst.VALUE_SIZE_DOUBLE,(Float)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_DOUBLE:
+					keyr= new SecondaryKey(Double.parseDouble(cdValue), TypeConst.VALUE_TYPE_DOUBLE, TypeConst.VALUE_SIZE_DOUBLE,(Double)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_STRING:
+					keyr= new SecondaryKey(Double.parseDouble(cdValue), TypeConst.VALUE_TYPE_DOUBLE, TypeConst.VALUE_SIZE_DOUBLE,(String)keyValue,keyType,keySize);
+					break;
+				}
+			case TypeConst.VALUE_TYPE_STRING:
+				switch(keyType) {
+				case TypeConst.VALUE_TYPE_INT:
+					keyr= new SecondaryKey(cdValue, TypeConst.VALUE_TYPE_STRING, size,(Integer)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_LONG:
+					keyr= new SecondaryKey(cdValue, TypeConst.VALUE_TYPE_STRING, size,(Long)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_FLOAT:
+					keyr= new SecondaryKey(cdValue, TypeConst.VALUE_TYPE_STRING, size,(Float)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_DOUBLE:
+					keyr= new SecondaryKey(cdValue, TypeConst.VALUE_TYPE_STRING, size,(Double)keyValue,keyType,keySize);
+					break;
+				case TypeConst.VALUE_TYPE_STRING:
+					keyr= new SecondaryKey(cdValue, TypeConst.VALUE_TYPE_STRING, size,(String)keyValue,keyType,keySize);
+					break;
+				}
+			}
+			return keyr;
+	}
+	protected LinkedList<Row> searchRows(String cdName,String cdValue, int op) throws IOException{
+		LinkedList<Row> rows=null;
+		if(this.schema.primaryKey.equalsIgnoreCase(cdName)) {
+			@SuppressWarnings("rawtypes")
+			PrimaryKey keyi=constructPrimaryKey(cdValue);
+			rows=searchByOp(keyi,op);
+		}else {
+			SchemaDescriptor sd=this.schema.descriptors.get(cdName);
+			@SuppressWarnings("rawtypes")
+			SecondaryKey keyr=constructSecondaryKey(sd.getType(),sd.getSize(),cdValue,null);
+			rows=searchByOpS(keyr,cdName,op);
+		}
+		return rows;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -166,81 +453,48 @@ public class Table implements Serializable{
 			qr.types=this.schema.types;
 			return qr;
 		}
-		if(this.schema.primaryKey.equalsIgnoreCase(cdName)) {
-			@SuppressWarnings("rawtypes")
-			PrimaryKey keyi;
-			switch(this.keyType) {
-			case TypeConst.VALUE_TYPE_INT:
-				keyi= new PrimaryKey<Integer>(Integer.parseInt(cdValue), TypeConst.VALUE_TYPE_INT, TypeConst.VALUE_SIZE_INT);
-				rows=searchByOp(keyi,op);
-				break;
-			case TypeConst.VALUE_TYPE_LONG:
-				keyi= new PrimaryKey<Long>(Long.parseLong(cdValue), TypeConst.VALUE_TYPE_LONG, TypeConst.VALUE_SIZE_LONG);
-				rows=searchByOp(keyi,op);
-				break;
-			case TypeConst.VALUE_TYPE_FLOAT:
-				keyi= new PrimaryKey<Float>(Float.parseFloat(cdValue), TypeConst.VALUE_TYPE_FLOAT, TypeConst.VALUE_SIZE_FLOAT);
-				rows=searchByOp(keyi,op);
-				break;
-			case TypeConst.VALUE_TYPE_DOUBLE:
-				keyi= new PrimaryKey<Double>(Double.parseDouble(cdValue), TypeConst.VALUE_TYPE_DOUBLE, TypeConst.VALUE_SIZE_DOUBLE);
-				rows=searchByOp(keyi,op);
-				break;
-			case TypeConst.VALUE_TYPE_STRING:
-				keyi= new PrimaryKey<String>(cdValue, TypeConst.VALUE_TYPE_STRING, keySize);
-				rows=searchByOp(keyi,op);
-				break;
-			}
-		}else {
-
-			SchemaDescriptor sd=this.schema.descriptors.get(cdName);
-			SecondaryKey keyr;
-			switch(sd.getType()) {
-			case TypeConst.VALUE_TYPE_INT:
-				keyr= new SecondaryKey(Integer.parseInt(cdValue), TypeConst.VALUE_TYPE_INT, TypeConst.VALUE_SIZE_INT,null,keyType,keySize);
-				rows=searchByOpS(keyr,cdName,op);
-				break;
-			case TypeConst.VALUE_TYPE_LONG:
-				keyr= new SecondaryKey(Long.parseLong(cdValue), TypeConst.VALUE_TYPE_LONG, TypeConst.VALUE_SIZE_LONG,null,keyType,keySize);
-				rows=searchByOpS(keyr,cdName,op);
-				break;
-			case TypeConst.VALUE_TYPE_FLOAT:
-				keyr= new SecondaryKey(Float.parseFloat(cdValue), TypeConst.VALUE_TYPE_FLOAT, TypeConst.VALUE_SIZE_FLOAT,null,keyType,keySize);
-				rows=searchByOpS(keyr,cdName,op);
-				break;
-			case TypeConst.VALUE_TYPE_DOUBLE:
-				keyr= new SecondaryKey(Double.parseDouble(cdValue), TypeConst.VALUE_TYPE_DOUBLE, TypeConst.VALUE_SIZE_DOUBLE,null,keyType,keySize);
-				rows=searchByOpS(keyr,cdName,op);
-				break;
-			case TypeConst.VALUE_TYPE_STRING:
-				keyr= new SecondaryKey(cdValue, TypeConst.VALUE_TYPE_STRING, sd.getSize(),null,keyType,keySize);
-				rows=searchByOpS(keyr,cdName,op);
-				break;
-			}
-
-		}
+		else
+			rows=searchRows(cdName,cdValue,op);
 		QueryResult qr=new QueryResult();
+		ArrayList<LinkedHashMap<String,Object>> res=new ArrayList<LinkedHashMap<String,Object>>();
 		ArrayList<LinkedHashMap<String,Object>> rowl=fromRaw(rows);
-		qr.data=rowl;
+		for(LinkedHashMap<String,Object> objs:rowl) {
+			LinkedHashMap<String,Object> nobjs=filterNames(names,objs);
+			res.add(nobjs);
+		}
+	
+		qr.data=res;
 		qr.types=this.schema.types;
 		return qr;
 	}
 		@SuppressWarnings("unchecked")
 	protected LinkedList<Row> searchByOpS(@SuppressWarnings("rawtypes") SecondaryKey key,String keyName,int op) throws IOException{
 		SecondaryIndex indext=indexs.get(keyName);
+		LinkedList<PrimaryKeyValue> vs = null;
+		LinkedList<Row> rows = new LinkedList<Row>();
 		switch(op) {
 		case Statement.lg:
-			return indext.searchByRange(key, true, true, null, false, true,false).rows;
+			vs= indext.searchByRange(key, true, true, null, false, true,false).rows;
+			break;
 		case Statement.lt:
-			return indext.searchByRange(null, false, true,key, true, true,false).rows;
+			vs= indext.searchByRange(null, false, true,key, true, true,false).rows;
+			break;
 		case Statement.lge:
-			return indext.searchByRange(key, true, false, null, false, true,false).rows;
+			vs= indext.searchByRange(key, true, false, null, false, true,false).rows;
+			break;
 		case Statement.lte:
-			return indext.searchByRange(null, false, true,key, true, false,false).rows;
+			vs= indext.searchByRange(null, false, true,key, true, false,false).rows;
+			break;
 		case Statement.eq:
-			return indext.search(key,false).rows;
+			vs= indext.search(key,false).rows;
+			break;
 		}
-		return null;
+		for(PrimaryKeyValue pk:vs) {
+			PrimaryKey pkey=this.constructPrimaryKeyB(pk.array);
+			rows.addAll(index.search(pkey).rows);
+		}
+		return rows;
+
 	}
 
 	@SuppressWarnings("unchecked")
@@ -419,29 +673,85 @@ public class Table implements Serializable{
 	    writer.close();
 	}
 	
-//	public void update(String cdName,String cdValue,int op,String setName,String setValue) throws IOException, ClassNotFoundException {
-//		LinkedList<Value> rows=index.searchAll().rows;
-//		ArrayList<LinkedHashMap<String,Object>> rowl=fromRaw(rows);
-
-//		RowFilter rf= buildFilter(cdName,op,cdValue);
-//		for(LinkedHashMap<String,Object> objs:rowl) {
-//			if(rf.method(objs)) {
-//				LinkedHashMap<String,Object> nobjs=modify(objs,cdName,cdValue);
-//				Row nrow=toRow(nobjs);
-//				index.update(nobjs.get(this.schema.primaryKey), nrow);
-//			}
-//		}
-//	}
+	@SuppressWarnings("unchecked")
+	public void delete(String cdName,String cdValue,int op) throws IOException, ClassNotFoundException {
+		LinkedList<Row> rows=searchRows(cdName,cdValue,op);
+		ArrayList<LinkedHashMap<String,Object>> rowl=fromRaw(rows);
+		
+		for(LinkedHashMap<String,Object> row:rowl) {
+			Object key=row.get(this.schema.primaryKey);
+			@SuppressWarnings("rawtypes")
+			PrimaryKey keyi=constructPrimaryKeyO(key);
+			this.index.delete(keyi);
+		}
+		
+	}
 	
-//	public LinkedHashMap<String,Object> modify(LinkedHashMap<String,Object> objs,String cdName,String cdValue){
-//		switch(this.schema.descriptors.get(cdName).getType()) {
-//			case TypeConst.VALUE_TYPE_INT:
-//			case TypeConst.VALUE_TYPE_LONG:
-//			case TypeConst.VALUE_TYPE_FLOAT:
-//			case TypeConst.VALUE_TYPE_DOUBLE:
-//			case TypeConst.VALUE_TYPE_STRING:
-//		}
-//	}
+	@SuppressWarnings("unchecked")
+	public void update(String cdName,String cdValue,int op,String setName,String setValue) throws IOException, ClassNotFoundException {
+		LinkedList<Row> rows=searchRows(cdName,cdValue,op);
+		ArrayList<LinkedHashMap<String,Object>> rowl=fromRaw(rows);
+		SchemaDescriptor sd=this.schema.descriptors.get(setName);
+		for(LinkedHashMap<String,Object> row:rowl) {
+			Object secondary=row.get(setName);
+			Object key=row.get(this.schema.primaryKey);
+			if(!sd.isPrimary()) {
+				@SuppressWarnings("rawtypes")
+				SecondaryKey secondaryKey=constructSecondaryKeyO(sd.getType(),sd.getSize(),secondary,key);
+				this.indexs.get(setName).delete(secondaryKey);
+			}
+			else {
+				PrimaryKey keyi=constructPrimaryKeyO(secondary);
+				this.index.delete(keyi);
+
+				for(Entry<String,Object> obj:row.entrySet()) {
+					SchemaDescriptor sdt=this.schema.descriptors.get(obj.getKey());
+					if(sdt.isPrimary()) continue;
+					SecondaryKey keyr=constructSecondaryKeyO(sd.getType(),sd.getSize(),obj.getValue(),key);
+					this.indexs.get(obj.getKey()).delete(keyr);
+				}
+			}
+		
+			switch(sd.getType()) {
+			case TypeConst.VALUE_TYPE_INT:
+				row.put(setName, Integer.parseInt(setValue));
+				break;
+			case TypeConst.VALUE_TYPE_LONG:
+				row.put(setName, Long.parseLong(setValue));
+				break;
+			case TypeConst.VALUE_TYPE_FLOAT:
+				row.put(setName, Float.parseFloat(setValue));
+				break;
+			case TypeConst.VALUE_TYPE_DOUBLE:
+				row.put(setName, Double.parseDouble(setValue));
+				break;
+			case TypeConst.VALUE_TYPE_STRING:
+				row.put(setName, setValue);
+				break;
+			}
+
+
+			if(!sd.isPrimary()) {
+				this.simpleUpdate(key, mkRowO(row).r);
+				SecondaryKey secondaryKeyl=constructSecondaryKey(sd.getType(),sd.getSize(),setValue,key);
+				byte[] array=this.getKeyArray(key);
+				PrimaryKeyValue kv=new PrimaryKeyValue(array,this.keyType);
+				this.indexs.get(setName).insert(secondaryKeyl, kv);
+			}
+			else {
+	     		key=row.get(this.schema.primaryKey);
+				this.simpleInsert(key, mkRowO(row).r);
+				byte[] array=this.getKeyArray(key);
+				PrimaryKeyValue kv=new PrimaryKeyValue(array,this.keyType);
+				for(Entry<String,Object> obj:row.entrySet()) {
+					SchemaDescriptor sdt=this.schema.descriptors.get(obj.getKey());
+					if(sdt.isPrimary()) continue;
+					SecondaryKey keyr=constructSecondaryKeyO(sd.getType(),sd.getSize(),obj.getValue(),key);
+					this.indexs.get(obj.getKey()).insert(keyr,kv);
+				}
+			}
+		}
+	}
 
 	public Pair<Object,Row> mkRowB(HashMap<String,String> pairs) throws NumberFormatException, IOException {
 		List<String> values=new ArrayList<String>();
@@ -455,6 +765,83 @@ public class Table implements Serializable{
 		}
 		return mkRow(values);
 	}
+
+	public Pair<Object,Row> mkRowO(HashMap<String,Object> values) throws NumberFormatException, IOException {
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		DataOutputStream dos = new DataOutputStream(outputStream);
+		Row row=new Row();
+		Object res= null;
+		Object key= null;
+		for(Entry<String, SchemaDescriptor> entry:schema.descriptors.entrySet()) {
+			SchemaDescriptor s=entry.getValue();
+			Object t=values.get(entry.getKey());
+			switch(s.getType()) {
+			case TypeConst.VALUE_TYPE_INT:
+				if(t!=null) {
+					dos.writeChar(0);
+					res=(Integer)t;
+					dos.writeInt((Integer)res);
+				}else {
+					dos.writeChar('n');
+					dos.writeInt(0);
+				}
+				break;
+			case TypeConst.VALUE_TYPE_LONG:
+				if(t!=null) {
+					dos.writeChar(0);
+					res=(Long)(t);
+					dos.writeLong((Long)res);
+				}else {
+					dos.writeChar('n');
+					dos.writeLong(0);
+				}
+				break;
+			case TypeConst.VALUE_TYPE_FLOAT:
+				if(t!=null) {
+					dos.writeChar(0);
+					res=(Float)(t);
+					dos.writeFloat((Float)res);
+				}else {
+					dos.writeChar('n');
+					dos.writeFloat(0);
+				}
+				break;
+			case TypeConst.VALUE_TYPE_DOUBLE:
+				if(t!=null) {
+					dos.writeChar(0);
+					res=(Double)(t);
+					dos.writeDouble((Double)res);
+				}else {
+					dos.writeChar('n');
+					dos.writeDouble(0);
+				}
+				break;
+			case TypeConst.VALUE_TYPE_STRING:
+				if(t!=null) {
+					dos.writeChar(0);
+					res=t;
+					dos.writeChars((String)t);
+					for(int i=0;i<s.getSize()/TypeConst.VALUE_SIZE_CHAR-((String)t).length();i++) {
+						dos.writeChar(0);
+					}
+				}else {
+					dos.writeChar('n');
+					for(int i=0;i<s.getSize()/TypeConst.VALUE_SIZE_CHAR;i++) {
+						dos.writeChar(0);
+					}
+				}
+				break;
+			}
+			if(s.isPrimary()) {
+				key=(Object)res;
+			}
+		}
+		dos.flush();
+		byte[] array=outputStream.toByteArray();
+		row.array=array;
+		return new Pair<Object,Row>(key,row); 
+	}
+
 
 	public Pair<Object,Row> mkRow(List<String> values) throws NumberFormatException, IOException {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -533,6 +920,31 @@ public class Table implements Serializable{
 		return new Pair<Object,Row>(key,row); 
 	}
 
+	@SuppressWarnings({ "unchecked", "null" })
+	public void simpleUpdate(Object key, Row row) throws IOException {
+		switch(keyType) {
+			case TypeConst.VALUE_TYPE_INT:
+				PrimaryKey<Integer> keyi = new PrimaryKey<Integer>((Integer)key, TypeConst.VALUE_TYPE_INT, TypeConst.VALUE_SIZE_INT);
+				index.update(keyi, row);	
+				break;
+			case TypeConst.VALUE_TYPE_LONG:
+				PrimaryKey<Long> keyl = new PrimaryKey<Long>((Long)key, TypeConst.VALUE_TYPE_LONG, TypeConst.VALUE_SIZE_LONG);
+				index.update(keyl, row);	
+				break;
+			case TypeConst.VALUE_TYPE_FLOAT:
+				PrimaryKey<Float> keyf = new PrimaryKey<Float>((Float)key, TypeConst.VALUE_TYPE_FLOAT, TypeConst.VALUE_SIZE_FLOAT);
+				index.update(keyf, row);	
+				break;
+			case TypeConst.VALUE_TYPE_DOUBLE:
+				PrimaryKey<Double> keyd = new PrimaryKey<Double>((Double)key, TypeConst.VALUE_TYPE_DOUBLE, TypeConst.VALUE_SIZE_DOUBLE);
+				index.update(keyd, row);	
+				break;
+			case TypeConst.VALUE_TYPE_STRING:
+				PrimaryKey<String> keys = new PrimaryKey<String>((String)key, TypeConst.VALUE_TYPE_STRING, keySize);
+				index.update(keys, row);	
+				break;
+			}
+	}
 
 	@SuppressWarnings({ "unchecked", "null" })
 	public void simpleInsert(Object key, Row row) throws IOException {

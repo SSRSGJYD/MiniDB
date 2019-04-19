@@ -64,8 +64,14 @@ public class MyListener extends MiniSQLBaseListener {
 			String op=ctx.condition().op().getText();
 			ssa.op=Statement.opFromString(op);
 		}
-		for(int i=0;i<ctx.names().Name().size();i++) {
-			ssa.names.add(ctx.names().Name(i).getText());
+		if(ctx.names()!=null) {
+			ssa.isStar=false;
+			for(int i=0;i<ctx.names().Name().size();i++) {
+				ssa.names.add(ctx.names().Name(i).getText());
+			}
+		}
+		else {
+			ssa.isStar=true;
 		}
 	}
 	

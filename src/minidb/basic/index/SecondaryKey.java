@@ -68,10 +68,13 @@ public class SecondaryKey<K extends Comparable<K>, PK extends Comparable<PK>> ex
      * @param useAll whether compare using all keys or just non-primary attribute
      * @return 1 for greater, 0 for equal and -1 for smaller
      */
-    public int compareTo(Key k, boolean useAll) {
-        SecondaryKey<K, PK> key = (SecondaryKey<K, PK>)k;
-        return this.key.compareTo(key.getKey());
-    }
+	public int compareTo(Key k, boolean useAll) {
+		SecondaryKey<K, PK> key = (SecondaryKey<K, PK>)k;
+		if(useAll) {
+			return this.compareTo(k);
+		}
+		return this.key.compareTo(key.getKey());
+	}
 
     @Override
     public void writeToFile(RandomAccessFile fa) throws IOException {
@@ -89,10 +92,7 @@ public class SecondaryKey<K extends Comparable<K>, PK extends Comparable<PK>> ex
                 fa.writeDouble((Double)key);
                 break;
             default:  //TypeConst.VALUE_TYPE_STRING:
-                fa.writeBytes((String)key);
-                for(int i = ((String) key).length(); i<attributeSize; i++) {
-                    fa.writeByte(0);
-                }
+            	fa.writeChars((String)key);
                 break;
         }
         switch (PKType) {
@@ -109,10 +109,7 @@ public class SecondaryKey<K extends Comparable<K>, PK extends Comparable<PK>> ex
                 fa.writeDouble((Double)primaryKey);
                 break;
             default:  //TypeConst.VALUE_TYPE_STRING:
-                fa.writeBytes((String)primaryKey);
-                for(int i = ((String) primaryKey).length(); i<PKSize; i++) {
-                    fa.writeByte(0);
-                }
+            	fa.writeChars((String)primaryKey);
                 break;
         }
     }

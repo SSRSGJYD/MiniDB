@@ -10,6 +10,7 @@ public class StatementSelectA extends Statement {
 	public boolean existWhere;
 	public String cdName;
 	public String cdValue;
+	public boolean isStar;
 	public int op;
 	
 	public StatementSelectA() {

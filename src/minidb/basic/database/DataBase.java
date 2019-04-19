@@ -4,7 +4,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
 import minidb.result.BoolResult;
@@ -71,6 +73,7 @@ public class DataBase{
 			tb=tables.get(sia.tableName);
 			pair=tb.mkRow(sia.values);
 			tb.simpleInsert(pair.l,pair.r);
+			tb.insertIndexs(pair.l, sia.values);
 			res=new BoolResult();
 			break;
 		case Statement.insertB:
@@ -78,21 +81,35 @@ public class DataBase{
 			tb=tables.get(sib.tableName);
 			pair=tb.mkRowB(sib.pairs);
 			tb.simpleInsert(pair.l,pair.r);
+			tb.insertIndexsB(pair.l, sib.pairs);
 			res=new BoolResult();
 			break;
 		case Statement.selectA:
 			StatementSelectA sla=(StatementSelectA) st;
 			tb=tables.get(sla.tableName);
-			res=tb.query(sla.names, sla.existWhere, sla.cdName, sla.cdValue, sla.op);
+			if(sla.isStar) {
+				List<String> names=new ArrayList<String>(tb.schema.descriptors.keySet());
+				res=tb.query(names, sla.existWhere, sla.cdName, sla.cdValue, sla.op);
+			}
+			else
+				res=tb.query(sla.names, sla.existWhere, sla.cdName, sla.cdValue, sla.op);
+			break;
+		case Statement.selectB:
 			break;
 
-//		case statement.update:
-//			statementupdate su=(statementupdate) st;
-//			tb=tables.get(su.tablename);
-//			tb.update(su.cdname,su.cdvalue,su.op,su.setname,su.setvalue);
-//			res=new boolresult();
-//			break;
+		case Statement.update:
+			StatementUpdate su=(StatementUpdate) st;
+			tb=tables.get(su.tableName);
+			tb.update(su.cdName,su.cdValue,su.op,su.setName,su.setValue);
+			res=new BoolResult();
+			break;
 
+		case Statement.delete:
+			StatementDelete sds=(StatementDelete) st;
+			tb=tables.get(sds.tableName);
+			tb.delete(sds.cdName,sds.cdValue,sds.op);
+			res=new BoolResult();
+			break;
 		}
 		return res;
 	}
