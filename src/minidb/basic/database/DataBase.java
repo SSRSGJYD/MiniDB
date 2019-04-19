@@ -105,6 +105,10 @@ public class DataBase{
 			break;
 
 		case Statement.delete:
+			StatementDelete sds=(StatementDelete) st;
+			tb=tables.get(sds.tableName);
+			tb.delete(sds.cdName,sds.cdValue,sds.op);
+			res=new BoolResult();
 			break;
 		}
 		return res;

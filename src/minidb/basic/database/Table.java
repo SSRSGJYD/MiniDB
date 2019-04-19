@@ -183,7 +183,6 @@ public class Table implements Serializable{
 			}
 		return keyi;
 	}
-
 	protected PrimaryKey constructPrimaryKey(String cdValue) {
 		PrimaryKey keyi=null;
 		switch(this.keyType) {
@@ -201,6 +200,29 @@ public class Table implements Serializable{
 				break;
 			case TypeConst.VALUE_TYPE_STRING:
 				keyi= new PrimaryKey<String>(cdValue, TypeConst.VALUE_TYPE_STRING, keySize);
+				break;
+			}
+		return keyi;
+
+	}
+
+	protected PrimaryKey constructPrimaryKeyO(Object cdValue) {
+		PrimaryKey keyi=null;
+		switch(this.keyType) {
+			case TypeConst.VALUE_TYPE_INT:
+				keyi= new PrimaryKey<Integer>((Integer)(cdValue), TypeConst.VALUE_TYPE_INT, TypeConst.VALUE_SIZE_INT);
+				break;
+			case TypeConst.VALUE_TYPE_LONG:
+				keyi= new PrimaryKey<Long>((Long)(cdValue), TypeConst.VALUE_TYPE_LONG, TypeConst.VALUE_SIZE_LONG);
+				break;
+			case TypeConst.VALUE_TYPE_FLOAT:
+				keyi= new PrimaryKey<Float>((Float)(cdValue), TypeConst.VALUE_TYPE_FLOAT, TypeConst.VALUE_SIZE_FLOAT);
+				break;
+			case TypeConst.VALUE_TYPE_DOUBLE:
+				keyi= new PrimaryKey<Double>((Double)(cdValue), TypeConst.VALUE_TYPE_DOUBLE, TypeConst.VALUE_SIZE_DOUBLE);
+				break;
+			case TypeConst.VALUE_TYPE_STRING:
+				keyi= new PrimaryKey<String>((String)cdValue, TypeConst.VALUE_TYPE_STRING, keySize);
 				break;
 			}
 		return keyi;
@@ -652,16 +674,44 @@ public class Table implements Serializable{
 	}
 	
 	@SuppressWarnings("unchecked")
+	public void delete(String cdName,String cdValue,int op) throws IOException, ClassNotFoundException {
+		LinkedList<Row> rows=searchRows(cdName,cdValue,op);
+		ArrayList<LinkedHashMap<String,Object>> rowl=fromRaw(rows);
+		
+		for(LinkedHashMap<String,Object> row:rowl) {
+			Object key=row.get(this.schema.primaryKey);
+			@SuppressWarnings("rawtypes")
+			PrimaryKey keyi=constructPrimaryKeyO(key);
+			this.index.delete(keyi);
+		}
+		
+	}
+	
+	@SuppressWarnings("unchecked")
 	public void update(String cdName,String cdValue,int op,String setName,String setValue) throws IOException, ClassNotFoundException {
 		LinkedList<Row> rows=searchRows(cdName,cdValue,op);
 		ArrayList<LinkedHashMap<String,Object>> rowl=fromRaw(rows);
 		SchemaDescriptor sd=this.schema.descriptors.get(setName);
 		for(LinkedHashMap<String,Object> row:rowl) {
 			Object secondary=row.get(setName);
-			@SuppressWarnings("rawtypes")
-			SecondaryKey secondaryKey=constructSecondaryKeyO(sd.getType(),sd.getSize(),secondary,null);
-			this.indexs.get(setName).delete(secondaryKey);
+			Object key=row.get(this.schema.primaryKey);
+			if(!sd.isPrimary()) {
+				@SuppressWarnings("rawtypes")
+				SecondaryKey secondaryKey=constructSecondaryKeyO(sd.getType(),sd.getSize(),secondary,key);
+				this.indexs.get(setName).delete(secondaryKey);
+			}
+			else {
+				PrimaryKey keyi=constructPrimaryKeyO(secondary);
+				this.index.delete(keyi);
 
+				for(Entry<String,Object> obj:row.entrySet()) {
+					SchemaDescriptor sdt=this.schema.descriptors.get(obj.getKey());
+					if(sdt.isPrimary()) continue;
+					SecondaryKey keyr=constructSecondaryKeyO(sd.getType(),sd.getSize(),obj.getValue(),key);
+					this.indexs.get(obj.getKey()).delete(keyr);
+				}
+			}
+		
 			switch(sd.getType()) {
 			case TypeConst.VALUE_TYPE_INT:
 				row.put(setName, Integer.parseInt(setValue));
@@ -679,12 +729,25 @@ public class Table implements Serializable{
 				row.put(setName, setValue);
 				break;
 			}
-			Object key=row.get(this.schema.primaryKey);
-			this.simpleInsert(key, mkRowO(row).r);
-			SecondaryKey secondaryKeyl=constructSecondaryKey(sd.getType(),sd.getSize(),setValue,key);
-			byte[] array=this.getKeyArray(key);
-			PrimaryKeyValue kv=new PrimaryKeyValue(array,this.keyType);
-			this.indexs.get(setName).insert(secondaryKeyl, kv);
+
+			this.simpleUpdate(key, mkRowO(row).r);
+
+			if(!sd.isPrimary()) {
+				SecondaryKey secondaryKeyl=constructSecondaryKey(sd.getType(),sd.getSize(),setValue,key);
+				byte[] array=this.getKeyArray(key);
+				PrimaryKeyValue kv=new PrimaryKeyValue(array,this.keyType);
+				this.indexs.get(setName).insert(secondaryKeyl, kv);
+			}
+			else {
+				byte[] array=this.getKeyArray(key);
+				PrimaryKeyValue kv=new PrimaryKeyValue(array,this.keyType);
+				for(Entry<String,Object> obj:row.entrySet()) {
+					SchemaDescriptor sdt=this.schema.descriptors.get(obj.getKey());
+					if(sdt.isPrimary()) continue;
+					SecondaryKey keyr=constructSecondaryKeyO(sd.getType(),sd.getSize(),obj.getValue(),key);
+					this.indexs.get(obj.getKey()).insert(keyr,kv);
+				}
+			}
 		}
 	}
 
@@ -855,6 +918,31 @@ public class Table implements Serializable{
 		return new Pair<Object,Row>(key,row); 
 	}
 
+	@SuppressWarnings({ "unchecked", "null" })
+	public void simpleUpdate(Object key, Row row) throws IOException {
+		switch(keyType) {
+			case TypeConst.VALUE_TYPE_INT:
+				PrimaryKey<Integer> keyi = new PrimaryKey<Integer>((Integer)key, TypeConst.VALUE_TYPE_INT, TypeConst.VALUE_SIZE_INT);
+				index.update(keyi, row);	
+				break;
+			case TypeConst.VALUE_TYPE_LONG:
+				PrimaryKey<Long> keyl = new PrimaryKey<Long>((Long)key, TypeConst.VALUE_TYPE_LONG, TypeConst.VALUE_SIZE_LONG);
+				index.update(keyl, row);	
+				break;
+			case TypeConst.VALUE_TYPE_FLOAT:
+				PrimaryKey<Float> keyf = new PrimaryKey<Float>((Float)key, TypeConst.VALUE_TYPE_FLOAT, TypeConst.VALUE_SIZE_FLOAT);
+				index.update(keyf, row);	
+				break;
+			case TypeConst.VALUE_TYPE_DOUBLE:
+				PrimaryKey<Double> keyd = new PrimaryKey<Double>((Double)key, TypeConst.VALUE_TYPE_DOUBLE, TypeConst.VALUE_SIZE_DOUBLE);
+				index.update(keyd, row);	
+				break;
+			case TypeConst.VALUE_TYPE_STRING:
+				PrimaryKey<String> keys = new PrimaryKey<String>((String)key, TypeConst.VALUE_TYPE_STRING, keySize);
+				index.update(keys, row);	
+				break;
+			}
+	}
 
 	@SuppressWarnings({ "unchecked", "null" })
 	public void simpleInsert(Object key, Row row) throws IOException {
