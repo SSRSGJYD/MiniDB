@@ -730,15 +730,17 @@ public class Table implements Serializable{
 				break;
 			}
 
-			this.simpleUpdate(key, mkRowO(row).r);
 
 			if(!sd.isPrimary()) {
+				this.simpleUpdate(key, mkRowO(row).r);
 				SecondaryKey secondaryKeyl=constructSecondaryKey(sd.getType(),sd.getSize(),setValue,key);
 				byte[] array=this.getKeyArray(key);
 				PrimaryKeyValue kv=new PrimaryKeyValue(array,this.keyType);
 				this.indexs.get(setName).insert(secondaryKeyl, kv);
 			}
 			else {
+	     		key=row.get(this.schema.primaryKey);
+				this.simpleInsert(key, mkRowO(row).r);
 				byte[] array=this.getKeyArray(key);
 				PrimaryKeyValue kv=new PrimaryKeyValue(array,this.keyType);
 				for(Entry<String,Object> obj:row.entrySet()) {

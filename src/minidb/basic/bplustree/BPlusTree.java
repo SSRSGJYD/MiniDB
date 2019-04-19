@@ -763,7 +763,7 @@ public class BPlusTree<K extends Key, V extends Value> {
             if(i == leaf.getCapacity()) { // key not found
                 return new DeleteResult();
             }
-            else if(key != leaf.keyList.get(i)) { // key not found
+            else if(key.compareTo(leaf.keyList.get(i))!=0) { // key not found
                 return new DeleteResult();
             }
             else { // key has been found
