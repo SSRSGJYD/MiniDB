@@ -2,18 +2,11 @@ package minidb.client;
 	
 import java.io.IOException;
 
-import com.sun.webkit.ContextMenu.ShowContext;
-
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 
@@ -36,7 +29,7 @@ public class ClientDialog extends Application {
 	/**
      * Initializes the root layout.
      */
-    public void initRootLayout() {
+    private void initRootLayout() {
         try {
             // Load root layout from fxml file.
             FXMLLoader loader = new FXMLLoader();
@@ -56,22 +49,25 @@ public class ClientDialog extends Application {
     /**
      * Shows the person overview inside the root layout.
      */
-    public void showContent() {
+    private void showContent() {
         try {
             // Load person overview.
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(ClientDialog.class.getResource("Scene.fxml"));
-            AnchorPane content = (AnchorPane) loader.load();
+            VBox content = (VBox) loader.load();
             content.setMinHeight(590);
             content.setMinWidth(940);
+            SceneController contentController = loader.getController();
+            contentController.initialize();
             // Set person overview into the center of root layout.
             rootLayout.getChildren().add(content);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-	
+    
 	public static void main(String[] args) {
 		launch(args);
 	}
+	
 }
