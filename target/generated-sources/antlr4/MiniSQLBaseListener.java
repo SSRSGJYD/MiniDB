@@ -123,18 +123,6 @@ public class MiniSQLBaseListener implements MiniSQLListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSelectA(MiniSQLParser.SelectAContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitSelectA(MiniSQLParser.SelectAContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterSelectB(MiniSQLParser.SelectBContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -142,6 +130,18 @@ public class MiniSQLBaseListener implements MiniSQLListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitSelectB(MiniSQLParser.SelectBContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterSelectA(MiniSQLParser.SelectAContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSelectA(MiniSQLParser.SelectAContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

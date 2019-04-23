@@ -109,18 +109,6 @@ public interface MiniSQLListener extends ParseTreeListener {
 	 */
 	void exitUpdate(MiniSQLParser.UpdateContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code selectA}
-	 * labeled alternative in {@link MiniSQLParser#sql}.
-	 * @param ctx the parse tree
-	 */
-	void enterSelectA(MiniSQLParser.SelectAContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code selectA}
-	 * labeled alternative in {@link MiniSQLParser#sql}.
-	 * @param ctx the parse tree
-	 */
-	void exitSelectA(MiniSQLParser.SelectAContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code selectB}
 	 * labeled alternative in {@link MiniSQLParser#sql}.
 	 * @param ctx the parse tree
@@ -132,6 +120,18 @@ public interface MiniSQLListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitSelectB(MiniSQLParser.SelectBContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code selectA}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
+	 * @param ctx the parse tree
+	 */
+	void enterSelectA(MiniSQLParser.SelectAContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code selectA}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
+	 * @param ctx the parse tree
+	 */
+	void exitSelectA(MiniSQLParser.SelectAContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code newline}
 	 * labeled alternative in {@link MiniSQLParser#sql}.

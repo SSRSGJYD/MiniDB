@@ -25,16 +25,27 @@ public class MyListener extends MiniSQLBaseListener {
 		ssb.existWhere=false;
 		if(ctx.condition() != null) {
 			ssb.existWhere=true;
-			ssb.cdName=ctx.condition().Name().getText();
-			ssb.cdValue=ctx.condition().value().getText();
+			if(ctx.condition().value()!=null) {
+				ssb.isImme=false;
+				ssb.cdName=ctx.condition().Name(0).getText();
+				ssb.cdValue=ctx.condition().value().getText();
+			}
+			else {
+				ssb.isImme=true;
+				ssb.cdName=ctx.condition().Name(0).getText();
+				ssb.cdNamer=ctx.condition().Name(1).getText();
+			}
 			String op=ctx.condition().op().getText();
 			ssb.op=Statement.opFromString(op);
 		}
 		
-		for(int i=0;i<ctx.cnames().cname().size();i++) {
-			ssb.cnames.add(new Pair<String, String>(ctx.cnames().cname(i).Name(0).getText()
-					,ctx.cnames().cname(i).Name(1).getText()));
+		if(ctx.cnames()!=null) {
+			for(int i=0;i<ctx.cnames().cname().size();i++) {
+				ssb.cnames.add(new Pair<String, String>(ctx.cnames().cname(i).Name(0).getText()
+						,ctx.cnames().cname(i).Name(1).getText()));
+			}
 		}
+
 		for(int i=0;i<ctx.jnames().Name().size();i++) {
 			ssb.jnames.add(ctx.jnames().Name(i).getText());
 			if(i>0) {
@@ -59,8 +70,17 @@ public class MyListener extends MiniSQLBaseListener {
 		ssa.existWhere=false;
 		if(ctx.condition() != null) {
 			ssa.existWhere=true;
-			ssa.cdName=ctx.condition().Name().getText();
-			ssa.cdValue=ctx.condition().value().getText();
+			if(ctx.condition().value()!=null) {
+				ssa.isImme=false;
+				ssa.cdName=ctx.condition().Name(0).getText();
+				ssa.cdValue=ctx.condition().value().getText();
+			}
+			else {
+				ssa.isImme=true;
+				ssa.cdName=ctx.condition().Name(0).getText();
+				ssa.cdNamer=ctx.condition().Name(1).getText();
+			}
+
 			String op=ctx.condition().op().getText();
 			ssa.op=Statement.opFromString(op);
 		}
@@ -84,8 +104,16 @@ public class MyListener extends MiniSQLBaseListener {
 		su.tableName=ctx.Name().getText();
 		su.setName=ctx.set().Name().getText();
 		su.setValue=ctx.set().value().getText();
-		su.cdName=ctx.condition().Name().getText();
-		su.cdValue=ctx.condition().value().getText();
+			if(ctx.condition().value()!=null) {
+				su.isImme=false;
+				su.cdName=ctx.condition().Name(0).getText();
+				su.cdValue=ctx.condition().value().getText();
+			}
+			else {
+				su.isImme=true;
+				su.cdName=ctx.condition().Name(0).getText();
+				su.cdNamer=ctx.condition().Name(1).getText();
+			}
 		String op=ctx.condition().op().getText();
 		su.op=Statement.opFromString(op);
 	}
@@ -136,8 +164,17 @@ public class MyListener extends MiniSQLBaseListener {
 		st=(Statement) sdl;
 		type=Statement.delete;
 		sdl.tableName=ctx.Name().getText();
-		sdl.cdName=ctx.condition().Name().getText();
-		sdl.cdValue=ctx.condition().value().getText();
+			if(ctx.condition().value()!=null) {
+				sdl.isImme=false;
+				sdl.cdName=ctx.condition().Name(0).getText();
+				sdl.cdValue=ctx.condition().value().getText();
+			}
+			else {
+				sdl.isImme=true;
+				sdl.cdName=ctx.condition().Name(0).getText();
+				sdl.cdNamer=ctx.condition().Name(1).getText();
+			}
+
 		String op=ctx.condition().op().getText();
 		sdl.op=Statement.opFromString(op);
 	}

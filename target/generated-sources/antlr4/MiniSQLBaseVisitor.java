@@ -79,14 +79,14 @@ public class MiniSQLBaseVisitor<T> extends AbstractParseTreeVisitor<T> implement
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitSelectA(MiniSQLParser.SelectAContext ctx) { return visitChildren(ctx); }
+	@Override public T visitSelectB(MiniSQLParser.SelectBContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitSelectB(MiniSQLParser.SelectBContext ctx) { return visitChildren(ctx); }
+	@Override public T visitSelectA(MiniSQLParser.SelectAContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

@@ -13,11 +13,12 @@ public class StatementSelectB extends Statement {
 	public List<Pair<Pair<String,String>,Pair<String,String>>> onConditions;
 	public List<String> jnames;
 	
-	public String tableName;
 	
 	public boolean existWhere;
 	public String cdName;
 	public String cdValue;
+	public String cdNamer;
+	public boolean isImme;
 	public int op;
 	
 	public StatementSelectB() {

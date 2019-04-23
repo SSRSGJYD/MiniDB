@@ -70,19 +70,19 @@ public interface MiniSQLVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitUpdate(MiniSQLParser.UpdateContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code selectA}
-	 * labeled alternative in {@link MiniSQLParser#sql}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitSelectA(MiniSQLParser.SelectAContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code selectB}
 	 * labeled alternative in {@link MiniSQLParser#sql}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitSelectB(MiniSQLParser.SelectBContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code selectA}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSelectA(MiniSQLParser.SelectAContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code newline}
 	 * labeled alternative in {@link MiniSQLParser#sql}.

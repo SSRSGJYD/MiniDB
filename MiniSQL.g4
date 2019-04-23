@@ -30,13 +30,13 @@ sql : 'create table' Name '(' schema ')' #create
     | 'insert into' Name '(' names ')' 'values' '(' values ')' #insertB
     | 'delete from' Name 'where' condition #delete
     | 'update' Name 'set' set 'where' condition #update
+    | 'select' (cnames|'*') 'from' jnames  ('where' condition)? #selectB
     | 'select' (names|'*') 'from' Name ('where' condition)? #selectA
-    | 'select' cnames 'from' jnames  ('where' condition)? #selectB
     | NEWLINE #newline
     ;
     
 
-condition : Name op value
+condition : Name op (value|Name)
 	;
 	
 set : Name '=' value

@@ -13,6 +13,7 @@ import minidb.result.BoolResult;
 import minidb.result.QueryResult;
 import minidb.result.Result; 
 
+//TODO rhs value of where
 public class DataBase{
 	
 
@@ -95,6 +96,8 @@ public class DataBase{
 				res=tb.query(sla.names, sla.existWhere, sla.cdName, sla.cdValue, sla.op);
 			break;
 		case Statement.selectB:
+			StatementSelectB slb=(StatementSelectB) st;
+			res=Table.queryJ(tables,slb.cnames,slb.jnames,slb.onConditions,slb.existWhere,slb.cdName,slb.cdValue,slb.op);
 			break;
 
 		case Statement.update:
