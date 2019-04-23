@@ -51,7 +51,7 @@ public class SQLParser{
 
 //				+ "select * from playt join playr on playt.id=playr.id\n";
 //				+ "select * from playr join playd on playd.info=playr.name\n";
-				+ "select * from playt join playr on playt.id=playr.id join playd on playd.info=playr.name\n";
+				+ "select playt.age,playr.id from playt join playr on playt.id=playr.id join playd on playd.info=playr.name\n";
 
 		InputStream targetStream = new ByteArrayInputStream(cmds.getBytes());
 		InputStreamReader in=new InputStreamReader(targetStream);

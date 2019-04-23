@@ -477,10 +477,24 @@ public class Table implements Serializable{
 				res=thatTb.join(cond.l.l,res, cond.r.r,cond.l.r);
 			}
 		}
+		ArrayList<LinkedHashMap<String,Object>> fres=new ArrayList<LinkedHashMap<String,Object>>();
+		for(LinkedHashMap<String,Object> obj:res) {
+			fres.add(filterNamesJ(cnames,obj));
+		}
 		QueryResult qr=new QueryResult();
-		qr.data=res;
+		qr.data=fres;
 		return qr;
 	}
+
+	protected static LinkedHashMap<String,Object> filterNamesJ(List<Pair<String, String>> cnames,LinkedHashMap<String,Object> data){
+		LinkedHashMap<String,Object> res=new LinkedHashMap<String,Object>();
+		for(Pair<String,String> namep:cnames) {
+			String name=namep.l+"."+namep.r;
+			res.put(name, data.get(name));
+		}
+		return res;
+	}
+
 	
 	protected ArrayList<LinkedHashMap<String,Object>> join(String thatTableName,ArrayList<LinkedHashMap<String,Object>> la,String thisCon,String thatCon) throws ClassNotFoundException, IOException{
 		@SuppressWarnings("unchecked")
