@@ -40,7 +40,7 @@ public class SQLParser{
 				+ "insert into playt values(134,299)\n"
 				+ "insert into playt values(13,29)\n"
 
-				+ "insert into playr values(134,9)\n"
+				+ "insert into playr(id,name) values(134,9)\n"
 				+ "insert into playr values(13,99)\n"
 				+ "insert into playr values(133,9)\n"
 
