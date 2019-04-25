@@ -8,8 +8,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.concurrent.FutureCallback;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.protocol.HTTP;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -77,8 +83,56 @@ public class SceneController {
 	
 	public void execute() {
 		final String sql = textArea.getText();
-		// TODO
-		System.out.println(sql);
+		try {
+			String executeURL = connectionInfo.baseURL + "/execute";
+			HttpPost httpPost = new HttpPost(executeURL);
+			httpPost.addHeader(HTTP.CONTENT_TYPE,"application/x-www-form-urlencoded");
+			String json = String.format("{'username':%s,'password':%s,'sql':%s}", 
+					connectionInfo.username, connectionInfo.password, sql);
+			StringEntity se = new StringEntity(json);
+			se.setContentEncoding("UTF-8");
+			se.setContentType("application/json");
+			httpPost.setEntity(se);
+			// async request
+			connectionInfo.httpClient.start();
+			connectionInfo.httpClient.execute(httpPost, new FutureCallback<HttpResponse>() {
+				public void completed(final HttpResponse response) {
+					if(response.getStatusLine().getStatusCode() == 200) {
+						// execute success
+					    // TODO:show result
+					}
+					else {
+						// execute failed
+						Alert information = new Alert(Alert.AlertType.ERROR,"execution failed!");
+						information.setTitle("error"); 
+						information.setHeaderText("Error!");	
+						information.show();
+					}
+                }
+
+                public void failed(final Exception ex) {
+                	// connection failed
+					Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
+					information.setTitle("error"); 
+					information.setHeaderText("Error!");	
+					information.show();
+                }
+
+                public void cancelled() {
+                	// connection failed
+					Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
+					information.setTitle("error"); 
+					information.setHeaderText("Error!");	
+					information.show();
+                }
+			});
+		} catch (Exception e) {
+			// connection failed
+			Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
+			information.setTitle("error"); 
+			information.setHeaderText("Error!");	
+			information.show();
+		}
 	}
 	
 	public void clear() {
