@@ -8,6 +8,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -21,10 +24,12 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import sun.security.util.Password;
 
 public class SceneController {
 	private Stage stage;
 	private Scene scene;
+	private ConnectionInfo connectionInfo;
 	
 	@FXML
 	private MenuItem connectMenuItem;
@@ -67,6 +72,7 @@ public class SceneController {
 	public void initialize() {
 		textArea.setText("Please enter sql commands here!");
 		textArea.setFont(new Font(18));
+		this.connectionInfo = new ConnectionInfo();
 	}
 	
 	public void execute() {
@@ -94,6 +100,7 @@ public class SceneController {
         ConnectionDialogController controller = loader.getController();
         controller.setScene(connectionScene);
         controller.setStage(connectionStage);
+        controller.setConnectionInfo(connectionInfo);
         connectionStage.show();
 	}
 	
