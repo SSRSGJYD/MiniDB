@@ -9,6 +9,7 @@ public abstract class Statement {
 	public static final int update = 5;
 	public static final int selectA = 6;
 	public static final int selectB = 7;
+	public static final int DB = 8;
 	
 	public static final int eq = 0;
 	public static final int lg = 1;

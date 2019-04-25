@@ -30,11 +30,19 @@ sql : 'create table' Name '(' schema ')' #create
     | 'insert into' Name '(' names ')' 'values' '(' values ')' #insertB
     | 'delete from' Name 'where' condition #delete
     | 'update' Name 'set' set 'where' condition #update
-    | 'select' (cnames|'*') 'from' jnames  ('where' condition)? #selectB
+    | 'select' (cnames|'*') 'from' jnames  ('where' ccondition)? #selectB
     | 'select' (names|'*') 'from' Name ('where' condition)? #selectA
+    | 'create database' Name #createdb
+    | 'drop database' Name #dropdb
+    | 'use database' Name #usedb
+    | 'show databases' #show
+    | 'show database' Name #showdb
     | NEWLINE #newline
     ;
     
+
+ccondition : cname op (value|cname)
+	;
 
 condition : Name op (value|Name)
 	;

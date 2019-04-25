@@ -15,9 +15,10 @@ public class StatementSelectB extends Statement {
 	
 	
 	public boolean existWhere;
-	public String cdName;
+	public boolean isStar;
+	public Pair<String,String> cdNameP;
 	public String cdValue;
-	public String cdNamer;
+	public Pair<String,String> cdNamerP;
 	public boolean isImme;
 	public int op;
 	

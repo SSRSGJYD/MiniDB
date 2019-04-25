@@ -10,6 +10,7 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
 import minidb.basic.database.DataBase;
+import minidb.basic.database.MiniDB;
 import minidb.result.Result;
 
 public class SQLParser{
@@ -32,9 +33,10 @@ public class SQLParser{
 
 	public static void main( String[] args) throws Exception 
 	{
-		String cmds="create table playt(id int,age int,primary key(id))\n"
+		String cmds="create database db\n"
+				+ "use database db\n"
+				+ "create table playt(id int,age int,primary key(id))\n"
 				+ "create table playr(id int,name int,primary key(id))\n"
-				+ "create table playd(id int,info int,primary key(id))\n"
 
 				+ "insert into playt values(1834,199)\n"
 				+ "insert into playt values(134,299)\n"
@@ -44,19 +46,12 @@ public class SQLParser{
 				+ "insert into playr values(13,99)\n"
 				+ "insert into playr values(133,9)\n"
 
-				+ "insert into playd values(1324,2)\n"
-				+ "insert into playd values(13,9)\n"
-				+ "insert into playd values(3,99)\n"
-				+ "insert into playd values(133,299)\n"
-
-//				+ "select * from playt join playr on playt.id=playr.id\n";
-//				+ "select * from playr join playd on playd.info=playr.name\n";
-				+ "select playt.age,playr.id from playt join playr on playt.id=playr.id join playd on playd.info=playr.name\n";
+				+ "select * from playt join playr on playt.id=playr.id where playr.name<playt.age\n";
 
 		InputStream targetStream = new ByteArrayInputStream(cmds.getBytes());
 		InputStreamReader in=new InputStreamReader(targetStream);
 		BufferedReader br=new BufferedReader(in);
-		DataBase db=new DataBase();
+		MiniDB db=new MiniDB();
 		while(true) {
 			String cmd=br.readLine();
 			if(cmd==null || cmd.length()==0)continue;

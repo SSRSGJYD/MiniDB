@@ -84,12 +84,53 @@ public interface MiniSQLVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitSelectA(MiniSQLParser.SelectAContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code createdb}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCreatedb(MiniSQLParser.CreatedbContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code dropdb}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDropdb(MiniSQLParser.DropdbContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code usedb}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitUsedb(MiniSQLParser.UsedbContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code show}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitShow(MiniSQLParser.ShowContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code showdb}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitShowdb(MiniSQLParser.ShowdbContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code newline}
 	 * labeled alternative in {@link MiniSQLParser#sql}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitNewline(MiniSQLParser.NewlineContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiniSQLParser#ccondition}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCcondition(MiniSQLParser.CconditionContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link MiniSQLParser#condition}.
 	 * @param ctx the parse tree
@@ -134,7 +175,7 @@ public interface MiniSQLVisitor<T> extends ParseTreeVisitor<T> {
 	T visitJnames(MiniSQLParser.JnamesContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code values}
-	 * labeled alternative in {@link MiniSQLParser#sqlsqlsqlsqlsqlsqlsqlsqlsqlschemaattributeattributeconstraint}.
+	 * labeled alternative in {@link MiniSQLParser#sqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlschemaattributeattributeconstraint}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */

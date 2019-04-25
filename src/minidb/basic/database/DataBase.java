@@ -19,6 +19,11 @@ public class DataBase{
 
 	String name;
 	HashMap<String,Table> tables;
+	public DataBase(String n) throws ClassNotFoundException, IOException {
+		tables=new HashMap<String,Table>();
+		name=n;
+		open();
+	}
 	
 	
 	public DataBase() throws ClassNotFoundException, IOException {
@@ -90,14 +95,21 @@ public class DataBase{
 			tb=tables.get(sla.tableName);
 			if(sla.isStar) {
 				List<String> names=new ArrayList<String>(tb.schema.descriptors.keySet());
-				res=tb.query(names, sla.existWhere, sla.cdName, sla.cdValue, sla.op);
+				if(sla.isImme)
+					res=tb.query(names, sla.existWhere, sla.cdName, sla.cdValue, sla.op);
+				else
+					res=tb.queryI(names, sla.existWhere, sla.cdName, sla.cdNamer, sla.op);
+					
 			}
 			else
-				res=tb.query(sla.names, sla.existWhere, sla.cdName, sla.cdValue, sla.op);
+				if(sla.isImme)
+					res=tb.query(sla.names, sla.existWhere, sla.cdName, sla.cdValue, sla.op);
+				else
+					res=tb.queryI(sla.names, sla.existWhere, sla.cdName, sla.cdNamer, sla.op);
 			break;
 		case Statement.selectB:
 			StatementSelectB slb=(StatementSelectB) st;
-			res=Table.queryJ(tables,slb.cnames,slb.jnames,slb.onConditions,slb.existWhere,slb.cdName,slb.cdValue,slb.op);
+			res=Table.queryJ(slb.isStar,tables,slb.cnames,slb.jnames,slb.onConditions,slb.existWhere,slb.isImme,slb.cdNameP,slb.cdValue,slb.cdNamerP,slb.op);
 			break;
 
 		case Statement.update:
