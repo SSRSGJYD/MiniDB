@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.ParseException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.concurrent.FutureCallback;
@@ -16,7 +17,16 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
+import org.omg.CORBA.PRIVATE_MEMBER;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -25,6 +35,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
@@ -49,7 +60,9 @@ public class SceneController {
 	private MenuItem aboutMenuItem;
 	
 	@FXML
-	private TreeView treeView;
+	private TreeView<String> treeView;
+	private SimpleStringProperty schemas;
+	
 	@FXML
 	private TextArea textArea;
 	@FXML
@@ -79,6 +92,30 @@ public class SceneController {
 		textArea.setText("Please enter sql commands here!");
 		textArea.setFont(new Font(18));
 		this.connectionInfo = new ConnectionInfo();
+		this.schemas = new SimpleStringProperty();
+		schemas.addListener(new ChangeListener<String>() {
+		      @Override
+		      public void changed(ObservableValue<? extends String> ov, String oldVal,
+		          String newVal) {
+		        // update treeView
+		    	TreeItem<String> root = new TreeItem<String>("Schemas");
+		    	treeView.setRoot(root);
+		    	// JSON object:{["schema_name":"", "attributes":["name":"", "type":""]]}
+		    	JSONArray array = JSONObject.parseArray(newVal);
+		    	for(Object object : array) {
+		    		JSONObject jsonObject = (JSONObject)object;
+		    		TreeItem<String> schemaItem = new TreeItem<String>(jsonObject.get("schema_name").toString());
+		    		root.getChildren().add(schemaItem);
+		    		JSONArray attributeArray = (JSONArray)jsonObject.get("attributes");
+		    		for(Object attributeObject : attributeArray) {
+		    			String attributeStr = ((JSONObject)attributeObject).get("name").toString() + ":"
+		    									+ ((JSONObject)attributeObject).get("type").toString();
+		    			TreeItem<String> attributeItem = new TreeItem<String>(attributeStr);
+		    			schemaItem.getChildren().add(attributeItem);
+		    		}
+		    	}
+		      }
+		    });
 	}
 	
 	public void execute() {
@@ -100,6 +137,7 @@ public class SceneController {
 					if(response.getStatusLine().getStatusCode() == 200) {
 						// execute success
 					    // TODO:show result
+						
 					}
 					else {
 						// execute failed
@@ -155,6 +193,7 @@ public class SceneController {
         controller.setScene(connectionScene);
         controller.setStage(connectionStage);
         controller.setConnectionInfo(connectionInfo);
+        controller.setSchemas(schemas);
         connectionStage.show();
 	}
 	
