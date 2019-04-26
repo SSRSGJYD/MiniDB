@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -135,30 +136,30 @@ public class SceneController {
 		      }
 		    });
 		//just for test
-		this.schemas.set("[{\"database_name\":\"database1\",\"schemas\":[{\"schema_name\":\"schema1\", \"attributes\":[{\"name\":\"id\", \"type\":\"int\"},{\"name\":\"name\", \"type\":\"String\"}]}]}]");
+		//this.schemas.set("[{\"database_name\":\"database1\",\"schemas\":[{\"schema_name\":\"schema1\", \"attributes\":[{\"name\":\"id\", \"type\":\"int\"},{\"name\":\"name\", \"type\":\"String\"}]}]}]");
 		//just for test
-		String str = "{\"attributes\":[\"id\",\"name\"], \"rows\":[{\"id\":\"id1\",\"name\":\"name1\"},{\"id\":\"id2\",\"name\":\"name2\"}]}";
+		//String str = "{\"attributes\":[\"id\",\"name\"], \"rows\":[{\"id\":\"id1\",\"name\":\"name1\"},{\"id\":\"id2\",\"name\":\"name2\"}]}";
 		//"{"attributes":["id","name"], "rows":[{"id":"id1","name":"name1"},{"id":"id2","name":"name2"}]}"
-		TableView<Map> tableView = new TableView<>();
-		JSONObject object = JSONObject.parseObject(str);
-		JSONArray attributeArr = (JSONArray) object.get("attributes");
-		for(Object attribute:attributeArr) {
-			TableColumn<Map, String> column = new TableColumn<Map, String>((String)attribute);
-			column.setCellValueFactory(new MapValueFactory<String>((String)attribute));
-			tableView.getColumns().add(column);
-		}
-		JSONArray rowArr = (JSONArray) object.get("rows");
-		ObservableList<Map> data = FXCollections.observableArrayList();
-		for(Object row:rowArr) {
-			Map<String, String> map = new HashMap<>();
-			int i = 0;
-			for(Object attribute:attributeArr) {
-				map.put((String)attribute,((JSONObject)row).get((String)attribute).toString());
-			}
-			data.add(map);
-		}
-		tableView.setItems(data);
-		resultScroll.setContent(tableView);
+//		TableView<Map> tableView = new TableView<>();
+//		JSONObject object = JSONObject.parseObject(str);
+//		JSONArray attributeArr = (JSONArray) object.get("attributes");
+//		for(Object attribute:attributeArr) {
+//			TableColumn<Map, String> column = new TableColumn<Map, String>((String)attribute);
+//			column.setCellValueFactory(new MapValueFactory<String>((String)attribute));
+//			tableView.getColumns().add(column);
+//		}
+//		JSONArray rowArr = (JSONArray) object.get("rows");
+//		ObservableList<Map> data = FXCollections.observableArrayList();
+//		for(Object row:rowArr) {
+//			Map<String, String> map = new HashMap<>();
+//			int i = 0;
+//			for(Object attribute:attributeArr) {
+//				map.put((String)attribute,((JSONObject)row).get((String)attribute).toString());
+//			}
+//			data.add(map);
+//		}
+//		tableView.setItems(data);
+//		resultScroll.setContent(tableView);
 	}
 	
 	public void execute() {
@@ -179,10 +180,33 @@ public class SceneController {
 				public void completed(final HttpResponse response) {
 					if(response.getStatusLine().getStatusCode() == 200) {
 						// execute success
-					    // TODO:show result
-						TableView<String[]> tableView = new TableView<String[]>();
-						
-						resultScroll.setContent(tableView);
+						HttpEntity entity = response.getEntity();
+						if(entity != null) { 
+							String responseStr = EntityUtils.toString(entity);
+							if(responseStr != "") {
+								// show result table
+								TableView<Map> tableView = new TableView<>();
+								JSONObject object = JSONObject.parseObject(responseStr);
+								JSONArray attributeArr = (JSONArray) object.get("attributes");
+								for(Object attribute:attributeArr) {
+									TableColumn<Map, String> column = new TableColumn<Map, String>((String)attribute);
+									column.setCellValueFactory(new MapValueFactory<String>((String)attribute));
+									tableView.getColumns().add(column);
+								}
+								JSONArray rowArr = (JSONArray) object.get("rows");
+								ObservableList<Map> data = FXCollections.observableArrayList();
+								for(Object row:rowArr) {
+									Map<String, String> map = new HashMap<>();
+									int i = 0;
+									for(Object attribute:attributeArr) {
+										map.put((String)attribute,((JSONObject)row).get((String)attribute).toString());
+									}
+									data.add(map);
+								}
+								tableView.setItems(data);
+								resultScroll.setContent(tableView);
+							}
+						}
 					}
 					else {
 						// execute failed
@@ -300,7 +324,10 @@ public class SceneController {
 	}
 	
 	public void about() {
-		
+		Alert information = new Alert(Alert.AlertType.INFORMATION);
+		information.setTitle("About"); 
+		information.setHeaderText("About Minidb");	
+		information.show();
 	}
 	
 	
