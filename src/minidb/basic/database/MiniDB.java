@@ -27,10 +27,16 @@ public class MiniDB {
 				res=new BoolResult();
 				break;
 			case StatementDB.drop:
+				if(!dbs.containsKey(sdb.dbName)) {
+					throw new IllegalArgumentException("database not exist");
+				}
 				dbs.remove(sdb.dbName);
 				res=new BoolResult();
 				break;
 			case StatementDB.use:
+				if(!dbs.containsKey(sdb.dbName)) {
+					throw new IllegalArgumentException("database not exist");
+				}
 				current=dbs.get(sdb.dbName);
 				res=new BoolResult();
 				break;
@@ -41,6 +47,9 @@ public class MiniDB {
 				res=lr;
 				break;
 			case StatementDB.showdb:
+				if(!dbs.containsKey(sdb.dbName)) {
+					throw new IllegalArgumentException("database not exist");
+				}
 				DataBase tdb=dbs.get(sdb.dbName);
 				ListResult tlr=new ListResult();
 				ArrayList<String> tls=new ArrayList<String>(tdb.tables.keySet());

@@ -15,38 +15,26 @@ import minidb.result.Result;
 
 public class SQLParser{
 	
-	public static void mainl( String[] args) throws Exception {
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-		DataOutputStream dos = new DataOutputStream(outputStream);
-		dos.writeChars("1234");
-		byte[]array=outputStream.toByteArray();
-
-		ByteArrayInputStream in = new ByteArrayInputStream(array);
-		DataInputStream inst=new DataInputStream(in);
-		String str="";
-		for(int i=0;i<4;i++) {
-			char s=inst.readChar();
-			str+=s;
-		}
-		System.out.print(str);
-	}
 
 	public static void main( String[] args) throws Exception 
 	{
 		String cmds="create database db\n"
 				+ "use database db\n"
-				+ "create table playt(id int,age int,primary key(id))\n"
+				+ "create table playt2(id int,age int,primary key(id))\n"
 				+ "create table playr(id int,name int,primary key(id))\n"
 
-				+ "insert into playt values(1834,199)\n"
-				+ "insert into playt values(134,299)\n"
-				+ "insert into playt values(13,29)\n"
+				+ "insert into playt2 values(1834,199)\n"
+				+ "insert into playt2 values(134,299)\n"
+				+ "insert into playt2 values(13,29)\n"
 
-				+ "insert into playr(id,name) values(134,9)\n"
-				+ "insert into playr values(13,99)\n"
 				+ "insert into playr values(133,9)\n"
+				+ "insert into playr(id,ir) values('134',22)\n"
+				+ "insert into playr values(13,99)\n"
 
-				+ "select * from playt join playr on playt.id=playr.id where playr.name<playt.age\n";
+				+ "select * from playt join playr on playt.id=playr.id where playr.id>80\n"
+
+				+ "show databases\n";
+
 
 		InputStream targetStream = new ByteArrayInputStream(cmds.getBytes());
 		InputStreamReader in=new InputStreamReader(targetStream);

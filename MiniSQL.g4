@@ -1,7 +1,7 @@
 grammar MiniSQL;
 
-Name : [a-z]+ ;
 Number : [0-9]+ ;
+Name : [0-9a-z_]+ ;
 String : '\'' (.)+? '\''
 	;
 NEWLINE:'\r'?'\n'

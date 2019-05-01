@@ -71,11 +71,19 @@ public class DataBase{
 			break;
 		case Statement.drop:
 			StatementDrop sd=(StatementDrop) st;
+			if(!this.tables.containsKey(sd.tableName)) {
+				throw new IllegalArgumentException("table not exist");
+			}
+
 			dropTable(sd.tableName);
 			res=new BoolResult();
 			break;
 		case Statement.insertA:
 			StatementInsertA sia=(StatementInsertA) st;
+			if(!this.tables.containsKey(sia.tableName)) {
+				throw new IllegalArgumentException("table not exist");
+			}
+
 			tb=tables.get(sia.tableName);
 			pair=tb.mkRow(sia.values);
 			tb.simpleInsert(pair.l,pair.r);
@@ -84,6 +92,9 @@ public class DataBase{
 			break;
 		case Statement.insertB:
 			StatementInsertB sib=(StatementInsertB) st;
+			if(!this.tables.containsKey(sib.tableName)) {
+				throw new IllegalArgumentException("table not exist");
+			}
 			tb=tables.get(sib.tableName);
 			pair=tb.mkRowB(sib.pairs);
 			tb.simpleInsert(pair.l,pair.r);
@@ -92,6 +103,9 @@ public class DataBase{
 			break;
 		case Statement.selectA:
 			StatementSelectA sla=(StatementSelectA) st;
+			if(!this.tables.containsKey(sla.tableName)) {
+				throw new IllegalArgumentException("table not exist");
+			}
 			tb=tables.get(sla.tableName);
 			if(sla.isStar) {
 				List<String> names=new ArrayList<String>(tb.schema.descriptors.keySet());
@@ -114,6 +128,9 @@ public class DataBase{
 
 		case Statement.update:
 			StatementUpdate su=(StatementUpdate) st;
+			if(!this.tables.containsKey(su.tableName)) {
+				throw new IllegalArgumentException("table not exist");
+			}
 			tb=tables.get(su.tableName);
 			tb.update(su.cdName,su.cdValue,su.op,su.setName,su.setValue);
 			res=new BoolResult();
@@ -121,6 +138,9 @@ public class DataBase{
 
 		case Statement.delete:
 			StatementDelete sds=(StatementDelete) st;
+			if(!this.tables.containsKey(sds.tableName)) {
+				throw new IllegalArgumentException("table not exist");
+			}
 			tb=tables.get(sds.tableName);
 			tb.delete(sds.cdName,sds.cdValue,sds.op);
 			res=new BoolResult();

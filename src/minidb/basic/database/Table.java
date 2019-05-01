@@ -81,6 +81,9 @@ public class Table implements Serializable{
 	}
 	
 	public void insertIndexsB(Object key,HashMap<String, String> pairs) throws IOException {
+		if(key==null) {
+			throw new IllegalArgumentException("key cannot be null");
+		}
 		List<String> values=new ArrayList<String>();
 		for(String Skey:this.schema.descriptors.keySet()) {
 			if(pairs.containsKey(Skey)) {
@@ -125,6 +128,9 @@ public class Table implements Serializable{
 	
 	
 	public void insertIndexs(Object key,List<String> values) throws IOException {
+		if(key==null) {
+			throw new IllegalArgumentException("key cannot be null");
+		}
 		byte[] array=this.getKeyArray(key);
 		int c=0;
 		for(Entry<String,SchemaDescriptor> entry:this.schema.descriptors.entrySet()) {
@@ -132,7 +138,9 @@ public class Table implements Serializable{
 				c++;
 				continue;
 			}
-			this.insertSecondaryIndex(entry.getKey(), entry.getValue(), values.get(c), key,array);
+			String value=values.get(c);
+			if(value!=null)
+				this.insertSecondaryIndex(entry.getKey(), entry.getValue(), value, key,array);
 			c++;
 		}
 	}
@@ -464,11 +472,18 @@ public class Table implements Serializable{
 	public static Result queryJ(Boolean isStar,HashMap<String, Table> tables, List<Pair<String, String>> cnames, List<String> jnames,
 			List<Pair<Pair<String, String>, Pair<String, String>>> onConditions, boolean existWhere, boolean isImme,
 			Pair<String, String> cdNameP, String cdValue, Pair<String, String> cdNamerP, int op) throws ClassNotFoundException, IOException {
+		if(!tables.containsKey(jnames.get(0))){
+			throw new IllegalArgumentException("table"+jnames.get(0)+" not exist");
+		}
 		Table rootTb=tables.get(jnames.get(0));
 		ArrayList<LinkedHashMap<String,Object>> res=rootTb.fromRawJ(rootTb.index.searchAll().rows);
 		Table thatTb;
 		for(int i=0;i<onConditions.size();i++) {
-			thatTb=tables.get(jnames.get(i+1));
+			String name=jnames.get(i+1);
+			if(!tables.containsKey(name)){
+				throw new IllegalArgumentException("table"+name+" not exist");
+			}
+			thatTb=tables.get(name);
 			Pair<Pair<String, String>, Pair<String, String>> cond=onConditions.get(i);
 			if(cond.l.l.equals(thatTb.tableName)){
 				res=thatTb.join(cond.r.l,res, cond.l.r,cond.r.r);
@@ -645,20 +660,39 @@ public class Table implements Serializable{
 	
 	protected static RowFilter buildFilter(Table tb,String cdName,int op,String cdNamer) {
 		SchemaDescriptor sd = tb.schema.descriptors.get(cdName);
-		RowFilter rf=(row)->tb.compare(op,sd.getType(),row.get(cdName),row.get(cdNamer));
+		RowFilter rf=(row)->{
+			Object va=row.get(cdName);
+			Object vb=row.get(cdNamer);
+			if(va==null||vb==null)
+				return false;
+			else
+				return tb.compare(op,sd.getType(),row.get(cdName),row.get(cdNamer));
+		};
 		return rf;
 	}
 	protected static RowFilter buildFilterJ(Table tba,Table tbb,String cdName,int op,String cdNamer) {
 		SchemaDescriptor sd = tba.schema.descriptors.get(cdName);
-		RowFilter rf=(row)->tba.compare(op,sd.getType(),row.get(tba.tableName+"."+cdName),row.get(tbb.tableName+"."+cdNamer));
+		RowFilter rf=(row)->{
+			Object va=row.get(tba.tableName+"."+cdName);
+			Object vb=row.get(tbb.tableName+"."+cdNamer);
+			if(va==null||vb==null)
+				return false;
+			else
+				return tba.compare(op,sd.getType(),va,vb);
+		};
 		return rf;
 	}
 	protected static RowFilter buildFilterJV(Table tb,String cdName,int op,String Value) {
 		SchemaDescriptor sd = tb.schema.descriptors.get(cdName);
-		RowFilter rf=(row)->tb.compareV(op,sd.getType(),row.get(tb.tableName+"."+cdName),Value);
+		RowFilter rf=(row)->{
+			Object va=row.get(tb.tableName+"."+cdName);
+			if(va==null)
+				return false;
+			else
+				return tb.compareV(op,sd.getType(),row.get(tb.tableName+"."+cdName),Value);
+		};
 		return rf;
 	}
-	
 	protected <T extends Comparable <T>> boolean compareT(int op,T va,T vb) {
 		int res=va.compareTo(vb);
 		switch(op) {
@@ -950,6 +984,9 @@ public class Table implements Serializable{
 	}
 
 	public Pair<Object,Row> mkRowB(HashMap<String,String> pairs) throws NumberFormatException, IOException {
+		if(pairs.size()>this.schema.descriptors.size()) {
+			throw new IllegalArgumentException("too many values");
+		}
 		List<String> values=new ArrayList<String>();
 		for(String key:this.schema.descriptors.keySet()) {
 			if(pairs.containsKey(key)) {
@@ -1040,6 +1077,9 @@ public class Table implements Serializable{
 
 
 	public Pair<Object,Row> mkRow(List<String> values) throws NumberFormatException, IOException {
+		if(values.size()>this.schema.descriptors.size()) {
+			throw new IllegalArgumentException("too many values");
+		}
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(outputStream);
 		Row row=new Row();
@@ -1118,6 +1158,9 @@ public class Table implements Serializable{
 
 	@SuppressWarnings({ "unchecked", "null" })
 	public void simpleUpdate(Object key, Row row) throws IOException {
+		if(key==null) {
+			throw new IllegalArgumentException("key cannot be null");
+		}
 		switch(keyType) {
 			case TypeConst.VALUE_TYPE_INT:
 				PrimaryKey<Integer> keyi = new PrimaryKey<Integer>((Integer)key, TypeConst.VALUE_TYPE_INT, TypeConst.VALUE_SIZE_INT);
@@ -1144,6 +1187,9 @@ public class Table implements Serializable{
 
 	@SuppressWarnings({ "unchecked", "null" })
 	public void simpleInsert(Object key, Row row) throws IOException {
+		if(key==null) {
+			throw new IllegalArgumentException("key cannot be null");
+		}
 		switch(keyType) {
 			case TypeConst.VALUE_TYPE_INT:
 				PrimaryKey<Integer> keyi = new PrimaryKey<Integer>((Integer)key, TypeConst.VALUE_TYPE_INT, TypeConst.VALUE_SIZE_INT);
