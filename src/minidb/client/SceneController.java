@@ -2,31 +2,23 @@ package minidb.client;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -46,12 +38,11 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.MapValueFactory;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
-import minidb.basic.database.Table;
 
 
 public class SceneController {
@@ -135,6 +126,7 @@ public class SceneController {
 		    	}
 		      }
 		    });
+		
 		//just for test
 		//this.schemas.set("[{\"database_name\":\"database1\",\"schemas\":[{\"schema_name\":\"schema1\", \"attributes\":[{\"name\":\"id\", \"type\":\"int\"},{\"name\":\"name\", \"type\":\"String\"}]}]}]");
 		//just for test
@@ -182,7 +174,12 @@ public class SceneController {
 						// execute success
 						HttpEntity entity = response.getEntity();
 						if(entity != null) { 
-							String responseStr = EntityUtils.toString(entity);
+							String responseStr = null;
+							try {
+								responseStr = EntityUtils.toString(entity);
+							} catch (ParseException | IOException e) {
+								e.printStackTrace();
+							}
 							if(responseStr != "") {
 								// show result table
 								TableView<Map> tableView = new TableView<>();
@@ -205,15 +202,36 @@ public class SceneController {
 								}
 								tableView.setItems(data);
 								resultScroll.setContent(tableView);
+								// show execution time
+								float time = object.getFloatValue("time");
+								bottomLabel.setText(String.format("execution time:%f", time));
 							}
 						}
 					}
 					else {
 						// execute failed
-						Alert information = new Alert(Alert.AlertType.ERROR,"execution failed!");
-						information.setTitle("error"); 
-						information.setHeaderText("Error!");	
-						information.show();
+						HttpEntity entity = response.getEntity();
+						if(entity != null) { 
+							String responseStr = null;
+							try {
+								responseStr = EntityUtils.toString(entity);
+							} catch (ParseException | IOException e) {
+								e.printStackTrace();
+							}
+							if(responseStr != "") {
+								JSONObject object = JSONObject.parseObject(responseStr);
+								String errorMsg = object.getString("msg");
+								// show error msg in result area
+								TextArea area = new TextArea();
+								area.setText(errorMsg);
+								resultScroll.setContent(area);
+								// show error msg in alert dialog
+								Alert information = new Alert(Alert.AlertType.ERROR, errorMsg);
+								information.setTitle("error"); 
+								information.setHeaderText("Error!");	
+								information.show();
+							}
+						}
 					}
                 }
 
@@ -261,6 +279,7 @@ public class SceneController {
         connectionStage.setHeight(250);
         connectionStage.setWidth(350);
         connectionStage.setResizable(false);
+        connectionStage.initModality(Modality.APPLICATION_MODAL);
         ConnectionDialogController controller = loader.getController();
         controller.setScene(connectionScene);
         controller.setStage(connectionStage);

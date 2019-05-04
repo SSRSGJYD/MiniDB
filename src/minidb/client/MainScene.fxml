@@ -80,7 +80,7 @@
                   </SplitPane>
                </children>
             </AnchorPane>
-            <Label id="label" fx:id="bottomLabel" minHeight="35.0" prefHeight="35.0" prefWidth="179.0" text="execute time:">
+            <Label id="label" fx:id="bottomLabel" alignment="CENTER" minHeight="35.0" prefHeight="35.0" prefWidth="179.0" text="execute time:">
                <font>
                   <Font size="18.0" />
                </font>

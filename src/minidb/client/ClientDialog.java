@@ -28,6 +28,7 @@ public class ClientDialog extends Application {
 		this.primaryStage.setHeight(625);
 		this.primaryStage.setResizable(false);
 		initRootLayout();
+		
 	}
 	
 	/**
@@ -50,6 +51,7 @@ public class ClientDialog extends Application {
             contentController.setScene(scene);
             contentController.setStage(primaryStage);
             contentController.initialize();
+            contentController.connect();
         } catch (IOException e) {
             e.printStackTrace();
         }
