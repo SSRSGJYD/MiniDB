@@ -31,7 +31,7 @@ public class SQLParser{
 				+ "insert into playr(id,ir) values('134',22)\n"
 				+ "insert into playr values(13,99)\n"
 
-				+ "select * from playt join playr on playt.id=playr.id where playr.id>80\n"
+				+ "select * from playt2 join playr on playt2.id=playr.id where playr.id>80\n"
 
 				+ "show databases\n";
 
