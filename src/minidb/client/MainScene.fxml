@@ -69,7 +69,7 @@
                                     </AnchorPane>
                                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                                        <children>
-                                          <ScrollPane layoutX="91.0" layoutY="-2.0" prefHeight="195.0" prefWidth="415.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                          <ScrollPane fx:id="resultScroll" layoutX="91.0" layoutY="-2.0" prefHeight="195.0" prefWidth="415.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                        </children>
                                     </AnchorPane>
                                  </items>
@@ -80,7 +80,7 @@
                   </SplitPane>
                </children>
             </AnchorPane>
-            <Label id="label" fx:id="bottomLabel" minHeight="35.0" prefHeight="35.0" prefWidth="179.0" text="execute time:">
+            <Label id="label" fx:id="bottomLabel" alignment="CENTER" minHeight="35.0" prefHeight="35.0" prefWidth="179.0" text="execute time:">
                <font>
                   <Font size="18.0" />
                </font>

@@ -1,7 +1,10 @@
 package minidb.client;
 
+import java.io.IOException;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.ParseException;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -18,6 +21,7 @@ import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -29,6 +33,7 @@ public class ConnectionDialogController {
 	private Stage stage;
 	private Scene scene;
 	private ConnectionInfo connectionInfo;
+	private SimpleStringProperty schemas;
 	
 	@FXML
 	private TextField passwordTextField;
@@ -61,6 +66,10 @@ public class ConnectionDialogController {
 		this.connectionInfo = connectionInfo;
 	}
 	
+	public void setSchemas(SimpleStringProperty schemas) {
+		this.schemas = schemas;
+	}
+	
 	public void connect() {
 		String baseURL = "http://" + ipTextField.getText() + ":" + portTextField.getText();
 		String loginURL = "http://" + ipTextField.getText() + ":" + portTextField.getText() + "/login";
@@ -91,6 +100,14 @@ public class ConnectionDialogController {
 					    connectionInfo.baseURL = baseURL;
 					    connectionInfo.username = usernameTextField.getText();
 					    connectionInfo.password = passwordTextField.getText();
+					    // receive schemas and update treeView
+						try {
+							schemas.set(EntityUtils.toString(response.getEntity(), "utf-8"));
+						} catch (ParseException | IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
 					    stage.close();
 					}
 					else {

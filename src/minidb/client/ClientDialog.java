@@ -23,11 +23,12 @@ public class ClientDialog extends Application {
 	@Override
 	public void start(Stage primaryStage) {	
 		this.primaryStage = primaryStage;
-		this.primaryStage.setTitle("MiniDB Client Dialog");
+		this.primaryStage.setTitle("MiniDB Client");
 		this.primaryStage.setWidth(950);
 		this.primaryStage.setHeight(625);
 		this.primaryStage.setResizable(false);
 		initRootLayout();
+		
 	}
 	
 	/**
@@ -50,6 +51,7 @@ public class ClientDialog extends Application {
             contentController.setScene(scene);
             contentController.setStage(primaryStage);
             contentController.initialize();
+            contentController.connect();
         } catch (IOException e) {
             e.printStackTrace();
         }
