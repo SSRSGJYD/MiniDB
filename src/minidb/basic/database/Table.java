@@ -550,6 +550,7 @@ public class Table implements Serializable{
 		ArrayList<LinkedHashMap<String,Object>> res=new ArrayList<LinkedHashMap<String,Object>>();
 		for(LinkedHashMap<String,Object> rowa: la) {
 			Object value=rowa.get(thatTableName+"."+thatCon);
+			if(value==null) continue;
 			ArrayList<LinkedHashMap<String,Object>> rows=fromRaw(this.searchRowsO(thisCon,value,Statement.eq));
 			for(LinkedHashMap<String,Object> rowb:rows) {
 				LinkedHashMap<String,Object> rowres=new LinkedHashMap<String,Object>();
