@@ -20,20 +20,15 @@ public class SQLParser{
 	{
 		String cmds="create database db\n"
 				+ "use database db\n"
-				+ "create table playt2(id int,age int,primary key(id))\n"
-				+ "create table playr(id int,name int,primary key(id))\n"
+				+ "create table playr(id float,name float,primary key(id))\n"
 
-				+ "insert into playt2 values(1834,199)\n"
-				+ "insert into playt2 values(134,299)\n"
-				+ "insert into playt2 values(13,29)\n"
+				+ "insert into playr values(133.500,9.2)\n"
+				+ "insert into playr(id) values(134)\n"
+				+ "insert into playr values(13,990.44)\n"
 
-				+ "insert into playr values(133,9)\n"
-				+ "insert into playr(id,ir) values('134',22)\n"
-				+ "insert into playr values(13,99)\n"
+				+ "select * from playr where name>15.0\n"
 
-				+ "select * from playt2 join playr on playt2.id=playr.id where playr.id>80\n"
-
-				+ "show databases\n";
+				+ "show database db\n";
 
 
 		InputStream targetStream = new ByteArrayInputStream(cmds.getBytes());

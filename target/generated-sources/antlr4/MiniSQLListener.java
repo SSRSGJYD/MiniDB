@@ -1,4 +1,5 @@
-// Generated from MiniSQL.g4 by ANTLR 4.7.2
+// Generated from MiniSQL.g4 by ANTLR 4.4
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -7,341 +8,341 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
  */
 public interface MiniSQLListener extends ParseTreeListener {
 	/**
-	 * Enter a parse tree produced by {@link MiniSQLParser#type}.
-	 * @param ctx the parse tree
-	 */
-	void enterType(MiniSQLParser.TypeContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MiniSQLParser#type}.
-	 * @param ctx the parse tree
-	 */
-	void exitType(MiniSQLParser.TypeContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MiniSQLParser#op}.
-	 * @param ctx the parse tree
-	 */
-	void enterOp(MiniSQLParser.OpContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MiniSQLParser#op}.
-	 * @param ctx the parse tree
-	 */
-	void exitOp(MiniSQLParser.OpContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MiniSQLParser#value}.
-	 * @param ctx the parse tree
-	 */
-	void enterValue(MiniSQLParser.ValueContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MiniSQLParser#value}.
-	 * @param ctx the parse tree
-	 */
-	void exitValue(MiniSQLParser.ValueContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code create}
-	 * labeled alternative in {@link MiniSQLParser#sql}.
-	 * @param ctx the parse tree
-	 */
-	void enterCreate(MiniSQLParser.CreateContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code create}
-	 * labeled alternative in {@link MiniSQLParser#sql}.
-	 * @param ctx the parse tree
-	 */
-	void exitCreate(MiniSQLParser.CreateContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code drop}
 	 * labeled alternative in {@link MiniSQLParser#sql}.
 	 * @param ctx the parse tree
 	 */
-	void enterDrop(MiniSQLParser.DropContext ctx);
+	void enterDrop(@NotNull MiniSQLParser.DropContext ctx);
 	/**
 	 * Exit a parse tree produced by the {@code drop}
 	 * labeled alternative in {@link MiniSQLParser#sql}.
 	 * @param ctx the parse tree
 	 */
-	void exitDrop(MiniSQLParser.DropContext ctx);
+	void exitDrop(@NotNull MiniSQLParser.DropContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code insertA}
-	 * labeled alternative in {@link MiniSQLParser#sql}.
+	 * Enter a parse tree produced by {@link MiniSQLParser#jnames}.
 	 * @param ctx the parse tree
 	 */
-	void enterInsertA(MiniSQLParser.InsertAContext ctx);
+	void enterJnames(@NotNull MiniSQLParser.JnamesContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code insertA}
-	 * labeled alternative in {@link MiniSQLParser#sql}.
+	 * Exit a parse tree produced by {@link MiniSQLParser#jnames}.
 	 * @param ctx the parse tree
 	 */
-	void exitInsertA(MiniSQLParser.InsertAContext ctx);
+	void exitJnames(@NotNull MiniSQLParser.JnamesContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code insertB}
-	 * labeled alternative in {@link MiniSQLParser#sql}.
+	 * Enter a parse tree produced by the {@code values}
+	 * labeled alternative in {@link MiniSQLParser#sqlsqlsqlsqlsqlsqlsqlsqlschemasqlattributesqlsqlsqlattributesqlsqlconstraint}.
 	 * @param ctx the parse tree
 	 */
-	void enterInsertB(MiniSQLParser.InsertBContext ctx);
+	void enterValues(@NotNull MiniSQLParser.ValuesContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code insertB}
-	 * labeled alternative in {@link MiniSQLParser#sql}.
+	 * Exit a parse tree produced by the {@code values}
+	 * labeled alternative in {@link MiniSQLParser#sqlsqlsqlsqlsqlsqlsqlsqlschemasqlattributesqlsqlsqlattributesqlsqlconstraint}.
 	 * @param ctx the parse tree
 	 */
-	void exitInsertB(MiniSQLParser.InsertBContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code delete}
-	 * labeled alternative in {@link MiniSQLParser#sql}.
-	 * @param ctx the parse tree
-	 */
-	void enterDelete(MiniSQLParser.DeleteContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code delete}
-	 * labeled alternative in {@link MiniSQLParser#sql}.
-	 * @param ctx the parse tree
-	 */
-	void exitDelete(MiniSQLParser.DeleteContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code update}
-	 * labeled alternative in {@link MiniSQLParser#sql}.
-	 * @param ctx the parse tree
-	 */
-	void enterUpdate(MiniSQLParser.UpdateContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code update}
-	 * labeled alternative in {@link MiniSQLParser#sql}.
-	 * @param ctx the parse tree
-	 */
-	void exitUpdate(MiniSQLParser.UpdateContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code selectB}
-	 * labeled alternative in {@link MiniSQLParser#sql}.
-	 * @param ctx the parse tree
-	 */
-	void enterSelectB(MiniSQLParser.SelectBContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code selectB}
-	 * labeled alternative in {@link MiniSQLParser#sql}.
-	 * @param ctx the parse tree
-	 */
-	void exitSelectB(MiniSQLParser.SelectBContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code selectA}
-	 * labeled alternative in {@link MiniSQLParser#sql}.
-	 * @param ctx the parse tree
-	 */
-	void enterSelectA(MiniSQLParser.SelectAContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code selectA}
-	 * labeled alternative in {@link MiniSQLParser#sql}.
-	 * @param ctx the parse tree
-	 */
-	void exitSelectA(MiniSQLParser.SelectAContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code createdb}
-	 * labeled alternative in {@link MiniSQLParser#sql}.
-	 * @param ctx the parse tree
-	 */
-	void enterCreatedb(MiniSQLParser.CreatedbContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code createdb}
-	 * labeled alternative in {@link MiniSQLParser#sql}.
-	 * @param ctx the parse tree
-	 */
-	void exitCreatedb(MiniSQLParser.CreatedbContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code dropdb}
-	 * labeled alternative in {@link MiniSQLParser#sql}.
-	 * @param ctx the parse tree
-	 */
-	void enterDropdb(MiniSQLParser.DropdbContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code dropdb}
-	 * labeled alternative in {@link MiniSQLParser#sql}.
-	 * @param ctx the parse tree
-	 */
-	void exitDropdb(MiniSQLParser.DropdbContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code usedb}
-	 * labeled alternative in {@link MiniSQLParser#sql}.
-	 * @param ctx the parse tree
-	 */
-	void enterUsedb(MiniSQLParser.UsedbContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code usedb}
-	 * labeled alternative in {@link MiniSQLParser#sql}.
-	 * @param ctx the parse tree
-	 */
-	void exitUsedb(MiniSQLParser.UsedbContext ctx);
+	void exitValues(@NotNull MiniSQLParser.ValuesContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code show}
 	 * labeled alternative in {@link MiniSQLParser#sql}.
 	 * @param ctx the parse tree
 	 */
-	void enterShow(MiniSQLParser.ShowContext ctx);
+	void enterShow(@NotNull MiniSQLParser.ShowContext ctx);
 	/**
 	 * Exit a parse tree produced by the {@code show}
 	 * labeled alternative in {@link MiniSQLParser#sql}.
 	 * @param ctx the parse tree
 	 */
-	void exitShow(MiniSQLParser.ShowContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code showdb}
-	 * labeled alternative in {@link MiniSQLParser#sql}.
-	 * @param ctx the parse tree
-	 */
-	void enterShowdb(MiniSQLParser.ShowdbContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code showdb}
-	 * labeled alternative in {@link MiniSQLParser#sql}.
-	 * @param ctx the parse tree
-	 */
-	void exitShowdb(MiniSQLParser.ShowdbContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code newline}
-	 * labeled alternative in {@link MiniSQLParser#sql}.
-	 * @param ctx the parse tree
-	 */
-	void enterNewline(MiniSQLParser.NewlineContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code newline}
-	 * labeled alternative in {@link MiniSQLParser#sql}.
-	 * @param ctx the parse tree
-	 */
-	void exitNewline(MiniSQLParser.NewlineContext ctx);
+	void exitShow(@NotNull MiniSQLParser.ShowContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link MiniSQLParser#ccondition}.
 	 * @param ctx the parse tree
 	 */
-	void enterCcondition(MiniSQLParser.CconditionContext ctx);
+	void enterCcondition(@NotNull MiniSQLParser.CconditionContext ctx);
 	/**
 	 * Exit a parse tree produced by {@link MiniSQLParser#ccondition}.
 	 * @param ctx the parse tree
 	 */
-	void exitCcondition(MiniSQLParser.CconditionContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MiniSQLParser#condition}.
-	 * @param ctx the parse tree
-	 */
-	void enterCondition(MiniSQLParser.ConditionContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MiniSQLParser#condition}.
-	 * @param ctx the parse tree
-	 */
-	void exitCondition(MiniSQLParser.ConditionContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MiniSQLParser#set}.
-	 * @param ctx the parse tree
-	 */
-	void enterSet(MiniSQLParser.SetContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MiniSQLParser#set}.
-	 * @param ctx the parse tree
-	 */
-	void exitSet(MiniSQLParser.SetContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MiniSQLParser#names}.
-	 * @param ctx the parse tree
-	 */
-	void enterNames(MiniSQLParser.NamesContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MiniSQLParser#names}.
-	 * @param ctx the parse tree
-	 */
-	void exitNames(MiniSQLParser.NamesContext ctx);
+	void exitCcondition(@NotNull MiniSQLParser.CconditionContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link MiniSQLParser#cname}.
 	 * @param ctx the parse tree
 	 */
-	void enterCname(MiniSQLParser.CnameContext ctx);
+	void enterCname(@NotNull MiniSQLParser.CnameContext ctx);
 	/**
 	 * Exit a parse tree produced by {@link MiniSQLParser#cname}.
 	 * @param ctx the parse tree
 	 */
-	void exitCname(MiniSQLParser.CnameContext ctx);
+	void exitCname(@NotNull MiniSQLParser.CnameContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link MiniSQLParser#cnames}.
+	 * Enter a parse tree produced by the {@code update}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
 	 * @param ctx the parse tree
 	 */
-	void enterCnames(MiniSQLParser.CnamesContext ctx);
+	void enterUpdate(@NotNull MiniSQLParser.UpdateContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link MiniSQLParser#cnames}.
+	 * Exit a parse tree produced by the {@code update}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
 	 * @param ctx the parse tree
 	 */
-	void exitCnames(MiniSQLParser.CnamesContext ctx);
+	void exitUpdate(@NotNull MiniSQLParser.UpdateContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link MiniSQLParser#onCondition}.
+	 * Enter a parse tree produced by {@link MiniSQLParser#type}.
 	 * @param ctx the parse tree
 	 */
-	void enterOnCondition(MiniSQLParser.OnConditionContext ctx);
+	void enterType(@NotNull MiniSQLParser.TypeContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link MiniSQLParser#onCondition}.
+	 * Exit a parse tree produced by {@link MiniSQLParser#type}.
 	 * @param ctx the parse tree
 	 */
-	void exitOnCondition(MiniSQLParser.OnConditionContext ctx);
+	void exitType(@NotNull MiniSQLParser.TypeContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link MiniSQLParser#jnames}.
+	 * Enter a parse tree produced by the {@code delete}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
 	 * @param ctx the parse tree
 	 */
-	void enterJnames(MiniSQLParser.JnamesContext ctx);
+	void enterDelete(@NotNull MiniSQLParser.DeleteContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link MiniSQLParser#jnames}.
+	 * Exit a parse tree produced by the {@code delete}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
 	 * @param ctx the parse tree
 	 */
-	void exitJnames(MiniSQLParser.JnamesContext ctx);
+	void exitDelete(@NotNull MiniSQLParser.DeleteContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code values}
-	 * labeled alternative in {@link MiniSQLParser#sqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlschemaattributeattributeconstraint}.
+	 * Enter a parse tree produced by the {@code insertB}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
 	 * @param ctx the parse tree
 	 */
-	void enterValues(MiniSQLParser.ValuesContext ctx);
+	void enterInsertB(@NotNull MiniSQLParser.InsertBContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code values}
-	 * labeled alternative in {@link MiniSQLParser#sqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlsqlschemaattributeattributeconstraint}.
+	 * Exit a parse tree produced by the {@code insertB}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
 	 * @param ctx the parse tree
 	 */
-	void exitValues(MiniSQLParser.ValuesContext ctx);
+	void exitInsertB(@NotNull MiniSQLParser.InsertBContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code attrcons}
-	 * labeled alternative in {@link MiniSQLParser#schema}.
+	 * Enter a parse tree produced by the {@code insertA}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
 	 * @param ctx the parse tree
 	 */
-	void enterAttrcons(MiniSQLParser.AttrconsContext ctx);
+	void enterInsertA(@NotNull MiniSQLParser.InsertAContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code attrcons}
-	 * labeled alternative in {@link MiniSQLParser#schema}.
+	 * Exit a parse tree produced by the {@code insertA}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
 	 * @param ctx the parse tree
 	 */
-	void exitAttrcons(MiniSQLParser.AttrconsContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code normalattr}
-	 * labeled alternative in {@link MiniSQLParser#attribute}.
-	 * @param ctx the parse tree
-	 */
-	void enterNormalattr(MiniSQLParser.NormalattrContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code normalattr}
-	 * labeled alternative in {@link MiniSQLParser#attribute}.
-	 * @param ctx the parse tree
-	 */
-	void exitNormalattr(MiniSQLParser.NormalattrContext ctx);
+	void exitInsertA(@NotNull MiniSQLParser.InsertAContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code notnullattr}
 	 * labeled alternative in {@link MiniSQLParser#attribute}.
 	 * @param ctx the parse tree
 	 */
-	void enterNotnullattr(MiniSQLParser.NotnullattrContext ctx);
+	void enterNotnullattr(@NotNull MiniSQLParser.NotnullattrContext ctx);
 	/**
 	 * Exit a parse tree produced by the {@code notnullattr}
 	 * labeled alternative in {@link MiniSQLParser#attribute}.
 	 * @param ctx the parse tree
 	 */
-	void exitNotnullattr(MiniSQLParser.NotnullattrContext ctx);
+	void exitNotnullattr(@NotNull MiniSQLParser.NotnullattrContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code showdb}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
+	 * @param ctx the parse tree
+	 */
+	void enterShowdb(@NotNull MiniSQLParser.ShowdbContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code showdb}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
+	 * @param ctx the parse tree
+	 */
+	void exitShowdb(@NotNull MiniSQLParser.ShowdbContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code newline}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
+	 * @param ctx the parse tree
+	 */
+	void enterNewline(@NotNull MiniSQLParser.NewlineContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code newline}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
+	 * @param ctx the parse tree
+	 */
+	void exitNewline(@NotNull MiniSQLParser.NewlineContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code create}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
+	 * @param ctx the parse tree
+	 */
+	void enterCreate(@NotNull MiniSQLParser.CreateContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code create}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
+	 * @param ctx the parse tree
+	 */
+	void exitCreate(@NotNull MiniSQLParser.CreateContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MiniSQLParser#value}.
+	 * @param ctx the parse tree
+	 */
+	void enterValue(@NotNull MiniSQLParser.ValueContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MiniSQLParser#value}.
+	 * @param ctx the parse tree
+	 */
+	void exitValue(@NotNull MiniSQLParser.ValueContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code primarykey}
 	 * labeled alternative in {@link MiniSQLParser#constraint}.
 	 * @param ctx the parse tree
 	 */
-	void enterPrimarykey(MiniSQLParser.PrimarykeyContext ctx);
+	void enterPrimarykey(@NotNull MiniSQLParser.PrimarykeyContext ctx);
 	/**
 	 * Exit a parse tree produced by the {@code primarykey}
 	 * labeled alternative in {@link MiniSQLParser#constraint}.
 	 * @param ctx the parse tree
 	 */
-	void exitPrimarykey(MiniSQLParser.PrimarykeyContext ctx);
+	void exitPrimarykey(@NotNull MiniSQLParser.PrimarykeyContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MiniSQLParser#op}.
+	 * @param ctx the parse tree
+	 */
+	void enterOp(@NotNull MiniSQLParser.OpContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MiniSQLParser#op}.
+	 * @param ctx the parse tree
+	 */
+	void exitOp(@NotNull MiniSQLParser.OpContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code selectB}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
+	 * @param ctx the parse tree
+	 */
+	void enterSelectB(@NotNull MiniSQLParser.SelectBContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code selectB}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
+	 * @param ctx the parse tree
+	 */
+	void exitSelectB(@NotNull MiniSQLParser.SelectBContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code selectA}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
+	 * @param ctx the parse tree
+	 */
+	void enterSelectA(@NotNull MiniSQLParser.SelectAContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code selectA}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
+	 * @param ctx the parse tree
+	 */
+	void exitSelectA(@NotNull MiniSQLParser.SelectAContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code usedb}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
+	 * @param ctx the parse tree
+	 */
+	void enterUsedb(@NotNull MiniSQLParser.UsedbContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code usedb}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
+	 * @param ctx the parse tree
+	 */
+	void exitUsedb(@NotNull MiniSQLParser.UsedbContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MiniSQLParser#set}.
+	 * @param ctx the parse tree
+	 */
+	void enterSet(@NotNull MiniSQLParser.SetContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MiniSQLParser#set}.
+	 * @param ctx the parse tree
+	 */
+	void exitSet(@NotNull MiniSQLParser.SetContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MiniSQLParser#cnames}.
+	 * @param ctx the parse tree
+	 */
+	void enterCnames(@NotNull MiniSQLParser.CnamesContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MiniSQLParser#cnames}.
+	 * @param ctx the parse tree
+	 */
+	void exitCnames(@NotNull MiniSQLParser.CnamesContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code attrcons}
+	 * labeled alternative in {@link MiniSQLParser#schema}.
+	 * @param ctx the parse tree
+	 */
+	void enterAttrcons(@NotNull MiniSQLParser.AttrconsContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code attrcons}
+	 * labeled alternative in {@link MiniSQLParser#schema}.
+	 * @param ctx the parse tree
+	 */
+	void exitAttrcons(@NotNull MiniSQLParser.AttrconsContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MiniSQLParser#onCondition}.
+	 * @param ctx the parse tree
+	 */
+	void enterOnCondition(@NotNull MiniSQLParser.OnConditionContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MiniSQLParser#onCondition}.
+	 * @param ctx the parse tree
+	 */
+	void exitOnCondition(@NotNull MiniSQLParser.OnConditionContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code dropdb}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
+	 * @param ctx the parse tree
+	 */
+	void enterDropdb(@NotNull MiniSQLParser.DropdbContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code dropdb}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
+	 * @param ctx the parse tree
+	 */
+	void exitDropdb(@NotNull MiniSQLParser.DropdbContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MiniSQLParser#condition}.
+	 * @param ctx the parse tree
+	 */
+	void enterCondition(@NotNull MiniSQLParser.ConditionContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MiniSQLParser#condition}.
+	 * @param ctx the parse tree
+	 */
+	void exitCondition(@NotNull MiniSQLParser.ConditionContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MiniSQLParser#names}.
+	 * @param ctx the parse tree
+	 */
+	void enterNames(@NotNull MiniSQLParser.NamesContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MiniSQLParser#names}.
+	 * @param ctx the parse tree
+	 */
+	void exitNames(@NotNull MiniSQLParser.NamesContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code normalattr}
+	 * labeled alternative in {@link MiniSQLParser#attribute}.
+	 * @param ctx the parse tree
+	 */
+	void enterNormalattr(@NotNull MiniSQLParser.NormalattrContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code normalattr}
+	 * labeled alternative in {@link MiniSQLParser#attribute}.
+	 * @param ctx the parse tree
+	 */
+	void exitNormalattr(@NotNull MiniSQLParser.NormalattrContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code createdb}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
+	 * @param ctx the parse tree
+	 */
+	void enterCreatedb(@NotNull MiniSQLParser.CreatedbContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code createdb}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
+	 * @param ctx the parse tree
+	 */
+	void exitCreatedb(@NotNull MiniSQLParser.CreatedbContext ctx);
 }
