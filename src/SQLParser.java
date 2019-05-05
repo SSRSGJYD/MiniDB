@@ -22,11 +22,11 @@ public class SQLParser{
 				+ "use database db\n"
 				+ "create table playr(id float,name float,primary key(id))\n"
 
-				+ "insert into playr values(133.500,9.2)\n"
+				+ "insert into playr values(133,9.3)\n"
 				+ "insert into playr(id) values(134)\n"
-				+ "insert into playr values(13,990.44)\n"
+				+ "insert into playr values(13,990)\n"
 
-				+ "select * from playr where name>15.0\n"
+				+ "select * from playr where name>132\n"
 
 				+ "show database db\n";
 

@@ -67,9 +67,9 @@ public class DataBase{
 				sa.types=sc.types;
 				this.createTable(sc.tableName,sa);
 			}
-			else {
-				throw new IllegalArgumentException("table already exist");
-			}
+//			else {
+//				throw new IllegalArgumentException("table already exist");
+//			}
 			res=new BoolResult();
 			break;
 		case Statement.drop:
