@@ -299,6 +299,7 @@ public class Table implements Serializable{
 					keyr= new SecondaryKey((Float)(cdValue), TypeConst.VALUE_TYPE_FLOAT, TypeConst.VALUE_SIZE_FLOAT,(String)keyValue,keyType,keySize);
 					break;
 				}
+				break;
 			case TypeConst.VALUE_TYPE_DOUBLE:
 				switch(keyType) {
 				case TypeConst.VALUE_TYPE_INT:
@@ -317,6 +318,7 @@ public class Table implements Serializable{
 					keyr= new SecondaryKey((Double)(cdValue), TypeConst.VALUE_TYPE_DOUBLE, TypeConst.VALUE_SIZE_DOUBLE,(String)keyValue,keyType,keySize);
 					break;
 				}
+				break;
 			case TypeConst.VALUE_TYPE_STRING:
 				switch(keyType) {
 				case TypeConst.VALUE_TYPE_INT:
@@ -335,6 +337,7 @@ public class Table implements Serializable{
 					keyr= new SecondaryKey((String)cdValue, TypeConst.VALUE_TYPE_STRING, size,(String)keyValue,keyType,keySize);
 					break;
 				}
+				break;
 			}
 			return keyr;
 	}
@@ -399,6 +402,7 @@ public class Table implements Serializable{
 					keyr= new SecondaryKey(Float.parseFloat(cdValue), TypeConst.VALUE_TYPE_FLOAT, TypeConst.VALUE_SIZE_FLOAT,(String)keyValue,keyType,keySize);
 					break;
 				}
+				break;
 			case TypeConst.VALUE_TYPE_DOUBLE:
 				switch(keyType) {
 				case TypeConst.VALUE_TYPE_INT:
@@ -417,6 +421,7 @@ public class Table implements Serializable{
 					keyr= new SecondaryKey(Double.parseDouble(cdValue), TypeConst.VALUE_TYPE_DOUBLE, TypeConst.VALUE_SIZE_DOUBLE,(String)keyValue,keyType,keySize);
 					break;
 				}
+				break;
 			case TypeConst.VALUE_TYPE_STRING:
 				switch(keyType) {
 				case TypeConst.VALUE_TYPE_INT:
@@ -435,6 +440,7 @@ public class Table implements Serializable{
 					keyr= new SecondaryKey(cdValue, TypeConst.VALUE_TYPE_STRING, size,(String)keyValue,keyType,keySize);
 					break;
 				}
+				break;
 			}
 			return keyr;
 	}

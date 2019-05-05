@@ -163,9 +163,16 @@ public class DataBase{
 	}
 	
 	public void dropTable(String name) throws IOException {
+		Table tb=tables.get(name);
 		tables.remove(name);
+		for(String n:tb.schema.descriptors.keySet()) {
+			File filef = new File(name.concat("_").concat(n).concat(".index"));
+			filef.delete();
+		}
 		File file = new File(name.concat(".schema"));
 		file.delete();
+		File file1 = new File(name.concat(".index"));
+		file1.delete();
 		File file2 = new File("schema.log");
 		file2.delete();
 		refreshLog();
