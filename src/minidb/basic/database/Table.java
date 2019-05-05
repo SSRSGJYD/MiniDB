@@ -29,6 +29,7 @@ import minidb.basic.index.SecondaryIndex;
 import minidb.basic.index.SecondaryKey;
 import minidb.basic.index.Value;
 import minidb.result.QueryResult;
+import minidb.result.Result;
 import minidb.result.SearchResult;
 import minidb.types.TypeConst;
 
@@ -80,6 +81,9 @@ public class Table implements Serializable{
 	}
 	
 	public void insertIndexsB(Object key,HashMap<String, String> pairs) throws IOException {
+		if(key==null) {
+			throw new IllegalArgumentException("key cannot be null");
+		}
 		List<String> values=new ArrayList<String>();
 		for(String Skey:this.schema.descriptors.keySet()) {
 			if(pairs.containsKey(Skey)) {
@@ -124,6 +128,9 @@ public class Table implements Serializable{
 	
 	
 	public void insertIndexs(Object key,List<String> values) throws IOException {
+		if(key==null) {
+			throw new IllegalArgumentException("key cannot be null");
+		}
 		byte[] array=this.getKeyArray(key);
 		int c=0;
 		for(Entry<String,SchemaDescriptor> entry:this.schema.descriptors.entrySet()) {
@@ -131,7 +138,9 @@ public class Table implements Serializable{
 				c++;
 				continue;
 			}
-			this.insertSecondaryIndex(entry.getKey(), entry.getValue(), values.get(c), key,array);
+			String value=values.get(c);
+			if(value!=null)
+				this.insertSecondaryIndex(entry.getKey(), entry.getValue(), value, key,array);
 			c++;
 		}
 	}
@@ -176,13 +185,16 @@ public class Table implements Serializable{
 				String str="";
 				int len=this.keySize/TypeConst.VALUE_SIZE_CHAR;
 		    	for(int i=0;i<len;i++) {
-		    		str+=inst.readChar();
+		    		char c=inst.readChar();
+		    		if(c!=0)
+						str+=c;
 		    	}
 				keyi= new PrimaryKey<String>(str, TypeConst.VALUE_TYPE_STRING, this.keySize);
 				break;
 			}
 		return keyi;
 	}
+
 	protected PrimaryKey constructPrimaryKey(String cdValue) {
 		PrimaryKey keyi=null;
 		switch(this.keyType) {
@@ -203,7 +215,6 @@ public class Table implements Serializable{
 				break;
 			}
 		return keyi;
-
 	}
 
 	protected PrimaryKey constructPrimaryKeyO(Object cdValue) {
@@ -288,6 +299,7 @@ public class Table implements Serializable{
 					keyr= new SecondaryKey((Float)(cdValue), TypeConst.VALUE_TYPE_FLOAT, TypeConst.VALUE_SIZE_FLOAT,(String)keyValue,keyType,keySize);
 					break;
 				}
+				break;
 			case TypeConst.VALUE_TYPE_DOUBLE:
 				switch(keyType) {
 				case TypeConst.VALUE_TYPE_INT:
@@ -306,6 +318,7 @@ public class Table implements Serializable{
 					keyr= new SecondaryKey((Double)(cdValue), TypeConst.VALUE_TYPE_DOUBLE, TypeConst.VALUE_SIZE_DOUBLE,(String)keyValue,keyType,keySize);
 					break;
 				}
+				break;
 			case TypeConst.VALUE_TYPE_STRING:
 				switch(keyType) {
 				case TypeConst.VALUE_TYPE_INT:
@@ -324,6 +337,7 @@ public class Table implements Serializable{
 					keyr= new SecondaryKey((String)cdValue, TypeConst.VALUE_TYPE_STRING, size,(String)keyValue,keyType,keySize);
 					break;
 				}
+				break;
 			}
 			return keyr;
 	}
@@ -388,6 +402,7 @@ public class Table implements Serializable{
 					keyr= new SecondaryKey(Float.parseFloat(cdValue), TypeConst.VALUE_TYPE_FLOAT, TypeConst.VALUE_SIZE_FLOAT,(String)keyValue,keyType,keySize);
 					break;
 				}
+				break;
 			case TypeConst.VALUE_TYPE_DOUBLE:
 				switch(keyType) {
 				case TypeConst.VALUE_TYPE_INT:
@@ -406,6 +421,7 @@ public class Table implements Serializable{
 					keyr= new SecondaryKey(Double.parseDouble(cdValue), TypeConst.VALUE_TYPE_DOUBLE, TypeConst.VALUE_SIZE_DOUBLE,(String)keyValue,keyType,keySize);
 					break;
 				}
+				break;
 			case TypeConst.VALUE_TYPE_STRING:
 				switch(keyType) {
 				case TypeConst.VALUE_TYPE_INT:
@@ -424,9 +440,25 @@ public class Table implements Serializable{
 					keyr= new SecondaryKey(cdValue, TypeConst.VALUE_TYPE_STRING, size,(String)keyValue,keyType,keySize);
 					break;
 				}
+				break;
 			}
 			return keyr;
 	}
+	protected LinkedList<Row> searchRowsO(String cdName,Object cdValue, int op) throws IOException{
+		LinkedList<Row> rows=null;
+		if(this.schema.primaryKey.equalsIgnoreCase(cdName)) {
+			@SuppressWarnings("rawtypes")
+			PrimaryKey keyi=constructPrimaryKeyO(cdValue);
+			rows=searchByOp(keyi,op);
+		}else {
+			SchemaDescriptor sd=this.schema.descriptors.get(cdName);
+			@SuppressWarnings("rawtypes")
+			SecondaryKey keyr=constructSecondaryKeyO(sd.getType(),sd.getSize(),cdValue,null);
+			rows=searchByOpS(keyr,cdName,op);
+		}
+		return rows;
+	}
+
 	protected LinkedList<Row> searchRows(String cdName,String cdValue, int op) throws IOException{
 		LinkedList<Row> rows=null;
 		if(this.schema.primaryKey.equalsIgnoreCase(cdName)) {
@@ -440,6 +472,98 @@ public class Table implements Serializable{
 			rows=searchByOpS(keyr,cdName,op);
 		}
 		return rows;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static Result queryJ(Boolean isStar,HashMap<String, Table> tables, List<Pair<String, String>> cnames, List<String> jnames,
+			List<Pair<Pair<String, String>, Pair<String, String>>> onConditions, boolean existWhere, boolean isImme,
+			Pair<String, String> cdNameP, String cdValue, Pair<String, String> cdNamerP, int op) throws ClassNotFoundException, IOException {
+		if(!tables.containsKey(jnames.get(0))){
+			throw new IllegalArgumentException("table"+jnames.get(0)+" not exist");
+		}
+		Table rootTb=tables.get(jnames.get(0));
+		ArrayList<LinkedHashMap<String,Object>> res=rootTb.fromRawJ(rootTb.index.searchAll().rows);
+		Table thatTb;
+		for(int i=0;i<onConditions.size();i++) {
+			String name=jnames.get(i+1);
+			if(!tables.containsKey(name)){
+				throw new IllegalArgumentException("table"+name+" not exist");
+			}
+			thatTb=tables.get(name);
+			Pair<Pair<String, String>, Pair<String, String>> cond=onConditions.get(i);
+			if(cond.l.l.equals(thatTb.tableName)){
+				res=thatTb.join(cond.r.l,res, cond.l.r,cond.r.r);
+			}
+			else {
+				res=thatTb.join(cond.l.l,res, cond.r.r,cond.l.r);
+			}
+		}
+
+		ArrayList<LinkedHashMap<String,Object>> fres=new ArrayList<LinkedHashMap<String,Object>>();
+		if(existWhere) {
+			if(isImme) {
+				RowFilter rf= buildFilterJV(tables.get(cdNameP.l),cdNameP.r,op,cdValue);
+				for(LinkedHashMap<String,Object> objs:res) {
+					if(rf.method(objs)) {
+						LinkedHashMap<String,Object> nobjs=filterNamesJ(isStar,cnames,objs);
+						fres.add(nobjs);
+					}
+				}
+			}
+			else {
+				//tofix
+				RowFilter rf= buildFilterJ(tables.get(cdNameP.l),tables.get(cdNamerP.l),cdNameP.r,op,cdNamerP.r);
+				for(LinkedHashMap<String,Object> objs:res) {
+					if(rf.method(objs)) {
+						LinkedHashMap<String,Object> nobjs=filterNamesJ(isStar,cnames,objs);
+						fres.add(nobjs);
+					}
+				}	
+			}
+			
+		}
+		else{
+			for(LinkedHashMap<String,Object> objs:res) {
+				LinkedHashMap<String,Object> nobjs=filterNamesJ(isStar,cnames,objs);
+				fres.add(nobjs);
+			}
+		}
+
+		QueryResult qr=new QueryResult();
+		qr.data=fres;
+		return qr;
+	}
+
+	protected static LinkedHashMap<String,Object> filterNamesJ(Boolean isStar,List<Pair<String, String>> cnames,LinkedHashMap<String,Object> data){
+		if(isStar) return data;
+		LinkedHashMap<String,Object> res=new LinkedHashMap<String,Object>();
+		for(Pair<String,String> namep:cnames) {
+			String name=namep.l+"."+namep.r;
+			res.put(name, data.get(name));
+		}
+		return res;
+	}
+
+	
+	protected ArrayList<LinkedHashMap<String,Object>> join(String thatTableName,ArrayList<LinkedHashMap<String,Object>> la,String thisCon,String thatCon) throws ClassNotFoundException, IOException{
+		@SuppressWarnings("unchecked")
+		ArrayList<LinkedHashMap<String,Object>> res=new ArrayList<LinkedHashMap<String,Object>>();
+		for(LinkedHashMap<String,Object> rowa: la) {
+			Object value=rowa.get(thatTableName+"."+thatCon);
+			if(value==null) continue;
+			ArrayList<LinkedHashMap<String,Object>> rows=fromRaw(this.searchRowsO(thisCon,value,Statement.eq));
+			for(LinkedHashMap<String,Object> rowb:rows) {
+				LinkedHashMap<String,Object> rowres=new LinkedHashMap<String,Object>();
+				LinkedHashMap<String,Object> rowbr=new LinkedHashMap<String,Object> ();
+				for(Entry<String,Object> entry:rowb.entrySet()) {
+					rowbr.put(this.tableName+"."+entry.getKey(), entry.getValue());
+				}
+				rowres.putAll(rowa);
+				rowres.putAll(rowbr);
+				res.add(rowres);
+			}
+		}
+		return res;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -513,13 +637,15 @@ public class Table implements Serializable{
 		}
 		return null;
 	}
-	protected QueryResult queryx(List<String> names,Boolean existWhere,String cdName,String cdValue, int op) throws IOException, ClassNotFoundException {
+	protected QueryResult queryI(List<String> names,Boolean existWhere,String cdName,String cdNamer, int op) throws IOException, ClassNotFoundException {
 		@SuppressWarnings("unchecked")
+
 		LinkedList<Row> rows=index.searchAll().rows;
 		ArrayList<LinkedHashMap<String,Object>> rowl=fromRaw(rows);
 		ArrayList<LinkedHashMap<String,Object>> res=new ArrayList<LinkedHashMap<String,Object>>();
+
 		if(existWhere) {
-			RowFilter rf= buildFilter(cdName,op,cdValue);
+			RowFilter rf= buildFilter(this,cdName,op,cdNamer);
 			for(LinkedHashMap<String,Object> objs:rowl) {
 				if(rf.method(objs)) {
 					LinkedHashMap<String,Object> nobjs=filterNames(names,objs);
@@ -539,12 +665,41 @@ public class Table implements Serializable{
 		return qr;
 	}
 	
-	protected RowFilter buildFilter(String cdName,int op,String cdValue) {
-		SchemaDescriptor sd = this.schema.descriptors.get(cdName);
-		RowFilter rf=(row)->this.compare(op,sd.getType(),row.get(cdName),cdValue);
+	protected static RowFilter buildFilter(Table tb,String cdName,int op,String cdNamer) {
+		SchemaDescriptor sd = tb.schema.descriptors.get(cdName);
+		RowFilter rf=(row)->{
+			Object va=row.get(cdName);
+			Object vb=row.get(cdNamer);
+			if(va==null||vb==null)
+				return false;
+			else
+				return tb.compare(op,sd.getType(),row.get(cdName),row.get(cdNamer));
+		};
 		return rf;
 	}
-	
+	protected static RowFilter buildFilterJ(Table tba,Table tbb,String cdName,int op,String cdNamer) {
+		SchemaDescriptor sd = tba.schema.descriptors.get(cdName);
+		RowFilter rf=(row)->{
+			Object va=row.get(tba.tableName+"."+cdName);
+			Object vb=row.get(tbb.tableName+"."+cdNamer);
+			if(va==null||vb==null)
+				return false;
+			else
+				return tba.compare(op,sd.getType(),va,vb);
+		};
+		return rf;
+	}
+	protected static RowFilter buildFilterJV(Table tb,String cdName,int op,String Value) {
+		SchemaDescriptor sd = tb.schema.descriptors.get(cdName);
+		RowFilter rf=(row)->{
+			Object va=row.get(tb.tableName+"."+cdName);
+			if(va==null)
+				return false;
+			else
+				return tb.compareV(op,sd.getType(),row.get(tb.tableName+"."+cdName),Value);
+		};
+		return rf;
+	}
 	protected <T extends Comparable <T>> boolean compareT(int op,T va,T vb) {
 		int res=va.compareTo(vb);
 		switch(op) {
@@ -562,7 +717,7 @@ public class Table implements Serializable{
 		return true;
 	}
 
-	protected boolean compare(int op,int type,Object va,String vb) {
+	protected boolean compareV(int op,int type,Object va,String vb) {
 		switch(type) {
 		case TypeConst.VALUE_TYPE_INT:
 			return compareT(op,(Integer)va,Integer.parseInt(vb));
@@ -579,6 +734,34 @@ public class Table implements Serializable{
 		
 	}
 
+
+	protected boolean compare(int op,int type,Object va,Object vb) {
+		switch(type) {
+		case TypeConst.VALUE_TYPE_INT:
+			return compareT(op,(Integer)va,(Integer)(vb));
+		case TypeConst.VALUE_TYPE_LONG:
+			return compareT(op,(Long)va,(Long)(vb));
+		case TypeConst.VALUE_TYPE_FLOAT:
+			return compareT(op,(Float)va,(Float)(vb));
+		case TypeConst.VALUE_TYPE_DOUBLE:
+			return compareT(op,(Double)va,(Double)(vb));
+		case TypeConst.VALUE_TYPE_STRING:
+			return compareT(op,(String)va,(String)vb);
+		}
+		return true;
+		
+	}
+
+	protected ArrayList<LinkedHashMap<String,Object>> fromRawJ(LinkedList<Row> rows) throws ClassNotFoundException, IOException{
+		ArrayList<LinkedHashMap<String,Object>> res=new ArrayList<LinkedHashMap<String,Object>>();
+		int c=0;
+		for(Row v:rows) {
+			res.add(extractJ(v));
+			c++;
+		}
+		return res;
+	}
+
 	protected ArrayList<LinkedHashMap<String,Object>> fromRaw(LinkedList<Row> rows) throws ClassNotFoundException, IOException{
 		ArrayList<LinkedHashMap<String,Object>> res=new ArrayList<LinkedHashMap<String,Object>>();
 		int c=0;
@@ -588,7 +771,52 @@ public class Table implements Serializable{
 		}
 		return res;
 	}
-	
+		
+	protected LinkedHashMap<String,Object> extractJ(Row row) throws IOException, ClassNotFoundException{
+		LinkedHashMap<String,Object> objs=new LinkedHashMap<String,Object>();
+		int pos=0;
+		for(Entry<String,SchemaDescriptor> e:this.schema.descriptors.entrySet()) {
+			SchemaDescriptor sd=e.getValue();
+			byte[] nulls = Arrays.copyOfRange(row.array, pos, pos+2);
+			byte[] slice = Arrays.copyOfRange(row.array, pos+2, pos+2+sd.getSize());
+			pos+=sd.getSize()+2;
+		    ByteArrayInputStream in = new ByteArrayInputStream(slice);
+		    DataInputStream inst=new DataInputStream(in);
+		    ByteArrayInputStream inn = new ByteArrayInputStream(nulls);
+		    DataInputStream instn=new DataInputStream(inn);
+		    char isnull=instn.readChar();
+		    if(isnull=='n') {
+		    	objs.put(this.tableName+"."+e.getKey(), null);
+		    	continue;
+		    }
+		    switch(sd.getType()) {
+		    case TypeConst.VALUE_TYPE_INT:
+				objs.put(this.tableName+"."+e.getKey(),(Object)inst.readInt());
+		    	break;
+		    case TypeConst.VALUE_TYPE_LONG:
+				objs.put(this.tableName+"."+e.getKey(),(Object)inst.readLong());
+		    	break;
+		    case TypeConst.VALUE_TYPE_DOUBLE:
+				objs.put(this.tableName+"."+e.getKey(),(Object)inst.readDouble());
+		    	break;
+		    case TypeConst.VALUE_TYPE_FLOAT:
+				objs.put(this.tableName+"."+e.getKey(),(Object)inst.readFloat());
+		    	break;
+		    case TypeConst.VALUE_TYPE_STRING:
+				String str="";
+				int len=sd.getSize()/TypeConst.VALUE_SIZE_CHAR;
+		    	for(int i=0;i<len;i++) {
+		    		char c=inst.readChar();
+		    		if(c!=0)
+						str+=c;
+		    	}
+				objs.put(this.tableName+"."+e.getKey(),(Object)str);
+		    	break;
+		    }
+		}
+		return objs;
+	}
+
 	protected LinkedHashMap<String,Object> extract(Row row) throws IOException, ClassNotFoundException{
 		LinkedHashMap<String,Object> objs=new LinkedHashMap<String,Object>();
 		int pos=0;
@@ -623,7 +851,9 @@ public class Table implements Serializable{
 				String str="";
 				int len=sd.getSize()/TypeConst.VALUE_SIZE_CHAR;
 		    	for(int i=0;i<len;i++) {
-		    		str+=inst.readChar();
+		    		char c=inst.readChar();
+		    		if(c!=0)
+						str+=c;
 		    	}
 				objs.put(e.getKey(),(Object)str);
 		    	break;
@@ -683,6 +913,13 @@ public class Table implements Serializable{
 			@SuppressWarnings("rawtypes")
 			PrimaryKey keyi=constructPrimaryKeyO(key);
 			this.index.delete(keyi);
+			for(Entry<String,Object> obj:row.entrySet()) {
+				SchemaDescriptor sdt=this.schema.descriptors.get(obj.getKey());
+				if(sdt.isPrimary()) continue;
+				SecondaryKey keyr=constructSecondaryKeyO(sdt.getType(),sdt.getSize(),obj.getValue(),key);
+				this.indexs.get(obj.getKey()).delete(keyr);
+			}
+
 		}
 		
 	}
@@ -707,7 +944,7 @@ public class Table implements Serializable{
 				for(Entry<String,Object> obj:row.entrySet()) {
 					SchemaDescriptor sdt=this.schema.descriptors.get(obj.getKey());
 					if(sdt.isPrimary()) continue;
-					SecondaryKey keyr=constructSecondaryKeyO(sd.getType(),sd.getSize(),obj.getValue(),key);
+					SecondaryKey keyr=constructSecondaryKeyO(sdt.getType(),sdt.getSize(),obj.getValue(),key);
 					this.indexs.get(obj.getKey()).delete(keyr);
 				}
 			}
@@ -754,6 +991,9 @@ public class Table implements Serializable{
 	}
 
 	public Pair<Object,Row> mkRowB(HashMap<String,String> pairs) throws NumberFormatException, IOException {
+		if(pairs.size()>this.schema.descriptors.size()) {
+			throw new IllegalArgumentException("too many values");
+		}
 		List<String> values=new ArrayList<String>();
 		for(String key:this.schema.descriptors.keySet()) {
 			if(pairs.containsKey(key)) {
@@ -844,6 +1084,9 @@ public class Table implements Serializable{
 
 
 	public Pair<Object,Row> mkRow(List<String> values) throws NumberFormatException, IOException {
+		if(values.size()>this.schema.descriptors.size()) {
+			throw new IllegalArgumentException("too many values");
+		}
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(outputStream);
 		Row row=new Row();
@@ -922,6 +1165,9 @@ public class Table implements Serializable{
 
 	@SuppressWarnings({ "unchecked", "null" })
 	public void simpleUpdate(Object key, Row row) throws IOException {
+		if(key==null) {
+			throw new IllegalArgumentException("key cannot be null");
+		}
 		switch(keyType) {
 			case TypeConst.VALUE_TYPE_INT:
 				PrimaryKey<Integer> keyi = new PrimaryKey<Integer>((Integer)key, TypeConst.VALUE_TYPE_INT, TypeConst.VALUE_SIZE_INT);
@@ -948,6 +1194,9 @@ public class Table implements Serializable{
 
 	@SuppressWarnings({ "unchecked", "null" })
 	public void simpleInsert(Object key, Row row) throws IOException {
+		if(key==null) {
+			throw new IllegalArgumentException("key cannot be null");
+		}
 		switch(keyType) {
 			case TypeConst.VALUE_TYPE_INT:
 				PrimaryKey<Integer> keyi = new PrimaryKey<Integer>((Integer)key, TypeConst.VALUE_TYPE_INT, TypeConst.VALUE_SIZE_INT);
@@ -971,4 +1220,7 @@ public class Table implements Serializable{
 				break;
 			}
 	}
+
+
+
 }

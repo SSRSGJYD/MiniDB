@@ -76,7 +76,7 @@ public class SecondaryIndex<K extends Comparable<K>, PK extends Comparable<PK>> 
     public SearchResult<PrimaryKeyValue> searchByRange(SecondaryKey<K,PK> lbound, boolean uselbound, boolean lstrict, SecondaryKey<K,PK> hbound, boolean usehbound, boolean hstrict, boolean useAll)
             throws IOException {
         assert uselbound || usehbound;
-        return tree.searchByKeyWithRange(lbound, uselbound, lstrict, hbound, usehbound, hstrict, true);
+        return tree.searchByKeyWithRange(lbound, uselbound, lstrict, hbound, usehbound, hstrict, false);
     }
 
     /**

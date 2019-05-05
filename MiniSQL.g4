@@ -1,7 +1,7 @@
 grammar MiniSQL;
 
-Name : [a-z]+ ;
-Number : [0-9]+ ;
+Number : [0-9.]+ ;
+Name : [0-9a-z_]+ ;
 String : '\'' (.)+? '\''
 	;
 NEWLINE:'\r'?'\n'
@@ -30,13 +30,21 @@ sql : 'create table' Name '(' schema ')' #create
     | 'insert into' Name '(' names ')' 'values' '(' values ')' #insertB
     | 'delete from' Name 'where' condition #delete
     | 'update' Name 'set' set 'where' condition #update
+    | 'select' (cnames|'*') 'from' jnames  ('where' ccondition)? #selectB
     | 'select' (names|'*') 'from' Name ('where' condition)? #selectA
-    | 'select' cnames 'from' jnames  ('where' condition)? #selectB
+    | 'create database' Name #createdb
+    | 'drop database' Name #dropdb
+    | 'use database' Name #usedb
+    | 'show databases' #show
+    | 'show database' Name #showdb
     | NEWLINE #newline
     ;
     
 
-condition : Name op value
+ccondition : cname op (value|cname)
+	;
+
+condition : Name op (value|Name)
 	;
 	
 set : Name '=' value

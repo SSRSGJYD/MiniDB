@@ -11,6 +11,8 @@ public class StatementSelectA extends Statement {
 	public String cdName;
 	public String cdValue;
 	public boolean isStar;
+	public String cdNamer;
+	public boolean isImme;
 	public int op;
 	
 	public StatementSelectA() {

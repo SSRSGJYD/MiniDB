@@ -10,37 +10,38 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
 import minidb.basic.database.DataBase;
+import minidb.basic.database.MiniDB;
 import minidb.result.Result;
 
 public class SQLParser{
 	
-	public static void mainl( String[] args) throws Exception {
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-		DataOutputStream dos = new DataOutputStream(outputStream);
-		dos.writeChars("1234");
-		byte[]array=outputStream.toByteArray();
-
-		ByteArrayInputStream in = new ByteArrayInputStream(array);
-		DataInputStream inst=new DataInputStream(in);
-		String str="";
-		for(int i=0;i<4;i++) {
-			char s=inst.readChar();
-			str+=s;
-		}
-		System.out.print(str);
-	}
 
 	public static void main( String[] args) throws Exception 
 	{
-		String cmds="create table playt(id int,age int,primary key(id))\n"
-				+ "insert into playt values(1834,199)\n"
-				+ "insert into playt values(134,300)\n"
-				+ "update playt set id=100 where id>134\n"
-				+ "select * from playt\n";
+		String cmds="create database db\n"
+				+ "use database db\n"
+				+ "create table playr(id int,name int,primary key(id))\n"
+				+ "create table playt(id int,name int,primary key(id))\n"
+
+				+ "insert into playr values(133,90)\n"
+				+ "insert into playr(id) values(134)\n"
+				+ "insert into playr values(13,990)\n"
+
+				+ "insert into playt values(133,90)\n"
+				+ "insert into playt(id) values(134)\n"
+				+ "insert into playt values(13,990)\n"
+
+				+ "select * from playr join playt on playr.name=playt.name where playr.id>=133\n"
+
+				+ "show database db\n"
+				+ "drop table playr\n"
+				+ "drop table playt\n";
+
+
 		InputStream targetStream = new ByteArrayInputStream(cmds.getBytes());
 		InputStreamReader in=new InputStreamReader(targetStream);
 		BufferedReader br=new BufferedReader(in);
-		DataBase db=new DataBase();
+		MiniDB db=new MiniDB();
 		while(true) {
 			String cmd=br.readLine();
 			if(cmd==null || cmd.length()==0)continue;
@@ -56,7 +57,7 @@ public class SQLParser{
 			parser.addErrorListener(ThrowingErrorListener.INSTANCE);
 	
 //			try {
-				ParseTree tree = parser.sql(); // begin parsing at rule 'r'
+				ParseTree tree = parser.sql();
 				
 				MyListener extractor = new MyListener();
 				ParseTreeWalker walker=new ParseTreeWalker();

@@ -1,6 +1,7 @@
-// Generated from MiniSQL.g4 by ANTLR 4.7.2
+// Generated from MiniSQL.g4 by ANTLR 4.4
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
@@ -15,312 +16,384 @@ public class MiniSQLBaseListener implements MiniSQLListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterType(MiniSQLParser.TypeContext ctx) { }
+	@Override public void enterDrop(@NotNull MiniSQLParser.DropContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitType(MiniSQLParser.TypeContext ctx) { }
+	@Override public void exitDrop(@NotNull MiniSQLParser.DropContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterOp(MiniSQLParser.OpContext ctx) { }
+	@Override public void enterJnames(@NotNull MiniSQLParser.JnamesContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitOp(MiniSQLParser.OpContext ctx) { }
+	@Override public void exitJnames(@NotNull MiniSQLParser.JnamesContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterValue(MiniSQLParser.ValueContext ctx) { }
+	@Override public void enterValues(@NotNull MiniSQLParser.ValuesContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitValue(MiniSQLParser.ValueContext ctx) { }
+	@Override public void exitValues(@NotNull MiniSQLParser.ValuesContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterCreate(MiniSQLParser.CreateContext ctx) { }
+	@Override public void enterShow(@NotNull MiniSQLParser.ShowContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitCreate(MiniSQLParser.CreateContext ctx) { }
+	@Override public void exitShow(@NotNull MiniSQLParser.ShowContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterDrop(MiniSQLParser.DropContext ctx) { }
+	@Override public void enterCcondition(@NotNull MiniSQLParser.CconditionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitDrop(MiniSQLParser.DropContext ctx) { }
+	@Override public void exitCcondition(@NotNull MiniSQLParser.CconditionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterInsertA(MiniSQLParser.InsertAContext ctx) { }
+	@Override public void enterCname(@NotNull MiniSQLParser.CnameContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitInsertA(MiniSQLParser.InsertAContext ctx) { }
+	@Override public void exitCname(@NotNull MiniSQLParser.CnameContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterInsertB(MiniSQLParser.InsertBContext ctx) { }
+	@Override public void enterUpdate(@NotNull MiniSQLParser.UpdateContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitInsertB(MiniSQLParser.InsertBContext ctx) { }
+	@Override public void exitUpdate(@NotNull MiniSQLParser.UpdateContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterDelete(MiniSQLParser.DeleteContext ctx) { }
+	@Override public void enterType(@NotNull MiniSQLParser.TypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitDelete(MiniSQLParser.DeleteContext ctx) { }
+	@Override public void exitType(@NotNull MiniSQLParser.TypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterUpdate(MiniSQLParser.UpdateContext ctx) { }
+	@Override public void enterDelete(@NotNull MiniSQLParser.DeleteContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitUpdate(MiniSQLParser.UpdateContext ctx) { }
+	@Override public void exitDelete(@NotNull MiniSQLParser.DeleteContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSelectA(MiniSQLParser.SelectAContext ctx) { }
+	@Override public void enterInsertB(@NotNull MiniSQLParser.InsertBContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitSelectA(MiniSQLParser.SelectAContext ctx) { }
+	@Override public void exitInsertB(@NotNull MiniSQLParser.InsertBContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSelectB(MiniSQLParser.SelectBContext ctx) { }
+	@Override public void enterInsertA(@NotNull MiniSQLParser.InsertAContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitSelectB(MiniSQLParser.SelectBContext ctx) { }
+	@Override public void exitInsertA(@NotNull MiniSQLParser.InsertAContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterNewline(MiniSQLParser.NewlineContext ctx) { }
+	@Override public void enterNotnullattr(@NotNull MiniSQLParser.NotnullattrContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitNewline(MiniSQLParser.NewlineContext ctx) { }
+	@Override public void exitNotnullattr(@NotNull MiniSQLParser.NotnullattrContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterCondition(MiniSQLParser.ConditionContext ctx) { }
+	@Override public void enterShowdb(@NotNull MiniSQLParser.ShowdbContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitCondition(MiniSQLParser.ConditionContext ctx) { }
+	@Override public void exitShowdb(@NotNull MiniSQLParser.ShowdbContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSet(MiniSQLParser.SetContext ctx) { }
+	@Override public void enterNewline(@NotNull MiniSQLParser.NewlineContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitSet(MiniSQLParser.SetContext ctx) { }
+	@Override public void exitNewline(@NotNull MiniSQLParser.NewlineContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterNames(MiniSQLParser.NamesContext ctx) { }
+	@Override public void enterCreate(@NotNull MiniSQLParser.CreateContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitNames(MiniSQLParser.NamesContext ctx) { }
+	@Override public void exitCreate(@NotNull MiniSQLParser.CreateContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterCname(MiniSQLParser.CnameContext ctx) { }
+	@Override public void enterValue(@NotNull MiniSQLParser.ValueContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitCname(MiniSQLParser.CnameContext ctx) { }
+	@Override public void exitValue(@NotNull MiniSQLParser.ValueContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterCnames(MiniSQLParser.CnamesContext ctx) { }
+	@Override public void enterPrimarykey(@NotNull MiniSQLParser.PrimarykeyContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitCnames(MiniSQLParser.CnamesContext ctx) { }
+	@Override public void exitPrimarykey(@NotNull MiniSQLParser.PrimarykeyContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterOnCondition(MiniSQLParser.OnConditionContext ctx) { }
+	@Override public void enterOp(@NotNull MiniSQLParser.OpContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitOnCondition(MiniSQLParser.OnConditionContext ctx) { }
+	@Override public void exitOp(@NotNull MiniSQLParser.OpContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterJnames(MiniSQLParser.JnamesContext ctx) { }
+	@Override public void enterSelectB(@NotNull MiniSQLParser.SelectBContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitJnames(MiniSQLParser.JnamesContext ctx) { }
+	@Override public void exitSelectB(@NotNull MiniSQLParser.SelectBContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterValues(MiniSQLParser.ValuesContext ctx) { }
+	@Override public void enterSelectA(@NotNull MiniSQLParser.SelectAContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitValues(MiniSQLParser.ValuesContext ctx) { }
+	@Override public void exitSelectA(@NotNull MiniSQLParser.SelectAContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterAttrcons(MiniSQLParser.AttrconsContext ctx) { }
+	@Override public void enterUsedb(@NotNull MiniSQLParser.UsedbContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitAttrcons(MiniSQLParser.AttrconsContext ctx) { }
+	@Override public void exitUsedb(@NotNull MiniSQLParser.UsedbContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterNormalattr(MiniSQLParser.NormalattrContext ctx) { }
+	@Override public void enterSet(@NotNull MiniSQLParser.SetContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitNormalattr(MiniSQLParser.NormalattrContext ctx) { }
+	@Override public void exitSet(@NotNull MiniSQLParser.SetContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterNotnullattr(MiniSQLParser.NotnullattrContext ctx) { }
+	@Override public void enterCnames(@NotNull MiniSQLParser.CnamesContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitNotnullattr(MiniSQLParser.NotnullattrContext ctx) { }
+	@Override public void exitCnames(@NotNull MiniSQLParser.CnamesContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterPrimarykey(MiniSQLParser.PrimarykeyContext ctx) { }
+	@Override public void enterAttrcons(@NotNull MiniSQLParser.AttrconsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitPrimarykey(MiniSQLParser.PrimarykeyContext ctx) { }
+	@Override public void exitAttrcons(@NotNull MiniSQLParser.AttrconsContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterOnCondition(@NotNull MiniSQLParser.OnConditionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitOnCondition(@NotNull MiniSQLParser.OnConditionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterDropdb(@NotNull MiniSQLParser.DropdbContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitDropdb(@NotNull MiniSQLParser.DropdbContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterCondition(@NotNull MiniSQLParser.ConditionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitCondition(@NotNull MiniSQLParser.ConditionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterNames(@NotNull MiniSQLParser.NamesContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitNames(@NotNull MiniSQLParser.NamesContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterNormalattr(@NotNull MiniSQLParser.NormalattrContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitNormalattr(@NotNull MiniSQLParser.NormalattrContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterCreatedb(@NotNull MiniSQLParser.CreatedbContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitCreatedb(@NotNull MiniSQLParser.CreatedbContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterEveryRule(ParserRuleContext ctx) { }
+	@Override public void enterEveryRule(@NotNull ParserRuleContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitEveryRule(ParserRuleContext ctx) { }
+	@Override public void exitEveryRule(@NotNull ParserRuleContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void visitTerminal(TerminalNode node) { }
+	@Override public void visitTerminal(@NotNull TerminalNode node) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void visitErrorNode(ErrorNode node) { }
+	@Override public void visitErrorNode(@NotNull ErrorNode node) { }
 }
