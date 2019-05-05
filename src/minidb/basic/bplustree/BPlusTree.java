@@ -1,7 +1,6 @@
 package minidb.basic.bplustree;
 
 import java.util.LinkedList;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.io.File;
 import java.io.IOException;
@@ -608,7 +607,7 @@ public class BPlusTree<K extends Key, V extends Value> {
      * @throws IOException
      */
     private void insertToNode(BPlusTreeNode<K,V> node, K key, V value)
-            throws IOException {
+            throws IOException, IllegalArgumentException {
         boolean useChild = true;
         int i = searchNode(node, key, BPlusTreeConst.SEARCH_ADD_ONE, 0, node.getCapacity()-1, true);
         // check if we have a leaf
@@ -621,7 +620,10 @@ public class BPlusTree<K extends Key, V extends Value> {
             int j = (leaf.getCapacity() > 0 && i == 0
                     && leaf.keyList.getFirst().compareTo(key) > 0) ? i : i-1;
             if(leaf.getCapacity() > 0 && leaf.keyList.get(j).compareTo(key) == 0) { // same value already exists
-                return; // should not have same key
+                if(isPrimaryIndex) {
+                	throw new IllegalArgumentException("duplicate primary key!"); // should not have same key
+                }
+                return;
             }
             else { // a new key
                 leaf.keyList.add(i, key);
