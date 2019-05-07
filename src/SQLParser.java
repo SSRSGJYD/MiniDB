@@ -13,6 +13,7 @@ import minidb.basic.database.DataBase;
 import minidb.basic.database.MiniDB;
 import minidb.result.Result;
 
+//TODO not null check
 public class SQLParser{
 	
 
