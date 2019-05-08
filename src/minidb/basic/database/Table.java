@@ -1095,6 +1095,9 @@ public class Table implements Serializable{
 		int c=0;
 		for(SchemaDescriptor s:schema.descriptors.values()) {
 			String t=values.get(c);
+			if(t==null&&s.isNotNull()) {
+				throw new IllegalArgumentException("not null attribute cannot be null");
+			}
 			switch(s.getType()) {
 			case TypeConst.VALUE_TYPE_INT:
 				if(t!=null) {

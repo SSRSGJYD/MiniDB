@@ -14,7 +14,7 @@ MiniDB采用**B+树**作为索引，所有数据直接存储在叶节点中。�
 
 ##### 2. 具体实现
 
-+ BPlusTree<K extends Key, V extends Value>类：B+树的实现类
++ 1.解析下面列表中提到的SQL，并生成对应的执行计划。2.执行生成的计划，并返回对应结果。加分项：应用课程中介绍的查询优化技术。主键支持多列。Where条件支持andor。Select支持选择表达式。BPlusTree<K extends Key, V extends Value>类：B+树的实现类
 + BPlusTreeNode<K extends Key, V extends Value>类：节点的实现类
 + BPlusTreeLeafNode<K extends Key, V extends Value> 类：叶节点的实现类
 + BPlusTreeInternalNode<K extends Key, V extends Value>类：内部节点的实现类
@@ -56,6 +56,18 @@ MiniDB支持建立在单个属性上的primary index和secondary index。在创�
 ##### 1. 基本原理
 元数据主要利用Java类的序列化进行存储。Schema类中利用LinkedHashMap存储数据库表的schema信息，包括表项名，类型，约束等。执行create table操作时，会将创建的Schema类序列化后存储在单个文件中，并将该文件路径写入schema.log文件中，这样在打开数据库时，扫描schema.log文件中记录的文件，读取文件，反序列化并载入schema。
 
+MiniBD.Java类 主要负责切换，创建，删除数据库实例，实现
+
+- 创建数据库 CREATE DATABASE dbName
+
+- 删除数据库 DROP DATABASE dbName
+
+- 切换数据库 USE  DATABASE dbName
+
+- 查询所有数据库 SHOW DATABASES
+
+- 查询一个数据库中所有表名 SHOW DATABASE dbName
+
 ##### 2. 具体实现
 
 DataBase.Java类：数据库类，对数据库的实现，使用HashMap存储数据库表，封装了一些操作接口
@@ -65,6 +77,8 @@ Table.Java类：数据库表类，对数据库表的实现，存储表名，主�
 Schema.Java类：存储表项名，类型，约束等信息，implement serializable用以实现持久化存储
 
 SchemaDescriptor.Java类：使用一个int存储数据库attribute的类型，约束，大小的信息，利用位运算得到特定信息，封装了各种信息的get和set
+
+MiniBD.Java类 主要负责切换，创建，删除数据库实例
 
 ##### 3. 主要类的类图
 

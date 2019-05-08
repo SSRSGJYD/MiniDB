@@ -13,7 +13,6 @@ import minidb.basic.database.DataBase;
 import minidb.basic.database.MiniDB;
 import minidb.result.Result;
 
-//TODO not null check
 public class SQLParser{
 	
 
@@ -21,7 +20,7 @@ public class SQLParser{
 	{
 		String cmds="create database db\n"
 				+ "use database db\n"
-				+ "create table playr(id int,name int,primary key(id))\n"
+				+ "create table playr(id int not null,name int,primary key(id))\n"
 				+ "create table playt(id int,name int,primary key(id))\n"
 
 				+ "insert into playr values(133,90)\n"
