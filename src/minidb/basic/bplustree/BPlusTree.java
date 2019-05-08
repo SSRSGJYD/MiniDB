@@ -456,8 +456,13 @@ public class BPlusTree<K extends Key, V extends Value> {
                         i++;
                     }
                     else {
-                        leaf = (BPlusTreeLeafNode<K, V>)readNodeFromFile(leaf.getNextPageIndex());
-                        i = 0;
+                    	if(leaf.getNextPageIndex() != -1L) {
+                    		leaf = (BPlusTreeLeafNode<K, V>)readNodeFromFile(leaf.getNextPageIndex());
+                            i = 0;
+                    	}
+                    	else {
+                    		return new SearchResult<V>(rows);
+                    	}
                     }
                 }
                 // save values
