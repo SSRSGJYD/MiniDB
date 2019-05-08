@@ -20,7 +20,7 @@ public class SQLParser{
 	{
 		String cmds="create database db\n"
 				+ "use database db\n"
-				+ "create table playr(id char(4) not null,name char(4) not null,primary key(id))\n"
+				+ "create table playr(id char(4),name char(4),primary key(id))\n"
 //				+ "create table playt(id int,name int,primary key(id))\n"
 
 				+ "insert into playr values('asdd','asds')\n"
@@ -30,9 +30,9 @@ public class SQLParser{
 //				+ "insert into playt(id) values(134)\n"
 //				+ "insert into playt values(13,990)\n"
 
-				+ "select * from playr where name>'asds'\n"
-				+ "select * from playr where id>'1333'\n"
-				+ "select * from playr where id='1333'\n"
+				+ "select * from playr where name<='990d'\n"
+//				+ "select * from playr where id>'1333'\n"
+//				+ "select * from playr where id='1333'\n"
 //				+ "select * from playr join playt on playr.name=playt.name\n"
 
 				+ "drop table playr\n";

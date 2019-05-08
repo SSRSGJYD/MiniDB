@@ -211,7 +211,7 @@ public class Table implements Serializable{
 				keyi= new PrimaryKey<Double>(Double.parseDouble(cdValue), TypeConst.VALUE_TYPE_DOUBLE, TypeConst.VALUE_SIZE_DOUBLE);
 				break;
 			case TypeConst.VALUE_TYPE_STRING:
-				keyi= new PrimaryKey<String>(cdValue, TypeConst.VALUE_TYPE_STRING, keySize);
+				keyi= new PrimaryKey<String>(parseString(cdValue), TypeConst.VALUE_TYPE_STRING, keySize);
 				break;
 			}
 		return keyi;
@@ -737,7 +737,7 @@ public class Table implements Serializable{
 		case TypeConst.VALUE_TYPE_DOUBLE:
 			return compareT(op,(Double)va,Double.parseDouble(vb));
 		case TypeConst.VALUE_TYPE_STRING:
-			return compareT(op,(String)va,(String)vb);
+			return compareT(op,(String)va,(String)parseString(vb));
 		}
 		return true;
 		
@@ -972,7 +972,7 @@ public class Table implements Serializable{
 				row.put(setName, Double.parseDouble(setValue));
 				break;
 			case TypeConst.VALUE_TYPE_STRING:
-				row.put(setName, setValue);
+				row.put(setName, parseString(setValue));
 				break;
 			}
 
