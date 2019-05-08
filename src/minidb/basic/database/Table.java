@@ -216,6 +216,15 @@ public class Table implements Serializable{
 			}
 		return keyi;
 	}
+	
+	public static String parseString(String str) {
+		if(str.charAt(0)=='\''&&str.charAt(str.length()-1)=='\'') {
+			return str.substring(1,str.length()-1);
+		}
+		else {
+			throw new IllegalArgumentException("parse String error");
+		}
+	}
 
 	protected PrimaryKey constructPrimaryKeyO(Object cdValue) {
 		PrimaryKey keyi=null;
@@ -425,19 +434,19 @@ public class Table implements Serializable{
 			case TypeConst.VALUE_TYPE_STRING:
 				switch(keyType) {
 				case TypeConst.VALUE_TYPE_INT:
-					keyr= new SecondaryKey(cdValue, TypeConst.VALUE_TYPE_STRING, size,(Integer)keyValue,keyType,keySize);
+					keyr= new SecondaryKey(parseString(cdValue), TypeConst.VALUE_TYPE_STRING, size,(Integer)keyValue,keyType,keySize);
 					break;
 				case TypeConst.VALUE_TYPE_LONG:
-					keyr= new SecondaryKey(cdValue, TypeConst.VALUE_TYPE_STRING, size,(Long)keyValue,keyType,keySize);
+					keyr= new SecondaryKey(parseString(cdValue), TypeConst.VALUE_TYPE_STRING, size,(Long)keyValue,keyType,keySize);
 					break;
 				case TypeConst.VALUE_TYPE_FLOAT:
-					keyr= new SecondaryKey(cdValue, TypeConst.VALUE_TYPE_STRING, size,(Float)keyValue,keyType,keySize);
+					keyr= new SecondaryKey(parseString(cdValue), TypeConst.VALUE_TYPE_STRING, size,(Float)keyValue,keyType,keySize);
 					break;
 				case TypeConst.VALUE_TYPE_DOUBLE:
-					keyr= new SecondaryKey(cdValue, TypeConst.VALUE_TYPE_STRING, size,(Double)keyValue,keyType,keySize);
+					keyr= new SecondaryKey(parseString(cdValue), TypeConst.VALUE_TYPE_STRING, size,(Double)keyValue,keyType,keySize);
 					break;
 				case TypeConst.VALUE_TYPE_STRING:
-					keyr= new SecondaryKey(cdValue, TypeConst.VALUE_TYPE_STRING, size,(String)keyValue,keyType,keySize);
+					keyr= new SecondaryKey(parseString(cdValue), TypeConst.VALUE_TYPE_STRING, size,(String)keyValue,keyType,keySize);
 					break;
 				}
 				break;
@@ -1142,6 +1151,7 @@ public class Table implements Serializable{
 			case TypeConst.VALUE_TYPE_STRING:
 				if(t!=null) {
 					dos.writeChar(0);
+					t=parseString(t);
 					res=t;
 					dos.writeChars((String)t);
 					for(int i=0;i<s.getSize()/TypeConst.VALUE_SIZE_CHAR-t.length();i++) {
