@@ -211,10 +211,19 @@ public class Table implements Serializable{
 				keyi= new PrimaryKey<Double>(Double.parseDouble(cdValue), TypeConst.VALUE_TYPE_DOUBLE, TypeConst.VALUE_SIZE_DOUBLE);
 				break;
 			case TypeConst.VALUE_TYPE_STRING:
-				keyi= new PrimaryKey<String>(cdValue, TypeConst.VALUE_TYPE_STRING, keySize);
+				keyi= new PrimaryKey<String>(parseString(cdValue), TypeConst.VALUE_TYPE_STRING, keySize);
 				break;
 			}
 		return keyi;
+	}
+	
+	public static String parseString(String str) {
+		if(str.charAt(0)=='\''&&str.charAt(str.length()-1)=='\'') {
+			return str.substring(1,str.length()-1);
+		}
+		else {
+			throw new IllegalArgumentException("parse String error");
+		}
 	}
 
 	protected PrimaryKey constructPrimaryKeyO(Object cdValue) {
@@ -425,19 +434,19 @@ public class Table implements Serializable{
 			case TypeConst.VALUE_TYPE_STRING:
 				switch(keyType) {
 				case TypeConst.VALUE_TYPE_INT:
-					keyr= new SecondaryKey(cdValue, TypeConst.VALUE_TYPE_STRING, size,(Integer)keyValue,keyType,keySize);
+					keyr= new SecondaryKey(parseString(cdValue), TypeConst.VALUE_TYPE_STRING, size,(Integer)keyValue,keyType,keySize);
 					break;
 				case TypeConst.VALUE_TYPE_LONG:
-					keyr= new SecondaryKey(cdValue, TypeConst.VALUE_TYPE_STRING, size,(Long)keyValue,keyType,keySize);
+					keyr= new SecondaryKey(parseString(cdValue), TypeConst.VALUE_TYPE_STRING, size,(Long)keyValue,keyType,keySize);
 					break;
 				case TypeConst.VALUE_TYPE_FLOAT:
-					keyr= new SecondaryKey(cdValue, TypeConst.VALUE_TYPE_STRING, size,(Float)keyValue,keyType,keySize);
+					keyr= new SecondaryKey(parseString(cdValue), TypeConst.VALUE_TYPE_STRING, size,(Float)keyValue,keyType,keySize);
 					break;
 				case TypeConst.VALUE_TYPE_DOUBLE:
-					keyr= new SecondaryKey(cdValue, TypeConst.VALUE_TYPE_STRING, size,(Double)keyValue,keyType,keySize);
+					keyr= new SecondaryKey(parseString(cdValue), TypeConst.VALUE_TYPE_STRING, size,(Double)keyValue,keyType,keySize);
 					break;
 				case TypeConst.VALUE_TYPE_STRING:
-					keyr= new SecondaryKey(cdValue, TypeConst.VALUE_TYPE_STRING, size,(String)keyValue,keyType,keySize);
+					keyr= new SecondaryKey(parseString(cdValue), TypeConst.VALUE_TYPE_STRING, size,(String)keyValue,keyType,keySize);
 					break;
 				}
 				break;
@@ -728,7 +737,7 @@ public class Table implements Serializable{
 		case TypeConst.VALUE_TYPE_DOUBLE:
 			return compareT(op,(Double)va,Double.parseDouble(vb));
 		case TypeConst.VALUE_TYPE_STRING:
-			return compareT(op,(String)va,(String)vb);
+			return compareT(op,(String)va,(String)parseString(vb));
 		}
 		return true;
 		
@@ -963,7 +972,7 @@ public class Table implements Serializable{
 				row.put(setName, Double.parseDouble(setValue));
 				break;
 			case TypeConst.VALUE_TYPE_STRING:
-				row.put(setName, setValue);
+				row.put(setName, parseString(setValue));
 				break;
 			}
 
@@ -1095,6 +1104,9 @@ public class Table implements Serializable{
 		int c=0;
 		for(SchemaDescriptor s:schema.descriptors.values()) {
 			String t=values.get(c);
+			if(t==null&&s.isNotNull()) {
+				throw new IllegalArgumentException("not null attribute cannot be null");
+			}
 			switch(s.getType()) {
 			case TypeConst.VALUE_TYPE_INT:
 				if(t!=null) {
@@ -1139,6 +1151,7 @@ public class Table implements Serializable{
 			case TypeConst.VALUE_TYPE_STRING:
 				if(t!=null) {
 					dos.writeChar(0);
+					t=parseString(t);
 					res=t;
 					dos.writeChars((String)t);
 					for(int i=0;i<s.getSize()/TypeConst.VALUE_SIZE_CHAR-t.length();i++) {

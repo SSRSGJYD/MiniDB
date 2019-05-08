@@ -65,6 +65,7 @@ public class MyListener extends MiniSQLBaseListener {
 		st=(Statement) ssb;
 		
 		ssb.existWhere=false;
+		ssb.isImme=true;
 		if(ctx.ccondition() != null) {
 			ssb.existWhere=true;
 			if(ctx.ccondition().value()!=null) {
@@ -114,6 +115,7 @@ public class MyListener extends MiniSQLBaseListener {
 		type=Statement.selectA;
 		ssa.tableName=ctx.Name().getText();
 		ssa.existWhere=false;
+		ssa.isImme=true;
 		if(ctx.condition() != null) {
 			ssa.existWhere=true;
 			if(ctx.condition().value()!=null) {
@@ -176,8 +178,7 @@ public class MyListener extends MiniSQLBaseListener {
 				sib.pairs.put(ctx.names().Name(i).getText(), ctx.values().value(i).getText());
 			else if(ctx.values().value(i).String()!=null) {
 				String str=ctx.values().value(i).getText();
-				String res=str.substring(1, str.length()-1);
-				sib.pairs.put(ctx.names().Name(i).getText(), res);
+				sib.pairs.put(ctx.names().Name(i).getText(), str);
 			}else {
 				sib.pairs.put(ctx.names().Name(i).getText(), null);
 			}
@@ -196,8 +197,7 @@ public class MyListener extends MiniSQLBaseListener {
 				sia.values.add(ctx.values().value(i).getText());
 			else if(ctx.values().value(i).String()!=null) {
 				String str=ctx.values().value(i).getText();
-				String res=str.substring(1, str.length()-1);
-				sia.values.add(res);
+				sia.values.add(str);
 			}else {
 				sia.values.add(null);
 			}
@@ -265,7 +265,11 @@ public class MyListener extends MiniSQLBaseListener {
 		SchemaDescriptor sd=new SchemaDescriptor();
 		int mtype=TypeConst.fromString(ctx.type().getText());
 		sd.setType(mtype);
-		sd.setSize(TypeConst.type2size(mtype));
+		int size=TypeConst.type2size(mtype);
+		if(ctx.type().getText().substring(0, 3).equals("cha")) {
+			size=size*Integer.parseInt(ctx.type().Number().getText());
+		}
+		sd.setSize(size);
 		StatementCreate sc=(StatementCreate) st;
 		sd.setNotNull();
 		switch(type) {
