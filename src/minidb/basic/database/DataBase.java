@@ -65,7 +65,7 @@ public class DataBase{
 			if(!tables.containsKey(sc.tableName)) {
 				Schema sa=new Schema(sc.descriptors);
 				sa.types=sc.types;
-				this.createTable(sc.tableName,sa);
+				this.createTable(sc.tableName,sa,sc.hasPrimary);
 			}
 //			else {
 //				throw new IllegalArgumentException("table already exist");
@@ -88,9 +88,10 @@ public class DataBase{
 			}
 
 			tb=tables.get(sia.tableName);
-			pair=tb.mkRow(sia.values);
+			List<String> values=tb.fixValues(sia.values);
+			pair=tb.mkRow(values);
 			tb.simpleInsert(pair.l,pair.r);
-			tb.insertIndexs(pair.l, sia.values);
+			tb.insertIndexs(pair.l, values);
 			res=new BoolResult();
 			break;
 		case Statement.insertB:
@@ -99,9 +100,10 @@ public class DataBase{
 				throw new IllegalArgumentException("table not exist");
 			}
 			tb=tables.get(sib.tableName);
-			pair=tb.mkRowB(sib.pairs);
+			HashMap<String,String> pairs=tb.fixPairs(sib.pairs);
+			pair=tb.mkRowB(pairs);
 			tb.simpleInsert(pair.l,pair.r);
-			tb.insertIndexsB(pair.l, sib.pairs);
+			tb.insertIndexsB(pair.l, pairs);
 			res=new BoolResult();
 			break;
 		case Statement.selectA:
@@ -156,8 +158,8 @@ public class DataBase{
 		tables.put(tb.tableName, tb);
 	}
 	
-	public void createTable(String tableName, Schema sa) throws IOException {
-		Table tb =new Table(tableName,sa);
+	public void createTable(String tableName, Schema sa,boolean hasPrimary) throws IOException {
+		Table tb =new Table(tableName,sa,hasPrimary);
 		tb.storeToFile(tb.tableName.concat(".schema"));
 		addTable(tb);
 	}

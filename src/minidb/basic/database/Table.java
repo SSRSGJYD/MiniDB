@@ -44,21 +44,36 @@ public class Table implements Serializable{
 	int keySize;
 	int keyType;
 	int valueSize=0;
+	int gCount=0;
+	boolean hasPrimary=false;
 	
-	public Table(String tableName,Schema schema) throws IOException {
+	public Table(String tableName,Schema schema,boolean hasPrimary) throws IOException {
 		this.tableName=tableName;
 		this.schema=schema;
 		this.indexs=new HashMap<String,SecondaryIndex>();
 
 		for(Entry<String, SchemaDescriptor> entry:schema.descriptors.entrySet()) {
 			SchemaDescriptor sd=entry.getValue();
-			if(sd.isPrimary()) {
+			if(hasPrimary&&sd.isPrimary()) {
+				this.hasPrimary=true;
 				keyType=sd.getType();
 				this.schema.primaryKey=entry.getKey();
 				keySize=sd.getSize();
 			}
 			valueSize+=sd.getSize()+TypeConst.VALUE_SIZE_NULL;
 		}
+		if(!hasPrimary) {
+			keyType=TypeConst.VALUE_TYPE_INT;
+			keySize=TypeConst.VALUE_SIZE_INT;
+			this.schema.primaryKey="_id";
+			valueSize+=keySize+TypeConst.VALUE_SIZE_NULL;
+			SchemaDescriptor sd=new SchemaDescriptor();
+			sd.setPrimary();
+			sd.setSize(keySize);
+			sd.setType(keyType);
+			this.schema.descriptors.put("_id", sd);
+		}
+
 		for(Entry<String, SchemaDescriptor> entry:schema.descriptors.entrySet()) {
 			SchemaDescriptor sd=entry.getValue();
 			if(!sd.isPrimary()) {
@@ -1232,6 +1247,22 @@ public class Table implements Serializable{
 				index.insert(keys, row);	
 				break;
 			}
+	}
+
+	public List<String> fixValues(List<String> values) {
+		if(!this.hasPrimary) {
+			gCount+=1;
+			values.add(Integer.toString(gCount));
+		}
+		return values;
+	}
+
+	public HashMap<String, String> fixPairs(HashMap<String, String> pairs) {
+		if(!this.hasPrimary) {
+			gCount+=1;
+			pairs.put("_id", Integer.toString(gCount));
+		}
+		return pairs;
 	}
 
 

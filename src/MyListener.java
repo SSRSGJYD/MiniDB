@@ -285,6 +285,7 @@ public class MyListener extends MiniSQLBaseListener {
 		StatementCreate sc=(StatementCreate) st;
 		SchemaDescriptor sd=sc.descriptors.get(ctx.Name().getText());
 		sd.setPrimary();
+		sc.hasPrimary=true;
 		sc.descriptors.put(ctx.Name().getText(), sd);
 		
 	}
