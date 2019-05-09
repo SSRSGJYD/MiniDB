@@ -592,29 +592,40 @@ public class Table implements Serializable{
 
 	@SuppressWarnings("unchecked")
 	protected QueryResult query(List<String> names,Boolean existWhere,String cdName,String cdValue, int op) throws IOException, ClassNotFoundException {
+		ArrayList<LinkedHashMap<String,Object>> res=new ArrayList<LinkedHashMap<String,Object>>();
 		LinkedList<Row> rows=null;
 		if(!existWhere) {
 			rows=index.searchAll().rows;
 			QueryResult qr=new QueryResult();
 			ArrayList<LinkedHashMap<String,Object>> rowl=fromRaw(rows);
-			qr.data=rowl;
+			for(LinkedHashMap<String,Object> objs:rowl) {
+				LinkedHashMap<String,Object> nobjs=filterNames(names,objs);
+				res.add(fixA(nobjs));
+			}
+			qr.data=res;
 			qr.types=this.schema.types;
 			return qr;
 		}
 		else
 			rows=searchRows(cdName,cdValue,op);
 		QueryResult qr=new QueryResult();
-		ArrayList<LinkedHashMap<String,Object>> res=new ArrayList<LinkedHashMap<String,Object>>();
 		ArrayList<LinkedHashMap<String,Object>> rowl=fromRaw(rows);
 		for(LinkedHashMap<String,Object> objs:rowl) {
 			LinkedHashMap<String,Object> nobjs=filterNames(names,objs);
-			res.add(nobjs);
+			res.add(fixA(nobjs));
 		}
 	
 		qr.data=res;
 		qr.types=this.schema.types;
 		return qr;
 	}
+	private LinkedHashMap<String, Object> fixA(LinkedHashMap<String, Object> nobjs) {
+		if(!this.hasPrimary) {
+			nobjs.remove("_id");
+		}
+		return nobjs;
+	}
+
 		@SuppressWarnings("unchecked")
 	protected LinkedList<Row> searchByOpS(@SuppressWarnings("rawtypes") SecondaryKey key,String keyName,int op) throws IOException{
 		SecondaryIndex indext=indexs.get(keyName);
@@ -673,14 +684,14 @@ public class Table implements Serializable{
 			for(LinkedHashMap<String,Object> objs:rowl) {
 				if(rf.method(objs)) {
 					LinkedHashMap<String,Object> nobjs=filterNames(names,objs);
-					res.add(nobjs);
+					res.add(fixA(nobjs));
 				}
 			}
 		}
 		else{
 			for(LinkedHashMap<String,Object> objs:rowl) {
 				LinkedHashMap<String,Object> nobjs=filterNames(names,objs);
-				res.add(nobjs);
+				res.add(fixA(nobjs));
 			}
 		}
 		QueryResult qr=new QueryResult();
@@ -808,6 +819,11 @@ public class Table implements Serializable{
 		    DataInputStream inst=new DataInputStream(in);
 		    ByteArrayInputStream inn = new ByteArrayInputStream(nulls);
 		    DataInputStream instn=new DataInputStream(inn);
+		    
+			if(!this.hasPrimary&&e.getKey().equals("_id")) {
+				continue;
+			}
+		    
 		    char isnull=instn.readChar();
 		    if(isnull=='n') {
 		    	objs.put(this.tableName+"."+e.getKey(), null);

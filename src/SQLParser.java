@@ -30,7 +30,7 @@ public class SQLParser{
 				+ "insert into playt(id) values(134)\n"
 				+ "insert into playt values(13,990)\n"
 
-//				+ "select * from playr\n"
+//				+ "select * from playr where id>'1332'\n"
 //				+ "select * from playr where id>'1333'\n"
 				+ "select * from playr join playt on playr.name=playt.name\n"
 
