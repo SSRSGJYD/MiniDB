@@ -590,6 +590,64 @@ public class Table implements Serializable{
 		return res;
 	}
 
+	protected QueryResult queryT(List<String> names,Boolean existWhere,LogicTree lt) throws IOException, ClassNotFoundException {
+		QueryResult res;
+		if(existWhere) {
+			if(lt.isLeaf) {
+				if(lt.isImme)
+					res=query(names, existWhere, lt.cdName, lt.cdValue, lt.op);
+				else
+					res=queryI(names, existWhere, lt.cdName, lt.cdNamer, lt.op);
+				return res;
+			}
+			else {
+				QueryResult resa=queryT(names,existWhere,lt.ltree);
+				QueryResult resb=queryT(names,existWhere,lt.rtree);
+				res=combineQRes(resa,resb,lt.lop);
+				return res;
+			}
+		}
+		else {
+			res=query(names, existWhere, "", "", 0);
+			return res;
+		}
+	}
+	private QueryResult combineQRes(QueryResult resa, QueryResult resb, int lop) {
+		ArrayList<LinkedHashMap<String,Object>> res=new ArrayList<LinkedHashMap<String,Object>>();
+		QueryResult qr=new QueryResult();
+		if(lop==LogicTree.and) {
+			HashMap<Object,Object> map =new HashMap<Object,Object>();
+			for(LinkedHashMap<String,Object> rec:resa.data) {
+				map.put(rec.get(this.schema.primaryKey), null);
+			}
+			for(LinkedHashMap<String,Object> rec:resb.data) {
+				if(map.containsKey(rec.get(this.schema.primaryKey))) {
+					res.add(rec);
+				}
+			}
+			qr.data=res;
+			qr.types=resa.types;
+			return qr;
+		}
+		if(lop==LogicTree.or) {
+			HashMap<Object,LinkedHashMap<String,Object>> map =new HashMap<Object,LinkedHashMap<String,Object>>();
+			for(LinkedHashMap<String,Object> rec:resa.data) {
+				map.put(rec.get(this.schema.primaryKey), rec);
+			}
+			for(LinkedHashMap<String,Object> rec:resb.data) {
+				map.put(rec.get(this.schema.primaryKey), rec);
+			}
+			for(LinkedHashMap<String,Object> rec:map.values()) {
+				res.add(rec);
+			}
+
+			qr.data=res;
+			qr.types=resa.types;
+			return qr;
+		}
+		return qr;
+	}
+
 	@SuppressWarnings("unchecked")
 	protected QueryResult query(List<String> names,Boolean existWhere,String cdName,String cdValue, int op) throws IOException, ClassNotFoundException {
 		ArrayList<LinkedHashMap<String,Object>> res=new ArrayList<LinkedHashMap<String,Object>>();
@@ -600,7 +658,7 @@ public class Table implements Serializable{
 			ArrayList<LinkedHashMap<String,Object>> rowl=fromRaw(rows);
 			for(LinkedHashMap<String,Object> objs:rowl) {
 				LinkedHashMap<String,Object> nobjs=filterNames(names,objs);
-				res.add(fixA(nobjs));
+				res.add((nobjs));
 			}
 			qr.data=res;
 			qr.types=this.schema.types;
@@ -612,7 +670,7 @@ public class Table implements Serializable{
 		ArrayList<LinkedHashMap<String,Object>> rowl=fromRaw(rows);
 		for(LinkedHashMap<String,Object> objs:rowl) {
 			LinkedHashMap<String,Object> nobjs=filterNames(names,objs);
-			res.add(fixA(nobjs));
+			res.add((nobjs));
 		}
 	
 		qr.data=res;
@@ -684,14 +742,14 @@ public class Table implements Serializable{
 			for(LinkedHashMap<String,Object> objs:rowl) {
 				if(rf.method(objs)) {
 					LinkedHashMap<String,Object> nobjs=filterNames(names,objs);
-					res.add(fixA(nobjs));
+					res.add((nobjs));
 				}
 			}
 		}
 		else{
 			for(LinkedHashMap<String,Object> objs:rowl) {
 				LinkedHashMap<String,Object> nobjs=filterNames(names,objs);
-				res.add(fixA(nobjs));
+				res.add((nobjs));
 			}
 		}
 		QueryResult qr=new QueryResult();
@@ -820,10 +878,6 @@ public class Table implements Serializable{
 		    ByteArrayInputStream inn = new ByteArrayInputStream(nulls);
 		    DataInputStream instn=new DataInputStream(inn);
 		    
-			if(!this.hasPrimary&&e.getKey().equals("_id")) {
-				continue;
-			}
-		    
 		    char isnull=instn.readChar();
 		    if(isnull=='n') {
 		    	objs.put(this.tableName+"."+e.getKey(), null);
@@ -944,9 +998,9 @@ public class Table implements Serializable{
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void delete(String cdName,String cdValue,int op) throws IOException, ClassNotFoundException {
-		LinkedList<Row> rows=searchRows(cdName,cdValue,op);
-		ArrayList<LinkedHashMap<String,Object>> rowl=fromRaw(rows);
+	public void delete(LogicTree lt) throws IOException, ClassNotFoundException {
+
+		ArrayList<LinkedHashMap<String,Object>> rowl=searchRowsT(lt);
 		
 		for(LinkedHashMap<String,Object> row:rowl) {
 			Object key=row.get(this.schema.primaryKey);
@@ -964,10 +1018,42 @@ public class Table implements Serializable{
 		
 	}
 	
+	private ArrayList<LinkedHashMap<String, Object>> searchRowsT(LogicTree lt) throws IOException, ClassNotFoundException {
+		if(lt.isLeaf) {
+			if(lt.isImme) {
+				LinkedList<Row> rows=searchRows(lt.cdName,lt.cdValue,lt.op);
+				return fromRaw(rows);
+			}
+			else{
+				ArrayList<LinkedHashMap<String,Object>> res=new ArrayList<LinkedHashMap<String,Object>>();
+				LinkedList<Row> rows=index.searchAll().rows;
+				ArrayList<LinkedHashMap<String,Object>> rowl=fromRaw(rows);
+				RowFilter rf= buildFilter(this,lt.cdName,lt.op,lt.cdNamer);
+				for(LinkedHashMap<String,Object> objs:rowl) {
+					if(rf.method(objs)) {
+						res.add((objs));
+					}
+				}
+				return res;
+			}
+		}
+		else {
+			ArrayList<LinkedHashMap<String, Object>> resa=searchRowsT(lt.ltree);
+			ArrayList<LinkedHashMap<String, Object>> resb=searchRowsT(lt.rtree);
+			QueryResult qa=new QueryResult();
+			QueryResult qb=new QueryResult();
+			qa.data=resa;
+			qb.data=resb;
+			ArrayList<LinkedHashMap<String, Object>> res=this.combineQRes(qa, qb, lt.lop).data;
+			return res;
+		}
+	}
+
 	@SuppressWarnings("unchecked")
-	public void update(String cdName,String cdValue,int op,String setName,String setValue) throws IOException, ClassNotFoundException {
-		LinkedList<Row> rows=searchRows(cdName,cdValue,op);
-		ArrayList<LinkedHashMap<String,Object>> rowl=fromRaw(rows);
+	public void update(LogicTree lt,String setName,String setValue) throws IOException, ClassNotFoundException {
+
+		ArrayList<LinkedHashMap<String,Object>> rowl=searchRowsT(lt);
+
 		SchemaDescriptor sd=this.schema.descriptors.get(setName);
 		for(LinkedHashMap<String,Object> row:rowl) {
 			Object secondary=row.get(setName);
@@ -1029,6 +1115,7 @@ public class Table implements Serializable{
 			}
 		}
 	}
+
 
 	public Pair<Object,Row> mkRowB(HashMap<String,String> pairs) throws NumberFormatException, IOException {
 		if(pairs.size()>this.schema.descriptors.size()) {

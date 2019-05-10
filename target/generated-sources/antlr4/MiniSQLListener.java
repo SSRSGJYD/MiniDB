@@ -30,6 +30,16 @@ public interface MiniSQLListener extends ParseTreeListener {
 	 */
 	void exitJnames(@NotNull MiniSQLParser.JnamesContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link MiniSQLParser#logictree}.
+	 * @param ctx the parse tree
+	 */
+	void enterLogictree(@NotNull MiniSQLParser.LogictreeContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MiniSQLParser#logictree}.
+	 * @param ctx the parse tree
+	 */
+	void exitLogictree(@NotNull MiniSQLParser.LogictreeContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code values}
 	 * labeled alternative in {@link MiniSQLParser#sqlsqlsqlsqlsqlsqlsqlsqlschemasqlattributesqlsqlsqlattributesqlsqlconstraint}.
 	 * @param ctx the parse tree
@@ -95,6 +105,16 @@ public interface MiniSQLListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitType(@NotNull MiniSQLParser.TypeContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MiniSQLParser#lop}.
+	 * @param ctx the parse tree
+	 */
+	void enterLop(@NotNull MiniSQLParser.LopContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MiniSQLParser#lop}.
+	 * @param ctx the parse tree
+	 */
+	void exitLop(@NotNull MiniSQLParser.LopContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code delete}
 	 * labeled alternative in {@link MiniSQLParser#sql}.

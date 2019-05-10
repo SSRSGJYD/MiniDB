@@ -17,21 +17,30 @@ public class SQLParser{
 		String cmds="create database db\n"
 				+ "use database db\n"
 				+ "create table playr(id char(4),name int)\n"
-				+ "create table playt(id int,name int,primary key(id))\n"
+//				+ "create table playt(id int,name int,primary key(id))\n"
+//				+ "create table playd(id int,name int,primary key(id))\n"
 
 				+ "insert into playr values('1332',90)\n"
+				+ "insert into playr values('1333',390)\n"
 				+ "insert into playr values('1333',990)\n"
+				+ "delete from playr  where (name>99 or name <900) and id>='1333'\n"
 
-				+ "insert into playt values(133,90)\n"
-				+ "insert into playt(id) values(134)\n"
-				+ "insert into playt values(13,990)\n"
+//				+ "insert into playt values(133,90)\n"
+//				+ "insert into playt(id) values(134)\n"
+//				+ "insert into playt values(13,990)\n"
+//
+//				+ "insert into playd values(133,90)\n"
+//				+ "insert into playd(id) values(134)\n"
+//				+ "insert into playd values(13,990)\n"
+//
+				+ "select * from playr\n"
+//				+ "select * from playr where (name>100 or name <400) and id>='1333'\n"
+//				+ "select * from playr join playt on playr.name=playt.name"
+//				+ "                    join playd on playd.name=playr.name\n"
 
-//				+ "select * from playr\n"
-//				+ "select * from playr where id>'1333'\n"
-				+ "select * from playr join playt on playr.name=playt.name\n"
-
-				+ "drop table playr\n"
-				+ "drop table playt\n";
+				+ "drop table playr\n";
+//				+ "drop table playd\n"
+//				+ "drop table playt\n";
 
 
 		InputStream targetStream = new ByteArrayInputStream(cmds.getBytes());

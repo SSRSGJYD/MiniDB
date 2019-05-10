@@ -40,6 +40,18 @@ public class MiniSQLBaseListener implements MiniSQLListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterLogictree(@NotNull MiniSQLParser.LogictreeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitLogictree(@NotNull MiniSQLParser.LogictreeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterValues(@NotNull MiniSQLParser.ValuesContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -107,6 +119,18 @@ public class MiniSQLBaseListener implements MiniSQLListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitType(@NotNull MiniSQLParser.TypeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterLop(@NotNull MiniSQLParser.LopContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitLop(@NotNull MiniSQLParser.LopContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

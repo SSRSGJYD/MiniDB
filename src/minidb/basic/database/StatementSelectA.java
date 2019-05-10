@@ -8,17 +8,13 @@ public class StatementSelectA extends Statement {
 	public List<String> names;
 	public String tableName;
 	public boolean existWhere;
-	public String cdName;
-	public String cdValue;
 	public boolean isStar;
-	public String cdNamer;
-	public boolean isImme;
-	public int op;
+	
+	public LogicTree lt;
+
 	
 	public StatementSelectA() {
 		this.type=Statement.selectA;
 		names=new ArrayList<String>();
 	}
-	
-	
 }

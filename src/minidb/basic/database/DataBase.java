@@ -114,17 +114,11 @@ public class DataBase{
 			tb=tables.get(sla.tableName);
 			if(sla.isStar) {
 				List<String> names=new ArrayList<String>(tb.schema.descriptors.keySet());
-				if(sla.isImme)
-					res=tb.query(names, sla.existWhere, sla.cdName, sla.cdValue, sla.op);
-				else
-					res=tb.queryI(names, sla.existWhere, sla.cdName, sla.cdNamer, sla.op);
+				res=tb.queryT(names, sla.existWhere, sla.lt);
 					
 			}
 			else
-				if(sla.isImme)
-					res=tb.query(sla.names, sla.existWhere, sla.cdName, sla.cdValue, sla.op);
-				else
-					res=tb.queryI(sla.names, sla.existWhere, sla.cdName, sla.cdNamer, sla.op);
+				res=tb.queryT(sla.names, sla.existWhere, sla.lt);
 			break;
 		case Statement.selectB:
 			StatementSelectB slb=(StatementSelectB) st;
@@ -137,7 +131,7 @@ public class DataBase{
 				throw new IllegalArgumentException("table not exist");
 			}
 			tb=tables.get(su.tableName);
-			tb.update(su.cdName,su.cdValue,su.op,su.setName,su.setValue);
+			tb.update(su.lt,su.setName,su.setValue);
 			res=new BoolResult();
 			break;
 
@@ -147,7 +141,7 @@ public class DataBase{
 				throw new IllegalArgumentException("table not exist");
 			}
 			tb=tables.get(sds.tableName);
-			tb.delete(sds.cdName,sds.cdValue,sds.op);
+			tb.delete(sds.lt);
 			res=new BoolResult();
 			break;
 		}
