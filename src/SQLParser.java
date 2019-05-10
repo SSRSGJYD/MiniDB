@@ -1,15 +1,11 @@
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
-import minidb.basic.database.DataBase;
 import minidb.basic.database.MiniDB;
 import minidb.result.Result;
 
@@ -30,7 +26,7 @@ public class SQLParser{
 				+ "insert into playt(id) values(134)\n"
 				+ "insert into playt values(13,990)\n"
 
-//				+ "select * from playr where id>'1332'\n"
+//				+ "select * from playr\n"
 //				+ "select * from playr where id>'1333'\n"
 				+ "select * from playr join playt on playr.name=playt.name\n"
 
