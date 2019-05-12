@@ -21,6 +21,8 @@ value : Number
       | String
       | 'null'
 	;
+	
+join: 'join' | 'left outer join' | 'right outer join' |'full outer join';
 
 WS: [ \t\r\n]+ -> skip;
 
@@ -66,7 +68,7 @@ cnames : cname (',' cname)*
 onCondition : cname'='cname
 	;
 	
-jnames : Name ('join' Name 'on' onCondition)+
+jnames : Name (join Name 'on' onCondition)+
 	;
 
 values : value (',' value)*

@@ -94,17 +94,26 @@ public class MyListener extends MiniSQLBaseListener {
 			ssb.isStar=true;
 		}
 
+		int t=0;
 		for(int i=0;i<ctx.jnames().Name().size();i++) {
-			ssb.jnames.add(ctx.jnames().Name(i).getText());
 			if(i>0) {
+				if(ctx.jnames().join(i-1).getText().equals("join"))
+					t=StatementSelectB.join;
+				else if(ctx.jnames().join(i-1).getText().equals("left outer join"))
+					t=StatementSelectB.leftOuterJoin;
+				else if(ctx.jnames().join(i-1).getText().equals("right outer join"))
+					t=StatementSelectB.rightOuterJoin;
+				else if(ctx.jnames().join(i-1).getText().equals("full outer join"))
+					t=StatementSelectB.fullOuterJoin;
+
 				Pair<String, String> l=new Pair<String,String>(ctx.jnames().onCondition(i-1).cname(0).Name(0).getText()
 						,ctx.jnames().onCondition(i-1).cname(0).Name(1).getText());
 				Pair<String, String> r=new Pair<String,String>(ctx.jnames().onCondition(i-1).cname(1).Name(0).getText()
 						,ctx.jnames().onCondition(i-1).cname(1).Name(1).getText());
 				
 				ssb.onConditions.add(new Pair<Pair<String, String>, Pair<String, String>>(l,r));
-				
 			}
+			ssb.jnames.add(new Pair<String, Integer>(ctx.jnames().Name(i).getText(),t));
 		}
 	}
 	
