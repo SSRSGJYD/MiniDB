@@ -3,6 +3,7 @@ package minidb.client;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,10 +32,14 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Toggle;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.MapValueFactory;
@@ -75,6 +80,19 @@ public class SceneController {
 	private Label bottomLabel;
 	@FXML
 	private ScrollPane resultScroll;
+	@FXML
+	private RadioButton printResultRadio;
+	@FXML
+	private RadioButton saveResultRadio;
+	@FXML
+	private Button resultPathBtn;
+	@FXML
+	private TextField resultPath;
+	
+	private ToggleGroup group;
+	private String resultFilePath;
+	private boolean inExecution;
+	private boolean printResult;
 	
 	public Stage getStage() {
 		return this.stage;
@@ -127,6 +145,39 @@ public class SceneController {
 		      }
 		    });
 		
+		// toggle group (radio buttons)
+		group = new ToggleGroup();
+		printResultRadio.setToggleGroup(group);
+		printResultRadio.setUserData(0);
+		saveResultRadio.setToggleGroup(group);
+		saveResultRadio.setUserData(1);
+		printResultRadio.setSelected(true);
+		resultPathBtn.setDisable(true);
+		group.selectedToggleProperty().addListener(
+                new ChangeListener<Toggle>() {
+                    public void changed(
+                            ObservableValue<? extends Toggle> ov,
+                            Toggle old_toggle, Toggle new_toggle) {
+                        if(inExecution) {
+                        	// do not allow changes during execution
+                        	group.selectToggle(old_toggle);
+                        }
+                        if(new_toggle != null) {
+                        	if((int)new_toggle.getUserData() == 0) {
+                            	// print to console
+                            	printResult = true;
+                            	resultPathBtn.setDisable(true);
+                            }
+                        	else {
+                        		// save result to file
+                        		printResult = false;
+                        		resultPathBtn.setDisable(false);
+                        	}
+                        }
+                    }
+                });
+		//
+		
 		//just for test
 		//this.schemas.set("[{\"database_name\":\"database1\",\"schemas\":[{\"schema_name\":\"schema1\", \"attributes\":[{\"name\":\"id\", \"type\":\"int\"},{\"name\":\"name\", \"type\":\"String\"}]}]}]");
 		//just for test
@@ -154,7 +205,28 @@ public class SceneController {
 //		resultScroll.setContent(tableView);
 	}
 	
+	public void choosePath() {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Choose file path to save result");
+		File f = fileChooser.showOpenDialog(stage);
+		if(f != null) {
+			if(f.canWrite()) {
+				resultFilePath = f.getPath();
+				resultPath.setText(resultFilePath);
+			}
+			else {
+				Alert information = new Alert(Alert.AlertType.ERROR,"cannot write to the file!");
+				information.setTitle("error");
+				information.setHeaderText("Error!");	
+				information.show();
+			}
+		}
+	}
+	
 	public void execute() {
+		if(inExecution) {
+			return;
+		}
 		final String sql = textArea.getText();
 		try {
 			String executeURL = connectionInfo.baseURL + "/execute";
@@ -167,6 +239,7 @@ public class SceneController {
 			se.setContentType("application/json");
 			httpPost.setEntity(se);
 			// async request
+			inExecution = true;
 			connectionInfo.httpClient.start();
 			connectionInfo.httpClient.execute(httpPost, new FutureCallback<HttpResponse>() {
 				public void completed(final HttpResponse response) {
@@ -181,30 +254,64 @@ public class SceneController {
 								e.printStackTrace();
 							}
 							if(responseStr != "") {
-								// show result table
-								TableView<Map> tableView = new TableView<>();
-								JSONObject object = JSONObject.parseObject(responseStr);
-								JSONArray attributeArr = (JSONArray) object.get("attributes");
-								for(Object attribute:attributeArr) {
-									TableColumn<Map, String> column = new TableColumn<Map, String>((String)attribute);
-									column.setCellValueFactory(new MapValueFactory<String>((String)attribute));
-									tableView.getColumns().add(column);
-								}
-								JSONArray rowArr = (JSONArray) object.get("rows");
-								ObservableList<Map> data = FXCollections.observableArrayList();
-								for(Object row:rowArr) {
-									Map<String, String> map = new HashMap<>();
-									int i = 0;
+								if(printResult) {
+									// show result table
+									TableView<Map> tableView = new TableView<>();
+									JSONObject object = JSONObject.parseObject(responseStr);
+									JSONArray attributeArr = (JSONArray) object.get("attributes");
 									for(Object attribute:attributeArr) {
-										map.put((String)attribute,((JSONObject)row).get((String)attribute).toString());
+										TableColumn<Map, String> column = new TableColumn<Map, String>((String)attribute);
+										column.setCellValueFactory(new MapValueFactory<String>((String)attribute));
+										tableView.getColumns().add(column);
 									}
-									data.add(map);
+									JSONArray rowArr = (JSONArray) object.get("rows");
+									ObservableList<Map> data = FXCollections.observableArrayList();
+									for(Object row:rowArr) {
+										Map<String, String> map = new HashMap<>();
+										int i = 0;
+										for(Object attribute:attributeArr) {
+											map.put((String)attribute,((JSONObject)row).get((String)attribute).toString());
+										}
+										data.add(map);
+									}
+									tableView.setItems(data);
+									resultScroll.setContent(tableView);
+									// show execution time
+									float time = object.getFloatValue("time");
+									bottomLabel.setText(String.format("execution time:%f", time));
 								}
-								tableView.setItems(data);
-								resultScroll.setContent(tableView);
-								// show execution time
-								float time = object.getFloatValue("time");
-								bottomLabel.setText(String.format("execution time:%f", time));
+								else {
+									// save to file
+									try {
+										File f = new File(resultFilePath);
+										FileWriter writer = new FileWriter(f);
+
+										JSONObject object = JSONObject.parseObject(responseStr);
+										JSONArray attributeArr = (JSONArray) object.get("attributes");
+										// attribute header
+										for(Object attribute:attributeArr) {
+											writer.write((String)attribute + "\t");
+										}
+										writer.write("\n");
+										// records
+										JSONArray rowArr = (JSONArray) object.get("rows");
+										ObservableList<Map> data = FXCollections.observableArrayList();
+										for(Object row:rowArr) {
+											for(Object attribute:attributeArr) {
+												writer.write(((JSONObject)row).get((String)attribute).toString() + "\t");											
+											}
+											writer.write("\n");
+										}
+										float time = object.getFloatValue("time");
+										writer.write(String.format("execution time:%f", time));
+										writer.close();
+										// show execution time
+										bottomLabel.setText(String.format("execution time:%f", time));
+									} catch (Exception e) {
+										// TODO: handle exception
+									}
+								}
+								
 							}
 						}
 					}
@@ -233,10 +340,12 @@ public class SceneController {
 							}
 						}
 					}
+					inExecution = false;
                 }
 
                 public void failed(final Exception ex) {
                 	// connection failed
+                	inExecution = false;
 					Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
 					information.setTitle("error"); 
 					information.setHeaderText("Error!");	
@@ -245,6 +354,7 @@ public class SceneController {
 
                 public void cancelled() {
                 	// connection failed
+                	inExecution = false;
 					Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
 					information.setTitle("error"); 
 					information.setHeaderText("Error!");	
@@ -253,6 +363,7 @@ public class SceneController {
 			});
 		} catch (Exception e) {
 			// connection failed
+			inExecution = false;
 			Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
 			information.setTitle("error"); 
 			information.setHeaderText("Error!");	
