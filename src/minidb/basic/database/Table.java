@@ -500,6 +500,32 @@ public class Table implements Serializable{
 		return rows;
 	}
 
+	public static Result queryJT(boolean isStar, HashMap<String, Table> tables, List<Pair<String, String>> cnames,
+			List<Pair<String, Integer>> jnames, List<Pair<Pair<String, String>, Pair<String, String>>> onConditions,
+			boolean existWhere, CLogicTree lt) throws ClassNotFoundException, IOException {
+		Result res;
+		if(existWhere) {
+			if(lt.isLeaf) {
+				res=(QueryResult) Table.queryJ(isStar,tables,cnames,jnames,onConditions,existWhere,lt.isImme,lt.cdNameP,lt.cdValue,lt.cdNamerP,lt.op);
+				return res;
+			}
+			else {
+				QueryResult resa=(QueryResult) queryJT(isStar,tables,cnames,jnames,onConditions,existWhere,lt.ltree);
+				QueryResult resb=(QueryResult) queryJT(isStar,tables,cnames,jnames,onConditions,existWhere,lt.rtree);
+				res=combineQResJ(resa,resb,lt.lop);
+				return res;
+			}
+		}
+		else {
+			res= Table.queryJ(isStar,tables,cnames,jnames,onConditions,existWhere,true,null,"",null,0);
+			return res;
+		}
+
+	}
+
+
+
+
 	@SuppressWarnings("unchecked")
 	public static Result queryJ(Boolean isStar,HashMap<String, Table> tables, List<Pair<String, String>> cnames, List<Pair<String, Integer>> jnames,
 			List<Pair<Pair<String, String>, Pair<String, String>>> onConditions, boolean existWhere, boolean isImme,
@@ -773,16 +799,50 @@ public class Table implements Serializable{
 			return res;
 		}
 	}
+	private static QueryResult combineQResJ(QueryResult resa, QueryResult resb, int lop) {
+		ArrayList<LinkedHashMap<String,Object>> res=new ArrayList<LinkedHashMap<String,Object>>();
+		QueryResult qr=new QueryResult();
+		if(lop==LogicTree.and) {
+			Set<LinkedHashMap<String,Object>> map =new HashSet();
+			for(LinkedHashMap rec:resa.data) {
+				map.add(rec);
+			}
+			for(LinkedHashMap<String,Object> rec:resb.data) {
+				if(map.contains(rec)) {
+					res.add(rec);
+				}
+			}
+			qr.data=res;
+			qr.types=resa.types;
+			return qr;
+		}
+		if(lop==LogicTree.or) {
+			Set<LinkedHashMap<String,Object>> set =new HashSet();
+			for(LinkedHashMap<String,Object> rec:resa.data) {
+				set.add(rec);
+			}
+			for(LinkedHashMap<String,Object> rec:resb.data) {
+				set.add(rec);
+			}
+			for(LinkedHashMap<String,Object> rec:set) {
+				res.add(rec);
+			}
+			qr.data=res;
+			qr.types=resa.types;
+			return qr;
+		}
+		return qr;
+	}
 	private QueryResult combineQRes(QueryResult resa, QueryResult resb, int lop) {
 		ArrayList<LinkedHashMap<String,Object>> res=new ArrayList<LinkedHashMap<String,Object>>();
 		QueryResult qr=new QueryResult();
 		if(lop==LogicTree.and) {
-			HashMap<Object,Object> map =new HashMap<Object,Object>();
+			Set<Object> map =new HashSet();
 			for(LinkedHashMap<String,Object> rec:resa.data) {
-				map.put(rec.get(this.schema.primaryKey), null);
+				map.add(rec.get(this.schema.primaryKey));
 			}
 			for(LinkedHashMap<String,Object> rec:resb.data) {
-				if(map.containsKey(rec.get(this.schema.primaryKey))) {
+				if(map.contains(rec.get(this.schema.primaryKey))) {
 					res.add(rec);
 				}
 			}
@@ -1528,7 +1588,6 @@ public class Table implements Serializable{
 		}
 		return pairs;
 	}
-
 
 
 }

@@ -1,3 +1,4 @@
+import minidb.basic.database.CLogicTree;
 import minidb.basic.database.LogicTree;
 import minidb.basic.database.Pair;
 import minidb.basic.database.SchemaDescriptor;
@@ -66,22 +67,12 @@ public class MyListener extends MiniSQLBaseListener {
 		st=(Statement) ssb;
 		
 		ssb.existWhere=false;
-		ssb.isImme=true;
-		if(ctx.ccondition() != null) {
+
+		if(ctx.clogictree()!=null) {
 			ssb.existWhere=true;
-			if(ctx.ccondition().value()!=null) {
-				ssb.isImme=true;
-				ssb.cdNameP=new Pair<String,String>(ctx.ccondition().cname(0).Name(0).getText(),ctx.ccondition().cname(0).Name(1).getText());
-				ssb.cdValue=ctx.ccondition().value().getText();
-			}
-			else {
-				ssb.isImme=false;
-				ssb.cdNameP=new Pair<String,String>(ctx.ccondition().cname(0).Name(0).getText(),ctx.ccondition().cname(0).Name(1).getText());
-				ssb.cdNamerP=new Pair<String,String>(ctx.ccondition().cname(1).Name(0).getText(),ctx.ccondition().cname(1).Name(1).getText());
-			}
-			String op=ctx.ccondition().op().getText();
-			ssb.op=Statement.opFromString(op);
+			ssb.lt=parseclt(ctx.clogictree());
 		}
+
 		
 		if(ctx.cnames()!=null) {
 			ssb.isStar=false;
@@ -142,7 +133,42 @@ public class MyListener extends MiniSQLBaseListener {
 			ssa.isStar=true;
 		}
 	}
-	
+
+	private CLogicTree parseclt(MiniSQLParser.ClogictreeContext logicTree) {
+		CLogicTree lt=new CLogicTree();
+		lt.isLeaf=false;
+		if(logicTree.ccondition()!=null) {
+			lt.isLeaf=true;
+
+			if(logicTree.ccondition().value()!=null) {
+				lt.isImme=true;
+				lt.cdNameP=new Pair<String,String>(logicTree.ccondition().cname(0).Name(0).getText(),logicTree.ccondition().cname(0).Name(1).getText());
+				lt.cdValue=logicTree.ccondition().value().getText();
+			}
+			else {
+				lt.isImme=false;
+				lt.cdNameP=new Pair<String,String>(logicTree.ccondition().cname(0).Name(0).getText(),logicTree.ccondition().cname(0).Name(1).getText());
+				lt.cdNamerP=new Pair<String,String>(logicTree.ccondition().cname(1).Name(0).getText(),logicTree.ccondition().cname(1).Name(1).getText());
+			}
+			String op=logicTree.ccondition().op().getText();
+			lt.op=Statement.opFromString(op);
+
+			return lt;
+		}
+		else {
+			lt.ltree=parseclt(logicTree.clogictree(0));
+			lt.rtree=parseclt(logicTree.clogictree(1));
+			if(logicTree.lop().getText().equalsIgnoreCase("and")) {
+				lt.lop=LogicTree.and;
+			}
+			else {
+				lt.lop=LogicTree.or;
+			}
+			return lt;
+		}
+	}
+
+
 	private LogicTree parselt(MiniSQLParser.LogictreeContext logicTree) {
 		LogicTree lt=new LogicTree();
 		lt.isLeaf=false;
@@ -174,6 +200,7 @@ public class MyListener extends MiniSQLBaseListener {
 			return lt;
 		}
 	}
+
 	@Override 
 	public void enterInsertB(MiniSQLParser.InsertBContext ctx) {
 		StatementInsertB sib=new StatementInsertB();

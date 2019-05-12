@@ -19,14 +19,10 @@ public class StatementSelectB extends Statement {
 	public List<Pair<Pair<String,String>,Pair<String,String>>> onConditions;
 	public List<Pair<String,Integer>> jnames;
 	
-	
-	public boolean existWhere;
 	public boolean isStar;
-	public Pair<String,String> cdNameP;
-	public String cdValue;
-	public Pair<String,String> cdNamerP;
-	public boolean isImme;
-	public int op;
+	public boolean existWhere;
+	public CLogicTree lt;
+	
 	
 	public StatementSelectB() {
 		this.type=Statement.selectB;

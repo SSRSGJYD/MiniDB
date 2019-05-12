@@ -122,7 +122,7 @@ public class DataBase{
 			break;
 		case Statement.selectB:
 			StatementSelectB slb=(StatementSelectB) st;
-			res=Table.queryJ(slb.isStar,tables,slb.cnames,slb.jnames,slb.onConditions,slb.existWhere,slb.isImme,slb.cdNameP,slb.cdValue,slb.cdNamerP,slb.op);
+			res=Table.queryJT(slb.isStar,tables,slb.cnames,slb.jnames,slb.onConditions,slb.existWhere,slb.lt);
 			break;
 
 		case Statement.update:

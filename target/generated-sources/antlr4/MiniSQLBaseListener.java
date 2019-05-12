@@ -220,6 +220,18 @@ public class MiniSQLBaseListener implements MiniSQLListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterClogictree(@NotNull MiniSQLParser.ClogictreeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitClogictree(@NotNull MiniSQLParser.ClogictreeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterJoin(@NotNull MiniSQLParser.JoinContext ctx) { }
 	/**
 	 * {@inheritDoc}

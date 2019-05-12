@@ -2,6 +2,8 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
@@ -11,7 +13,6 @@ import minidb.result.Result;
 
 public class SQLParser{
 	
-
 	public static void main( String[] args) throws Exception 
 	{
 		String cmds="create database db\n"
@@ -34,13 +35,12 @@ public class SQLParser{
 //
 //				+ "select * from playr\n"
 //				+ "select * from playr where (name>100 or name <400) and id>='1333'\n"
-				+ "select * from playr full outer join playt on playr.name=playt.name\n"
+				+ "select * from playr join playt on playr.name=playt.name where playt.name>100 or playt.id<40\n"
 //				+ "                    join playd on playd.name=playr.name\n"
 
 				+ "drop table playr\n"
 				+ "drop table playd\n"
 				+ "drop table playt\n";
-
 
 		InputStream targetStream = new ByteArrayInputStream(cmds.getBytes());
 		InputStreamReader in=new InputStreamReader(targetStream);

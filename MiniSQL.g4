@@ -34,7 +34,7 @@ sql : 'create table' Name '(' schema ')' #create
     | 'insert into' Name '(' names ')' 'values' '(' values ')' #insertB
     | 'delete from' Name 'where' logictree #delete
     | 'update' Name 'set' set 'where' logictree #update
-    | 'select' (cnames|'*') 'from' jnames  ('where' ccondition)? #selectB
+    | 'select' (cnames|'*') 'from' jnames  ('where' clogictree )? #selectB
     | 'select' (names|'*') 'from' Name ('where' logictree)? #selectA
     | 'create database' Name #createdb
     | 'drop database' Name #dropdb
@@ -47,6 +47,11 @@ sql : 'create table' Name '(' schema ')' #create
 logictree : logictree lop logictree 
 	| '('logictree lop logictree ')'
 	| condition  
+	; 
+
+clogictree : clogictree lop clogictree 
+	| '('clogictree lop clogictree ')'
+	| ccondition  
 	; 
 
 
