@@ -25,7 +25,7 @@
           </Menu>
         </menus>
       </MenuBar>
-      <VBox minHeight="570.0" minWidth="940.0" prefHeight="570.0" prefWidth="940.0">
+      <VBox minHeight="570.0" minWidth="940.0" prefHeight="655.0" prefWidth="1069.0">
          <children>
             <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="535.0" minWidth="940.0" prefHeight="535.0" prefWidth="940.0">
                <children>
@@ -51,16 +51,20 @@
                                                 </TextArea>
                                                 <ToolBar prefHeight="40.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                                                    <items>
-                                                      <Button id="executeBtn" fx:id="executeBtn" mnemonicParsing="false" onAction="#execute" text="Execute">
-                                                         <font>
-                                                            <Font size="14.0" />
-                                                         </font>
-                                                      </Button>
                                                       <Button id="clearBtn" fx:id="clearBtn" mnemonicParsing="false" onAction="#clear" text="Clear">
                                                          <font>
                                                             <Font size="14.0" />
                                                          </font>
                                                       </Button>
+                                                      <Button id="executeBtn" fx:id="executeBtn" mnemonicParsing="false" onAction="#execute" text="Execute">
+                                                         <font>
+                                                            <Font size="14.0" />
+                                                         </font>
+                                                      </Button>
+                                                      <RadioButton fx:id="printResultRadio" mnemonicParsing="false" text="print result" />
+                                                      <RadioButton fx:id="saveResultRadio" mnemonicParsing="false" text="save result to file" />
+                                                      <Button fx:id="resultPathBtn" mnemonicParsing="false" onAction="#choosePath" text="choose path" />
+                                                      <TextField fx:id="resultPath" editable="false" />
                                                    </items>
                                                 </ToolBar>
                                              </children>
