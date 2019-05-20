@@ -10,7 +10,7 @@ NEWLINE:'\r'?'\n'
 
 type : 'int'
      | 'long'
-     | 'float'
+     | 'flot'
      | 'double'
      | 'char' '(' Number ')' 
      ;
