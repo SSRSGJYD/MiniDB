@@ -1,0 +1,26 @@
+create database db
+use database db
+
+create table playr(id char(4),name int)
+create table playt(id int,name int,primary key(id))
+create table playd(id int,name int,primary key(id))
+
+insert into playr values('1332',90)
+insert into playr values('1333',390)
+insert into playr values('1333',990)
+
+insert into playt values(133,90)
+insert into playt(id) values(134)
+insert into playt values(13,990)
+
+insert into playd values(133,90)
+insert into playd(id) values(134)
+insert into playd values(13,990)
+
+select * from playr
+select * from playt
+select * from playd
+
+drop table playr
+drop table playd
+drop table playt
