@@ -18,4 +18,5 @@ main = do
   mapM_ (deleteOne h) [1,3..100]
   hPutStrLn h "select * from play where name>50 and name<=60"
   hPutStrLn h "drop table play"
+  hClose h
 
