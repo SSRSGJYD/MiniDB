@@ -591,6 +591,7 @@ public class BPlusTree<K extends Key, V extends Value> {
             // create a new root
             BPlusTreeNode<K,V> childNode = this.root;
             BPlusTreeInternalNode<K,V> node = createInternalNode(getFreeSlot());
+            node.setNodeType(BPlusTreeConst.NODE_TYPE_ROOT_INTERNAL);
             node.ptrList.add(0, childNode.getPageIndex());
             this.root = node;
             // split old root node
@@ -1218,20 +1219,17 @@ public class BPlusTree<K extends Key, V extends Value> {
         }
         // update prev and next pointer
         left.setNextPageIndex(right.getNextPageIndex());
+        // update pointer in parent
+        fixTheTopPointer(other, parent, parentPointerIndex,
+                parentKeyIndex, isLeftOfNext, useNextPointer);
         if(right.getNextPageIndex() != -1) {
             BPlusTreeLeafNode<K,V> next = (BPlusTreeLeafNode<K,V>)readNodeFromFile(right.getNextPageIndex());
             next.setPrevPageIndex(left.getPageIndex());
             writeNodeToFile(next);
         }
-        // update pointer in parent
-        fixTheTopPointer(other, parent, parentPointerIndex,
-                parentKeyIndex, isLeftOfNext, useNextPointer);
         // release the page slot of right node
         right.setValid(false);
         releasePage(right.getPageIndex());
-        // now fix the top pointer
-        fixTheTopPointer(other, parent, parentPointerIndex,
-                parentKeyIndex, isLeftOfNext, useNextPointer);
         // update
         parent.decreaseCapacity();
         writeNodeToFile(parent);
@@ -1531,8 +1529,15 @@ public class BPlusTree<K extends Key, V extends Value> {
     private BPlusTreeNode<K,V> adjustLeafNode(BPlusTreeLeafNode<K,V> node, BPlusTreeInternalNode<K,V> parent,
                                                   int parentPointerIndex, int parentKeyIndex)
             throws IOException {
-        BPlusTreeLeafNode<K,V> leftBrother = (BPlusTreeLeafNode<K,V>)readNodeFromFile(parent.ptrList.get(parentPointerIndex-1));
-        BPlusTreeLeafNode<K,V> rightBrother = (BPlusTreeLeafNode<K,V>)readNodeFromFile(parent.ptrList.get(parentPointerIndex+1));
+    	
+        BPlusTreeLeafNode<K,V> leftBrother = null;
+        BPlusTreeLeafNode<K,V> rightBrother = null;
+        if(0 <= parentPointerIndex-1 && parentPointerIndex-1 < parent.ptrList.size()) {
+        	leftBrother = (BPlusTreeLeafNode<K,V>)readNodeFromFile(parent.ptrList.get(parentPointerIndex-1));
+        }
+        if(0 <= parentPointerIndex+1 && parentPointerIndex+1 < parent.ptrList.size()) {
+        	rightBrother = (BPlusTreeLeafNode<K,V>)readNodeFromFile(parent.ptrList.get(parentPointerIndex+1));
+        }
         boolean canRedistributeCurrent = canRedistribute(node);
         boolean canRedistributeLeftBrother = canRedistribute(leftBrother);
         boolean canRedistributeRightBrother = canRedistribute(rightBrother);
