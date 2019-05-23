@@ -1463,9 +1463,16 @@ public class BPlusTree<K extends Key, V extends Value> {
     private BPlusTreeNode<K,V> adjustInternalNode(BPlusTreeInternalNode<K,V> node, BPlusTreeInternalNode<K,V> parent,
                                                   int parentPointerIndex, int parentKeyIndex)
             throws IOException {
-        BPlusTreeInternalNode<K,V> leftBrother = (BPlusTreeInternalNode<K,V>)readNodeFromFile(parent.ptrList.get(parentPointerIndex-1));
-        BPlusTreeInternalNode<K,V> rightBrother = (BPlusTreeInternalNode<K,V>)readNodeFromFile(parent.ptrList.get(parentPointerIndex+1));
-        boolean canRedistributeCurrent = canRedistribute(node);
+    	BPlusTreeInternalNode<K,V> leftBrother = null;
+    	BPlusTreeInternalNode<K,V> rightBrother = null;
+        if(0 <= parentPointerIndex-1 && parentPointerIndex-1 < parent.ptrList.size()) {
+        	leftBrother = (BPlusTreeInternalNode<K,V>)readNodeFromFile(parent.ptrList.get(parentPointerIndex-1));
+        }
+        if(0 <= parentPointerIndex+1 && parentPointerIndex+1 < parent.ptrList.size()) {
+        	rightBrother = (BPlusTreeInternalNode<K,V>)readNodeFromFile(parent.ptrList.get(parentPointerIndex+1));
+        }
+        
+    	boolean canRedistributeCurrent = canRedistribute(node);
         boolean canRedistributeLeftBrother = canRedistribute(leftBrother);
         boolean canRedistributeRightBrother = canRedistribute(rightBrother);
 
