@@ -21,6 +21,7 @@ import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
@@ -45,6 +46,11 @@ public class ConnectionDialogController {
 	private Button connectBtn;
 	@FXML
 	private TextField portTextField;
+	
+	public void initialize() {
+		ipTextField.setText("127.0.0.1");
+		portTextField.setText("8080");
+	}
 	
 	public Stage getStage() {
 		return this.stage;
@@ -93,46 +99,74 @@ public class ConnectionDialogController {
 			httpClient.execute(httpPost, new FutureCallback<HttpResponse>() {
 				public void completed(final HttpResponse response) {
 					if(response.getStatusLine().getStatusCode() == 200) {
-						// login success
-					    connectionInfo.httpClient = httpClient;
-					    connectionInfo.requestConfig = requestConfig;
-					    connectionInfo.context = context;
-					    connectionInfo.baseURL = baseURL;
-					    connectionInfo.username = usernameTextField.getText();
-					    connectionInfo.password = passwordTextField.getText();
-					    // receive schemas and update treeView
-						try {
-							schemas.set(EntityUtils.toString(response.getEntity(), "utf-8"));
-						} catch (ParseException | IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						
-					    stage.close();
+						Platform.runLater(new Runnable() {
+						    @Override
+						    public void run() {
+						        //更新JavaFX的主线程的代码放在此处
+								// login success
+							    connectionInfo.httpClient = httpClient;
+							    connectionInfo.requestConfig = requestConfig;
+							    connectionInfo.context = context;
+							    connectionInfo.baseURL = baseURL;
+							    connectionInfo.username = usernameTextField.getText();
+							    connectionInfo.password = passwordTextField.getText();
+							    // receive schemas and update treeView
+								try {
+									schemas.set(EntityUtils.toString(response.getEntity(), "utf-8"));
+								} catch (ParseException | IOException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+								
+							    stage.close();
+						    }
+						});
+
 					}
 					else {
-						// login failed
-						Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
-						information.setTitle("error"); 
-						information.setHeaderText("Error!");	
-						information.show();
+						Platform.runLater(new Runnable() {
+						    @Override
+						    public void run() {
+						        //更新JavaFX的主线程的代码放在此处
+						    	// login failed
+								Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
+								information.setTitle("error"); 
+								information.setHeaderText("Error!");	
+								information.show();
+						    }
+						});
+						
 					}
                 }
 
                 public void failed(final Exception ex) {
-                	// login failed
-					Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
-					information.setTitle("error"); 
-					information.setHeaderText("Error!");	
-					information.show();
+                	Platform.runLater(new Runnable() {
+                	    @Override
+                	    public void run() {
+                	        //更新JavaFX的主线程的代码放在此处
+                	    	// login failed
+        					Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
+        					information.setTitle("error"); 
+        					information.setHeaderText("Error!");	
+        					information.show();
+                	    }
+                	});
+                	
                 }
 
                 public void cancelled() {
-                	// login failed
-					Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
-					information.setTitle("error"); 
-					information.setHeaderText("Error!");	
-					information.show();
+                	Platform.runLater(new Runnable() {
+                	    @Override
+                	    public void run() {
+                	        //更新JavaFX的主线程的代码放在此处
+                	    	// login failed
+        					Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
+        					information.setTitle("error"); 
+        					information.setHeaderText("Error!");	
+        					information.show();
+                	    }
+                	});
+                	
                 }
 			});
 		} 
