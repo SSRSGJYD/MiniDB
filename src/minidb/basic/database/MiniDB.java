@@ -10,11 +10,27 @@ import minidb.result.Result;
 
 public class MiniDB {
 	HashMap<String,DataBase> dbs;
+	HashMap<String,User> users;
 	DataBase current;
+	User curUser;
 	
 	public MiniDB(){
 		dbs=new HashMap<String,DataBase>();
+		curUser=new User("root","root");
 	}
+	
+	public void createUser(String un,String pw) {
+		users.put(un, new User(un,pw));
+	}
+	public boolean login(String un,String pw) {
+		User user=users.get(un);
+		if(user.password==pw) {
+			curUser=user;
+			return true;
+		}
+		return false;
+	}
+
 
 	public Result execute(Statement st) throws IOException, ClassNotFoundException {
 		Result res = null;
@@ -24,9 +40,15 @@ public class MiniDB {
 			case StatementDB.create:
 				DataBase db=new DataBase(sdb.dbName);
 				dbs.put(sdb.dbName, db);
+				if(this.curUser.isRoot)
+					this.curUser.grantDB(sdb.dbName);
 				res=new BoolResult();
 				break;
 			case StatementDB.drop:
+				if(!curUser.isGrantedDB(sdb.dbName)) {
+					res=new BoolResult(false);
+					return res;
+				}
 				if(!dbs.containsKey(sdb.dbName)) {
 					throw new IllegalArgumentException("database not exist");
 				}
@@ -34,6 +56,11 @@ public class MiniDB {
 				res=new BoolResult();
 				break;
 			case StatementDB.use:
+				if(!curUser.isGrantedDB(sdb.dbName)) {
+					res=new BoolResult(false);
+					return res;
+				}
+
 				if(!dbs.containsKey(sdb.dbName)) {
 					throw new IllegalArgumentException("database not exist");
 				}

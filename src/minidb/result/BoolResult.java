@@ -5,7 +5,10 @@ public class BoolResult extends Result {
 	public BoolResult() {
 		this.isOk=true;
 	}
-	void setFalse() {
+	public BoolResult(boolean res) {
+		this.isOk=res;
+	}
+	public void setFalse() {
 		this.isOk=false;
 	}
 	@Override
