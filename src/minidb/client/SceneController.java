@@ -20,6 +20,7 @@ import org.apache.http.util.EntityUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -244,121 +245,144 @@ public class SceneController {
 			connectionInfo.httpClient.execute(httpPost, new FutureCallback<HttpResponse>() {
 				public void completed(final HttpResponse response) {
 					if(response.getStatusLine().getStatusCode() == 200) {
-						// execute success
-						HttpEntity entity = response.getEntity();
-						if(entity != null) { 
-							String responseStr = null;
-							try {
-								responseStr = EntityUtils.toString(entity);
-							} catch (ParseException | IOException e) {
-								e.printStackTrace();
-							}
-							if(responseStr != "") {
-								if(printResult) {
-									// show result table
-									TableView<Map> tableView = new TableView<>();
-									JSONObject object = JSONObject.parseObject(responseStr);
-									JSONArray attributeArr = (JSONArray) object.get("attributes");
-									for(Object attribute:attributeArr) {
-										TableColumn<Map, String> column = new TableColumn<Map, String>((String)attribute);
-										column.setCellValueFactory(new MapValueFactory<String>((String)attribute));
-										tableView.getColumns().add(column);
-									}
-									JSONArray rowArr = (JSONArray) object.get("rows");
-									ObservableList<Map> data = FXCollections.observableArrayList();
-									for(Object row:rowArr) {
-										Map<String, String> map = new HashMap<>();
-										int i = 0;
-										for(Object attribute:attributeArr) {
-											map.put((String)attribute,((JSONObject)row).get((String)attribute).toString());
-										}
-										data.add(map);
-									}
-									tableView.setItems(data);
-									resultScroll.setContent(tableView);
-									// show execution time
-									float time = object.getFloatValue("time");
-									bottomLabel.setText(String.format("execution time:%f", time));
-								}
-								else {
-									// save to file
+						Platform.runLater(new Runnable() {
+						    @Override
+						    public void run() {
+						        //更新JavaFX的主线程的代码放在此处
+						    	// execute success
+								HttpEntity entity = response.getEntity();
+								if(entity != null) { 
+									String responseStr = null;
 									try {
-										File f = new File(resultFilePath);
-										FileWriter writer = new FileWriter(f);
-
-										JSONObject object = JSONObject.parseObject(responseStr);
-										JSONArray attributeArr = (JSONArray) object.get("attributes");
-										// attribute header
-										for(Object attribute:attributeArr) {
-											writer.write((String)attribute + "\t");
-										}
-										writer.write("\n");
-										// records
-										JSONArray rowArr = (JSONArray) object.get("rows");
-										ObservableList<Map> data = FXCollections.observableArrayList();
-										for(Object row:rowArr) {
+										responseStr = EntityUtils.toString(entity);
+									} catch (ParseException | IOException e) {
+										e.printStackTrace();
+									}
+									if(responseStr != "") {
+										if(printResult) {
+											// show result table
+											TableView<Map> tableView = new TableView<>();
+											JSONObject object = JSONObject.parseObject(responseStr);
+											JSONArray attributeArr = (JSONArray) object.get("attributes");
 											for(Object attribute:attributeArr) {
-												writer.write(((JSONObject)row).get((String)attribute).toString() + "\t");											
+												TableColumn<Map, String> column = new TableColumn<Map, String>((String)attribute);
+												column.setCellValueFactory(new MapValueFactory<String>((String)attribute));
+												tableView.getColumns().add(column);
 											}
-											writer.write("\n");
+											JSONArray rowArr = (JSONArray) object.get("rows");
+											ObservableList<Map> data = FXCollections.observableArrayList();
+											for(Object row:rowArr) {
+												Map<String, String> map = new HashMap<>();
+												int i = 0;
+												for(Object attribute:attributeArr) {
+													map.put((String)attribute,((JSONObject)row).get((String)attribute).toString());
+												}
+												data.add(map);
+											}
+											tableView.setItems(data);
+											resultScroll.setContent(tableView);
+											// show execution time
+											float time = object.getFloatValue("time");
+											bottomLabel.setText(String.format("execution time:%f", time));
 										}
-										float time = object.getFloatValue("time");
-										writer.write(String.format("execution time:%f", time));
-										writer.close();
-										// show execution time
-										bottomLabel.setText(String.format("execution time:%f", time));
-									} catch (Exception e) {
-										// TODO: handle exception
+										else {
+											// save to file
+											try {
+												File f = new File(resultFilePath);
+												FileWriter writer = new FileWriter(f);
+
+												JSONObject object = JSONObject.parseObject(responseStr);
+												JSONArray attributeArr = (JSONArray) object.get("attributes");
+												// attribute header
+												for(Object attribute:attributeArr) {
+													writer.write((String)attribute + "\t");
+												}
+												writer.write("\n");
+												// records
+												JSONArray rowArr = (JSONArray) object.get("rows");
+												ObservableList<Map> data = FXCollections.observableArrayList();
+												for(Object row:rowArr) {
+													for(Object attribute:attributeArr) {
+														writer.write(((JSONObject)row).get((String)attribute).toString() + "\t");											
+													}
+													writer.write("\n");
+												}
+												float time = object.getFloatValue("time");
+												writer.write(String.format("execution time:%f", time));
+												writer.close();
+												// show execution time
+												bottomLabel.setText(String.format("execution time:%f", time));
+											} catch (Exception e) {
+												// TODO: handle exception
+											}
+										}
 									}
 								}
-								
-							}
-						}
+						    }
+						});
 					}
 					else {
 						// execute failed
-						HttpEntity entity = response.getEntity();
-						if(entity != null) { 
-							String responseStr = null;
-							try {
-								responseStr = EntityUtils.toString(entity);
-							} catch (ParseException | IOException e) {
-								e.printStackTrace();
-							}
-							if(responseStr != "") {
-								JSONObject object = JSONObject.parseObject(responseStr);
-								String errorMsg = object.getString("msg");
-								// show error msg in result area
-								TextArea area = new TextArea();
-								area.setText(errorMsg);
-								resultScroll.setContent(area);
-								// show error msg in alert dialog
-								Alert information = new Alert(Alert.AlertType.ERROR, errorMsg);
-								information.setTitle("error"); 
-								information.setHeaderText("Error!");	
-								information.show();
-							}
-						}
+						Platform.runLater(new Runnable() {
+						    @Override
+						    public void run() {
+						        //更新JavaFX的主线程的代码放在此处
+						    	HttpEntity entity = response.getEntity();
+								if(entity != null) { 
+									String responseStr = null;
+									try {
+										responseStr = EntityUtils.toString(entity);
+									} catch (ParseException | IOException e) {
+										e.printStackTrace();
+									}
+									if(responseStr != "") {
+										JSONObject object = JSONObject.parseObject(responseStr);
+										String errorMsg = object.getString("msg");
+										// show error msg in result area
+										TextArea area = new TextArea();
+										area.setText(errorMsg);
+										resultScroll.setContent(area);
+										// show error msg in alert dialog
+										Alert information = new Alert(Alert.AlertType.ERROR, errorMsg);
+										information.setTitle("error"); 
+										information.setHeaderText("Error!");	
+										information.show();
+									}
+								}
+						    }
+						});
 					}
 					inExecution = false;
                 }
 
                 public void failed(final Exception ex) {
                 	// connection failed
-                	inExecution = false;
-					Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
-					information.setTitle("error"); 
-					information.setHeaderText("Error!");	
-					information.show();
+                	Platform.runLater(new Runnable() {
+                	    @Override
+                	    public void run() {
+                	        //更新JavaFX的主线程的代码放在此处
+                	    	inExecution = false;
+        					Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
+        					information.setTitle("error"); 
+        					information.setHeaderText("Error!");	
+        					information.show();
+                	    }
+                	});
                 }
 
                 public void cancelled() {
                 	// connection failed
-                	inExecution = false;
-					Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
-					information.setTitle("error"); 
-					information.setHeaderText("Error!");	
-					information.show();
+                	Platform.runLater(new Runnable() {
+                	    @Override
+                	    public void run() {
+                	        //更新JavaFX的主线程的代码放在此处
+                	    	inExecution = false;
+        					Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
+        					information.setTitle("error"); 
+        					information.setHeaderText("Error!");	
+        					information.show();
+                	    }
+                	});
                 }
 			});
 		} catch (Exception e) {
