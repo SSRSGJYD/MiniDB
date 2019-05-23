@@ -47,6 +47,11 @@ public class ConnectionDialogController {
 	@FXML
 	private TextField portTextField;
 	
+	public void initialize() {
+		ipTextField.setText("127.0.0.1");
+		portTextField.setText("8080");
+	}
+	
 	public Stage getStage() {
 		return this.stage;
 	}

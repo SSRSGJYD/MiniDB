@@ -420,6 +420,7 @@ public class SceneController {
         controller.setStage(connectionStage);
         controller.setConnectionInfo(connectionInfo);
         controller.setSchemas(schemas);
+        controller.initialize();
         connectionStage.show();
 	}
 	
