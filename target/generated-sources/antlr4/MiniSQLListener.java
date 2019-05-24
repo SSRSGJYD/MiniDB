@@ -30,6 +30,16 @@ public interface MiniSQLListener extends ParseTreeListener {
 	 */
 	void exitJnames(@NotNull MiniSQLParser.JnamesContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link MiniSQLParser#perm}.
+	 * @param ctx the parse tree
+	 */
+	void enterPerm(@NotNull MiniSQLParser.PermContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MiniSQLParser#perm}.
+	 * @param ctx the parse tree
+	 */
+	void exitPerm(@NotNull MiniSQLParser.PermContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link MiniSQLParser#logictree}.
 	 * @param ctx the parse tree
 	 */
@@ -41,13 +51,13 @@ public interface MiniSQLListener extends ParseTreeListener {
 	void exitLogictree(@NotNull MiniSQLParser.LogictreeContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code values}
-	 * labeled alternative in {@link MiniSQLParser#sqlsqlsqlsqlsqlsqlsqlsqlsqlschemasqlattributesqlsqlsqlattributesqlsqlsqlconstraint}.
+	 * labeled alternative in {@link MiniSQLParser#sqlsqlsqlsqlsqlsqlsqlsqlsqlschemasqlattributesqlsqlsqlattributesqlsqlsqlsqlconstraint}.
 	 * @param ctx the parse tree
 	 */
 	void enterValues(@NotNull MiniSQLParser.ValuesContext ctx);
 	/**
 	 * Exit a parse tree produced by the {@code values}
-	 * labeled alternative in {@link MiniSQLParser#sqlsqlsqlsqlsqlsqlsqlsqlsqlschemasqlattributesqlsqlsqlattributesqlsqlsqlconstraint}.
+	 * labeled alternative in {@link MiniSQLParser#sqlsqlsqlsqlsqlsqlsqlsqlsqlschemasqlattributesqlsqlsqlattributesqlsqlsqlsqlconstraint}.
 	 * @param ctx the parse tree
 	 */
 	void exitValues(@NotNull MiniSQLParser.ValuesContext ctx);
@@ -395,6 +405,18 @@ public interface MiniSQLListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitNormalattr(@NotNull MiniSQLParser.NormalattrContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code createUser}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
+	 * @param ctx the parse tree
+	 */
+	void enterCreateUser(@NotNull MiniSQLParser.CreateUserContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code createUser}
+	 * labeled alternative in {@link MiniSQLParser#sql}.
+	 * @param ctx the parse tree
+	 */
+	void exitCreateUser(@NotNull MiniSQLParser.CreateUserContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code createdb}
 	 * labeled alternative in {@link MiniSQLParser#sql}.

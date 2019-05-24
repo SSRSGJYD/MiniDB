@@ -17,4 +17,4 @@ delete from play where name=5
 delete from play where name=7
 delete from play where name=9
 select * from play
-drop table play
+drop database db

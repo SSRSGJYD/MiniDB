@@ -24,6 +24,7 @@ public class User {
 	
 	public void grantDB(String dbn) {
 		this.granteddb.add(dbn);
+		perms.put(dbn, new HashMap<String,Permission>());
 	}
 
 	public void revokePerm(String dbn,String tbn,Permission pm) {

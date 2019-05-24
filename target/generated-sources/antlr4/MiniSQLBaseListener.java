@@ -40,6 +40,18 @@ public class MiniSQLBaseListener implements MiniSQLListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterPerm(@NotNull MiniSQLParser.PermContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitPerm(@NotNull MiniSQLParser.PermContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterLogictree(@NotNull MiniSQLParser.LogictreeContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -431,6 +443,18 @@ public class MiniSQLBaseListener implements MiniSQLListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitNormalattr(@NotNull MiniSQLParser.NormalattrContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterCreateUser(@NotNull MiniSQLParser.CreateUserContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitCreateUser(@NotNull MiniSQLParser.CreateUserContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

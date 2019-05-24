@@ -1,5 +1,10 @@
 package minidb.basic.database;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,11 +19,12 @@ public class MiniDB {
 	DataBase current;
 	User curUser;
 	
-	public MiniDB(){
+	public MiniDB() throws ClassNotFoundException, IOException{
 		dbs=new HashMap<String,DataBase>();
 		curUser=new User("root","root");
 		users=new HashMap<String,User> ();
 		users.put("root", curUser);
+		this.open();
 	}
 	
 	public void createUser(String un,String pw) {
@@ -33,41 +39,73 @@ public class MiniDB {
 		return false;
 	}
 
+	public void open() throws IOException, ClassNotFoundException {
+		File file = new File("log.dbs"); 
+		if(!file.exists())
+			return;
+		@SuppressWarnings("resource")
+		BufferedReader br = new BufferedReader(new FileReader(file)); 
+		String st; 
+
+		while ((st = br.readLine()) != null) {
+			DataBase temp=new DataBase(st);
+			dbs.put(st, temp);
+			temp.open();
+		}
+
+    }
+
 
 	public Result execute(Statement st) throws IOException, ClassNotFoundException {
 		Result res = null;
 		if(st.type==Statement.User) {
 			StatementUser suser=(StatementUser)st;
-			switch(suser.stType) {
-			case StatementUser.grant:
+			User user=new User(suser.username,suser.password);
+			users.put(suser.username, user);
+		}
+		else if(st.type==Statement.Perm) {
+			StatementPerm sperm=(StatementPerm)st;
+			Permission permT=curUser.perms.get(current.dbName).get(sperm.tableName);
+			switch(sperm.stType) {
+			case StatementPerm.grant:
 				Permission pm=new Permission();
-				if(suser.perm.equals("select")) {
-					pm.canSelect=true;
-					if(suser.isOption) {
-						pm.canGrantSelect=true;
+				if(sperm.perm.equals("select")) {
+					if(curUser.isRoot||(permT!=null&&permT.canGrantSelect)) {
+						pm.canSelect=true;
+						if(sperm.isOption) {
+							pm.canGrantSelect=true;
+						}
 					}
-				}else if(suser.perm.equals("update")) {
-					pm.canUpdate=true;
-					if(suser.isOption) {
-						pm.canGrantUpdate=true;
+					else {
+						throw new IllegalArgumentException("permission not granted");
+					}
+				}else if(sperm.perm.equals("update")) {
+					if(curUser.isRoot||(permT!=null&&permT.canGrantUpdate)) {
+						pm.canUpdate=true;
+						if(sperm.isOption) {
+							pm.canGrantUpdate=true;
+						}
+					}
+					else {
+						throw new IllegalArgumentException("permission not granted");
 					}
 				}
-				users.get(suser.userName).grantPerm(current.name, suser.tableName, pm);
+				users.get(sperm.userName).grantPerm(current.dbName, sperm.tableName, pm);
 				break;
-			case StatementUser.revoke:
+			case StatementPerm.revoke:
 				pm=new Permission();
-				if(suser.perm.equals("select")) {
+				if(sperm.perm.equals("select")) {
 					pm.canSelect=false;
 					pm.canGrantSelect=false;
 					pm.canUpdate=true;
 					pm.canGrantUpdate=true;
-				}else if(suser.perm.equals("update")) {
+				}else if(sperm.perm.equals("update")) {
 					pm.canSelect=true;
 					pm.canGrantSelect=true;
 					pm.canUpdate=false;
 					pm.canGrantUpdate=false;
 				}
-				users.get(suser.userName).revokePerm(current.name, suser.tableName, pm);
+				users.get(sperm.userName).revokePerm(current.dbName, sperm.tableName, pm);
 				break;
 			}
 		}
@@ -76,8 +114,9 @@ public class MiniDB {
 			switch(sdb.stType) {
 			case StatementDB.create:
 				DataBase db=new DataBase(sdb.dbName);
+				this.logToFile(sdb.dbName);
 				dbs.put(sdb.dbName, db);
-				if(this.curUser.isRoot)
+//				if(this.curUser.isRoot)
 					this.curUser.grantDB(sdb.dbName);
 				res=new BoolResult();
 				break;
@@ -89,14 +128,16 @@ public class MiniDB {
 				if(!dbs.containsKey(sdb.dbName)) {
 					throw new IllegalArgumentException("database not exist");
 				}
-				dbs.remove(sdb.dbName);
+
+
+				this.dropTable(sdb.dbName);
+
 				res=new BoolResult();
 				break;
 			case StatementDB.use:
-				if(!curUser.isGrantedDB(sdb.dbName)) {
-					res=new BoolResult(false);
-					return res;
-				}
+//				if(!curUser.isGrantedDB(sdb.dbName)) {
+//					throw new IllegalArgumentException("no database permission");
+//				}
 
 				if(!dbs.containsKey(sdb.dbName)) {
 					throw new IllegalArgumentException("database not exist");
@@ -124,9 +165,35 @@ public class MiniDB {
 				
 		}
 		else {
-			res=current.execute(st,curUser.perms.get(current.name),curUser.isRoot);
+			res=current.execute(st,curUser.perms.get(current.dbName),curUser.isRoot);
 		}
 		return res;
 	}
-	
+
+	private void dropTable(String dbName) throws IOException {
+		File file = new File("log.dbs");
+		file.delete();
+		this.refreshLog();
+		DataBase db = dbs.get(dbName);
+		for(String name:db.tables.keySet()) {
+			db.dropTable(name);
+		}
+		dbs.remove(dbName);
+	}
+
+	private void logToFile(String dbName) throws IOException {
+	    BufferedWriter writer = new BufferedWriter(new FileWriter("log.dbs",true));
+	    writer.append(dbName);
+	    writer.append('\n');
+	    writer.close();
+	}
+	protected void refreshLog() throws IOException {
+	    BufferedWriter writer = new BufferedWriter(new FileWriter("log.dbs",true));
+		for(String name:dbs.keySet()) {
+			writer.append(name);
+			writer.append('\n');
+		}
+	    writer.close();
+	}
+
 }
