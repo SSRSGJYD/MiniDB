@@ -55,7 +55,7 @@ public class DataBase{
 
     }
 	
-	public Result execute(Statement st) throws IOException, ClassNotFoundException {
+	public Result execute(Statement st,HashMap<String,Permission> perms,boolean isRoot) throws IOException, ClassNotFoundException {
 		Result res = null;
 		Table tb;
 		Pair<Object,Row> pair;
@@ -108,6 +108,9 @@ public class DataBase{
 			break;
 		case Statement.selectA:
 			StatementSelectA sla=(StatementSelectA) st;
+			if(!isRoot&&!perms.get(sla.tableName).canSelect) {
+				throw new IllegalArgumentException("no select permission");
+			}
 			if(!this.tables.containsKey(sla.tableName)) {
 				throw new IllegalArgumentException("table not exist");
 			}
@@ -122,11 +125,19 @@ public class DataBase{
 			break;
 		case Statement.selectB:
 			StatementSelectB slb=(StatementSelectB) st;
+			for(Pair<String,Integer> jname:slb.jnames) {
+				if(!isRoot&&!perms.get(jname.l).canSelect) {
+					throw new IllegalArgumentException("no select permission");
+				}
+			}
 			res=Table.queryJT(slb.isStar,tables,slb.cnames,slb.jnames,slb.onConditions,slb.existWhere,slb.lt);
 			break;
 
 		case Statement.update:
 			StatementUpdate su=(StatementUpdate) st;
+			if(!isRoot&&!perms.get(su.tableName).canUpdate) {
+				throw new IllegalArgumentException("no select permission");
+			}
 			if(!this.tables.containsKey(su.tableName)) {
 				throw new IllegalArgumentException("table not exist");
 			}

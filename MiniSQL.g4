@@ -7,6 +7,7 @@ String : '\'' (.)+? '\''
 NEWLINE:'\r'?'\n'
      |EOF;
    
+withGrant: 'with grant option';
 
 type : 'int'
      | 'long'
@@ -41,6 +42,8 @@ sql : 'create table' Name '(' schema ')' #create
     | 'use database' Name #usedb
     | 'show databases' #show
     | 'show database' Name #showdb
+    | 'grant' Name 'on' Name 'to' Name (withGrant)? #grant
+    | 'revoke' Name 'on' Name 'from' Name #revoke
     | NEWLINE #newline
     ;
     

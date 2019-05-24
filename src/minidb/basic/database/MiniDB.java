@@ -17,6 +17,8 @@ public class MiniDB {
 	public MiniDB(){
 		dbs=new HashMap<String,DataBase>();
 		curUser=new User("root","root");
+		users=new HashMap<String,User> ();
+		users.put("root", curUser);
 	}
 	
 	public void createUser(String un,String pw) {
@@ -34,7 +36,42 @@ public class MiniDB {
 
 	public Result execute(Statement st) throws IOException, ClassNotFoundException {
 		Result res = null;
-		if(st.type==Statement.DB) {
+		if(st.type==Statement.User) {
+			StatementUser suser=(StatementUser)st;
+			switch(suser.stType) {
+			case StatementUser.grant:
+				Permission pm=new Permission();
+				if(suser.perm.equals("select")) {
+					pm.canSelect=true;
+					if(suser.isOption) {
+						pm.canGrantSelect=true;
+					}
+				}else if(suser.perm.equals("update")) {
+					pm.canUpdate=true;
+					if(suser.isOption) {
+						pm.canGrantUpdate=true;
+					}
+				}
+				users.get(suser.userName).grantPerm(current.name, suser.tableName, pm);
+				break;
+			case StatementUser.revoke:
+				pm=new Permission();
+				if(suser.perm.equals("select")) {
+					pm.canSelect=false;
+					pm.canGrantSelect=false;
+					pm.canUpdate=true;
+					pm.canGrantUpdate=true;
+				}else if(suser.perm.equals("update")) {
+					pm.canSelect=true;
+					pm.canGrantSelect=true;
+					pm.canUpdate=false;
+					pm.canGrantUpdate=false;
+				}
+				users.get(suser.userName).revokePerm(current.name, suser.tableName, pm);
+				break;
+			}
+		}
+		else if(st.type==Statement.DB) {
 			StatementDB sdb=(StatementDB)st;
 			switch(sdb.stType) {
 			case StatementDB.create:
@@ -87,7 +124,7 @@ public class MiniDB {
 				
 		}
 		else {
-			res=current.execute(st);
+			res=current.execute(st,curUser.perms.get(current.name),curUser.isRoot);
 		}
 		return res;
 	}

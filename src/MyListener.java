@@ -12,12 +12,36 @@ import minidb.basic.database.StatementInsertB;
 import minidb.basic.database.StatementSelectA;
 import minidb.basic.database.StatementSelectB;
 import minidb.basic.database.StatementUpdate;
+import minidb.basic.database.StatementUser;
 import minidb.types.TypeConst;
 
 public class MyListener extends MiniSQLBaseListener {
 
 	Statement st;
 	int type;
+
+	@Override 
+	public void enterRevoke(MiniSQLParser.RevokeContext ctx) {
+		type=Statement.User;
+		StatementUser user=new StatementUser();
+		st=(Statement) user;
+		user.stType=StatementUser.revoke;
+		user.perm=ctx.Name(0).getText();
+		user.tableName=ctx.Name(1).getText();
+		user.userName=ctx.Name(2).getText();
+	}
+	@Override 
+	public void enterGrant(MiniSQLParser.GrantContext ctx) {
+		type=Statement.User;
+		StatementUser user=new StatementUser();
+		st=(Statement) user;
+		user.stType=StatementUser.grant;
+		user.perm=ctx.Name(0).getText();
+		user.tableName=ctx.Name(1).getText();
+		user.userName=ctx.Name(2).getText();
+		if(ctx.withGrant()!=null)
+			user.isOption=true;
+	}
 
 	@Override 
 	public void enterShowdb(MiniSQLParser.ShowdbContext ctx) {
