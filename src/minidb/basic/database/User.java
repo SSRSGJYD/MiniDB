@@ -1,10 +1,13 @@
 package minidb.basic.database;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-public class User {
+public class User  implements Serializable{
+	private static final long serialVersionUID = 1L;
+
 	public String username;
 	public String password;
 	Set<String> granteddb;

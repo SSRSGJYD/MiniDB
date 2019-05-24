@@ -3,9 +3,13 @@ package minidb.basic.database;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -38,8 +42,28 @@ public class MiniDB {
 		}
 		return false;
 	}
+	
+	@SuppressWarnings("unchecked")
+	public void loadUserFromFile() throws ClassNotFoundException, IOException {
+		File file = new File("user.data"); 
+		if(!file.exists())
+			return;
+
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream("user.data"));
+        users = (HashMap<String, User>) ois.readObject();
+        ois.close();
+	}
+	
+	public void storeUserToFile () throws IOException {
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("user.data"));
+        oos.writeObject(this.users);
+        oos.close();
+	}
+
 
 	public void open() throws IOException, ClassNotFoundException {
+		this.loadUserFromFile();
+		System.out.print(users);
 		File file = new File("log.dbs"); 
 		if(!file.exists())
 			return;
@@ -62,6 +86,8 @@ public class MiniDB {
 			StatementUser suser=(StatementUser)st;
 			User user=new User(suser.username,suser.password);
 			users.put(suser.username, user);
+			this.storeUserToFile();
+			res=new BoolResult();
 		}
 		else if(st.type==Statement.Perm) {
 			StatementPerm sperm=(StatementPerm)st;
@@ -108,6 +134,8 @@ public class MiniDB {
 				users.get(sperm.userName).revokePerm(current.dbName, sperm.tableName, pm);
 				break;
 			}
+			this.storeUserToFile();
+			res=new BoolResult();
 		}
 		else if(st.type==Statement.DB) {
 			StatementDB sdb=(StatementDB)st;
