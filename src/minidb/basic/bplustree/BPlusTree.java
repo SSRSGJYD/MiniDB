@@ -595,7 +595,7 @@ public class BPlusTree<K extends Key, V extends Value> {
         while(true) {
             int capacity = leaf.getCapacity();
             for(int i=0; i<capacity; i++) {
-            	if(key.compareTo(leaf.keyList.get(i)) != 0)
+            	if(key.compareTo(leaf.keyList.get(i),false) != 0)
             		rows.push(leaf.valueList.get(i));
             }
             // move on to nextInternal leaf node
