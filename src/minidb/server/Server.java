@@ -58,7 +58,11 @@ public class Server {
 			    builder.append(buffer, 0, rsz);
 			}
 			//获得request参数
-			Map<String, Object> params = (Map<String, Object>)Exchange.getAttribute("parameters");
+			Map<String, String> params = (Map<String, String>)Exchange.getAttribute("parameters");
+			String username = params.get("username");
+			String password = params.get("password");
+			System.out.println("username:" + username);
+			System.out.println("password:" + password);
 			
 			// 获取请求头
             String userAgent = Exchange.getRequestHeaders().getFirst("User-Agent");
@@ -104,7 +108,12 @@ public class Server {
             System.out.println("User-Agent: " + userAgent);
 			
 			//获得request参数
-			Map<String, Object> params = (Map<String, Object>)Exchange.getAttribute("parameters");
+			Map<String, String> params = (Map<String, String>)Exchange.getAttribute("parameters");
+			String username = params.get("username");
+			String password = params.get("password");
+			String sql = params.get("sql");
+			System.out.println("username:" + username);
+			System.out.println("password:" + password);
 			
 			//响应格式
 			Headers responseHeaders = Exchange.getResponseHeaders();
