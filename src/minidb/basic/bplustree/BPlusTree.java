@@ -573,6 +573,43 @@ public class BPlusTree<K extends Key, V extends Value> {
 
         return new SearchResult<V>(rows);
     }
+    
+    /**
+     * search except specific value
+     *
+     * @return a search result object
+     * @throws IOException
+     */
+    public SearchResult<V> searchNotEqual(K key) throws IOException {
+        if(root == null) {
+            return new SearchResult<V>();
+        }
+        LinkedList<V> rows = new LinkedList<V>();
+        BPlusTreeNode<K,V> iterator = root;
+        while(iterator.getNodeType() != BPlusTreeConst.NODE_TYPE_LEAF
+            && iterator.getNodeType() != BPlusTreeConst.NODE_TYPE_ROOT_LEAF) {
+            iterator = readNodeFromFile(((BPlusTreeInternalNode<K,V>) iterator).ptrList.getFirst());
+        }
+        // now iterator is at left-bottom leaf node
+        BPlusTreeLeafNode<K,V> leaf = (BPlusTreeLeafNode<K,V>)iterator;
+        while(true) {
+            int capacity = leaf.getCapacity();
+            for(int i=0; i<capacity; i++) {
+            	if(key.compareTo(leaf.keyList.get(i)) != 0)
+            		rows.push(leaf.valueList.get(i));
+            }
+            // move on to nextInternal leaf node
+            long nextLeafIndex = leaf.getNextPageIndex();
+            if(nextLeafIndex != -1L) {
+                leaf = (BPlusTreeLeafNode<K,V>)readNodeFromFile(nextLeafIndex);
+            }
+            else{
+                break;
+            }
+        }
+
+        return new SearchResult<V>(rows);
+    }
 
 
 
