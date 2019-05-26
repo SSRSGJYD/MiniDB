@@ -928,6 +928,9 @@ public class Table implements Serializable{
 		case Statement.eq:
 			vs= indext.search(key,false).rows;
 			break;
+		case Statement.neq:
+			vs=indext.searchNotEqual(key).rows;
+			break;
 		}
 		for(PrimaryKeyValue pk:vs) {
 			PrimaryKey pkey=this.constructPrimaryKeyB(pk.array);
@@ -950,6 +953,8 @@ public class Table implements Serializable{
 			return index.searchByRange(null, false, true,key, true, false).rows;
 		case Statement.eq:
 			return index.search(key).rows;
+		case Statement.neq:
+			return index.searchNotEqual(key).rows;
 		}
 		return null;
 	}
