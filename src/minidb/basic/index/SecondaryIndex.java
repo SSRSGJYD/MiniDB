@@ -88,6 +88,16 @@ public class SecondaryIndex<K extends Comparable<K>, PK extends Comparable<PK>> 
     public SearchResult<PrimaryKeyValue> searchAll() throws IOException {
         return tree.searchAll();
     }
+    
+    /**
+     * search except specific key
+     *
+     * @return a SearchResult Object
+     * @throws IOException
+     */
+    public SearchResult<PrimaryKeyValue> searchNotEqual(SecondaryKey<K,PK> key) throws IOException {
+        return tree.searchNotEqual(key);
+    }
 
     /**
      * delete a (key,value) pair
