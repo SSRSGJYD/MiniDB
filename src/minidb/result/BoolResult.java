@@ -1,4 +1,6 @@
 package minidb.result;
+import org.json.simple.JSONObject;
+
 
 public class BoolResult extends Result {
 	boolean isOk;
@@ -15,4 +17,11 @@ public class BoolResult extends Result {
 	public void display() {
 		System.out.println(isOk);
 	}
+
+	public String json() {
+		JSONObject obj=new JSONObject();
+		obj.put("msg", "");
+		return obj.toString();
+	}
+
 }

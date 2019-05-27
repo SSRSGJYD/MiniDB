@@ -12,10 +12,15 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import minidb.result.BoolResult;
 import minidb.result.ListResult;
 import minidb.result.Result;
+import minidb.types.TypeConst;
 
 public class MiniDB {
 	HashMap<String,DataBase> dbs;
@@ -33,6 +38,30 @@ public class MiniDB {
 	
 	public void createUser(String un,String pw) {
 		users.put(un, new User(un,pw));
+	}
+	
+	@SuppressWarnings("unchecked")
+	public String getInfo() {
+		JSONObject obj=new JSONObject();
+		JSONArray list=new JSONArray();
+		for(Table tb:current.tables.values()) {
+			JSONObject table=new JSONObject();
+			table.put("schema_name", tb.tableName);
+			JSONArray attrs=new JSONArray();
+			for(Map.Entry<String,SchemaDescriptor> e:tb.schema.descriptors.entrySet()) {
+				JSONObject objt=new JSONObject();
+				objt.put("name",e.getKey());
+				objt.put("type",TypeConst.toString(e.getValue().getType()));
+				attrs.add(objt);
+			}
+			table.put("attributes", attrs);
+			list.add(table);
+		}
+		
+		
+		obj.put("database_name",current.dbName);
+		obj.put("schemas",list);
+		return obj.toString();
 	}
 	public boolean login(String un,String pw) {
 		User user=users.get(un);

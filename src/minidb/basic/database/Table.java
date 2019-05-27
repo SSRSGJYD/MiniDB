@@ -39,9 +39,9 @@ public class Table implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	
-	String tableName;
+	public String tableName;
 	String dbName;
-	Schema schema;
+	public Schema schema;
 	transient PrimaryIndex index;
 	transient HashMap<String,SecondaryIndex> indexs;
 	int keySize;
