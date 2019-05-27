@@ -29,16 +29,6 @@ public class SQLParser{
 //				+ "create table playr(id char(4),name int)\n"
 //				+ "create table playt(id int,name int,primary key(id))\n"
 //				+ "create table playd(id int,name int,primary key(id))\n"
-
-//				+ "insert into playr values('1332',17)\n"
-//				+ "insert into playr values('1333',390)\n"
-//				+ "insert into playr values('1333',990)\n"
-//				+ "delete from playr where name=90\n"
-//				+ "delete from playr where name=390\n"
-//
-//				+ "insert into playt values(133,90)\n"
-//				+ "insert into playt(id) values(134)\n"
-//				+ "insert into playt values(13,990)\n"
 //
 //				+ "insert into playd values(133,90)\n"
 //				+ "insert into playd(id) values(134)\n"
