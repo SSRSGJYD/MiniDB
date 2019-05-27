@@ -394,7 +394,7 @@ public class BPlusTree<K extends Key, V extends Value> {
         else { // internal node
             BPlusTreeInternalNode<K,V> internal = (BPlusTreeInternalNode<K,V>)node;
             // padding to account for the last pointer (if needed)
-            if(i != node.getCapacity() && key.compareTo(internal.keyList.get(i), useAll) > 0) {
+            if(i != node.getCapacity() && key.compareTo(internal.keyList.get(i), useAll) >= 0) {
                 i++;
             }
             BPlusTreeNode<K,V> nextToSearch = readNodeFromFile(internal.ptrList.get(i));
