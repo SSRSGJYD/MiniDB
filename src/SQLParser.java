@@ -13,8 +13,11 @@ import org.antlr.v4.runtime.tree.*;
 
 import minidb.basic.database.MiniDB;
 import minidb.result.Result;
+import com.alibaba.fastjson.JSON;
 
 public class SQLParser{
+	
+
 	
 	public static void main( String[] args) throws Exception 
 	{
@@ -76,7 +79,7 @@ public class SQLParser{
 				walker.walk(extractor, tree);		
 				
 				Result res=db.execute(extractor.st);
-				res.display();
+				System.out.println(res.json());
 //			}
 //			catch(Exception e) {
 //				System.out.println(e);
