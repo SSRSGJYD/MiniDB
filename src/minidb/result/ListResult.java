@@ -10,5 +10,10 @@ public class ListResult extends Result {
 		System.out.print(data);
 
 	}
+	@Override
+	public String json() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

@@ -12,12 +12,46 @@ import minidb.basic.database.StatementInsertB;
 import minidb.basic.database.StatementSelectA;
 import minidb.basic.database.StatementSelectB;
 import minidb.basic.database.StatementUpdate;
+import minidb.basic.database.StatementUser;
+import minidb.basic.database.StatementPerm;
 import minidb.types.TypeConst;
 
 public class MyListener extends MiniSQLBaseListener {
 
 	Statement st;
 	int type;
+
+	@Override 
+	public void enterCreateUser(MiniSQLParser.CreateUserContext ctx) {
+		type=Statement.User;
+		StatementUser user=new StatementUser();
+		st=(Statement) user;
+		user.username=ctx.Name(0).getText();
+		user.password=ctx.Name(1).getText();
+	}
+
+	@Override 
+	public void enterRevoke(MiniSQLParser.RevokeContext ctx) {
+		type=Statement.Perm;
+		StatementPerm user=new StatementPerm();
+		st=(Statement) user;
+		user.stType=StatementPerm.revoke;
+		user.perm=ctx.perm().getText();
+		user.tableName=ctx.Name(0).getText();
+		user.userName=ctx.Name(1).getText();
+	}
+	@Override 
+	public void enterGrant(MiniSQLParser.GrantContext ctx) {
+		type=Statement.Perm;
+		StatementPerm user=new StatementPerm();
+		st=(Statement) user;
+		user.stType=StatementPerm.grant;
+		user.perm=ctx.perm().getText();
+		user.tableName=ctx.Name(0).getText();
+		user.userName=ctx.Name(1).getText();
+		if(ctx.withGrant()!=null)
+			user.isOption=true;
+	}
 
 	@Override 
 	public void enterShowdb(MiniSQLParser.ShowdbContext ctx) {
