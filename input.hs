@@ -14,9 +14,9 @@ main = do
   hPutStrLn h "create database db"
   hPutStrLn h "use database db"
   hPutStrLn h "create table play(id int,name int, primary key(id))"
-  mapM_ (insertOne h) [1..100]
-  mapM_ (deleteOne h) [1,3..15]
-  hPutStrLn h "select * from play"
+  mapM_ (insertOne h) [1..10000]
+  mapM_ (deleteOne h) [1,3..10000]
+  hPutStrLn h "select name from play where (name > 9500 and name < 9550)"
   hPutStrLn h "drop table play"
   hClose h
 
