@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
+import java.net.URI;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,7 +38,7 @@ public class Server {
 		String msg = null;
 		
 		public responseMsg() {
-			// TODO ×Ô¶¯Éú³ÉµÄ¹¹Ôìº¯Êı´æ¸ù
+			// TODO è‡ªåŠ¨ç”Ÿæˆçš„æ„é€ å‡½æ•°å­˜æ ¹
 			this.msg = null;
 		}
 	}
@@ -76,19 +77,19 @@ public class Server {
 
 	}
 	
-	//Æô¶¯·şÎñÆ÷£¬¼àÌı¿Í»§¶ËÇëÇó
+	//å¯åŠ¨æœåŠ¡å™¨ï¼Œç›‘å¬å®¢æˆ·ç«¯è¯·æ±‚
 	public static void main(String[] args) throws IOException, ClassNotFoundException {
-		//³õÊ¼»¯ MiniDB
+		//åˆå§‹åŒ– MiniDB
 		db = new MiniDB();
 		
 		
 		//HttpServerProvider provider = HttpServerProvider.provider();
-		//¼àÌı¶Ë¿Ú8080£¬Í¬Ê±½ÓÊÕ100¸öÇëÇó
+		//ç›‘å¬ç«¯å£8080ï¼ŒåŒæ—¶æ¥æ”¶100ä¸ªè¯·æ±‚
 		HttpServer httpServer = HttpServer.create(new InetSocketAddress(8080), 100);
-		//¼àÌıLoginÇëÇó
+		//ç›‘å¬Loginè¯·æ±‚
 		HttpContext contextLogin = httpServer.createContext("/login", new LoginHandler());
 		//contextLogin.getFilters().add(new ParameterFilter());
-		//¼àÌıSQLÇëÇó
+		//ç›‘å¬SQLè¯·æ±‚
 		HttpContext contextSQL = httpServer.createContext("/execute", new ExecuteHandler());
 		//contextSQL.getFilters().add(new ParameterFilter());
 		
@@ -97,51 +98,62 @@ public class Server {
 		System.out.println("Server started!");
 	}
 	
-	//LoginÇëÇó´¦Àí
+	//Loginè¯·æ±‚å¤„ç†
 	static class LoginHandler implements HttpHandler {
 		@Override
 		public void handle(HttpExchange Exchange) throws IOException {		
-			//ÏìÓ¦ĞÅÏ¢
+			//å“åº”ä¿¡æ¯
 			responseMsg responseMsg = new responseMsg();
 			responseMsg.msg = "{\"msg\":\"login failed!\"}";
 			Headers responseHeaders = Exchange.getResponseHeaders();
 			responseHeaders.set("Content-Type", "application/json");
 			
-//			//»ñµÃrequest²ÎÊı
-//			Map<String, String> params = (Map<String, String>)Exchange.getAttribute("parameters");
-//			String username = params.get("username");
-//			String password = params.get("password");
-//			System.out.println("username:" + username);
-//			System.out.println("password:" + password);
+			//è·å–è¯·æ±‚æ–¹æ³•
+			String requestMethod = Exchange.getRequestMethod();
+			System.out.println("method:" + requestMethod);
 			
-			//»ñµÃpost²ÎÊı
-			//parse request
-            Map<String, Object> parameters = new HashMap<String, Object>();
-            InputStreamReader isr = new InputStreamReader(Exchange.getRequestBody(), "utf-8");
-            BufferedReader br = new BufferedReader(isr);
-            String query = br.readLine();
-            parseQuery(query, parameters);    
-			String username = parameters.get("username").toString();
-			String password = parameters.get("password").toString();
-			System.out.println("username:" + username);
-			System.out.println("password:" + password);
+			
+			String username = null;
+			String password = null;
+			if(requestMethod.equals("GET")) {
+				//è·å¾—getå‚æ•°
+				Map<String, Object> parameters = new HashMap<String, Object>();
+                URI requestedUri = Exchange.getRequestURI();
+                String query = requestedUri.getRawQuery();
+                parseQuery(query, parameters);
+				username = (String) parameters.get("username");
+				password = (String) parameters.get("password");	
+			}
+			else if(requestMethod.equals("POST")) {
+				//è·å¾—postå‚æ•°
+				//parse request
+	            Map<String, Object> parameters = new HashMap<String, Object>();
+	            InputStreamReader isr = new InputStreamReader(Exchange.getRequestBody(), "utf-8");
+	            BufferedReader br = new BufferedReader(isr);
+	            String query = br.readLine();
+	            parseQuery(query, parameters);    
+				username = (String) parameters.get("username");
+				password = (String) parameters.get("password");
+			}
             
+			System.out.println("username:" + username);
+			System.out.println("password:" + password);	
 			
-			//ÑéÖ¤ÓÃ»§
+			//éªŒè¯ç”¨æˆ·
 			if(!db.login(username, password)) {
-				//ÏìÓ¦¸ñÊ½
+				//å“åº”æ ¼å¼
 				responseMsg.msg = "{\"msg\":\"login failed!\"}";
 				Exchange.sendResponseHeaders(500, responseMsg.msg.getBytes().length);
 			}
 			else {
-				//ÏìÓ¦¸ñÊ½
+				//å“åº”æ ¼å¼
 				//responseMsg.msg = db.getInfo();
 				responseMsg.msg = "{\"msg\":\"login failed!\"}";
 				Exchange.sendResponseHeaders(200, responseMsg.msg.getBytes().length);
 			}
 			
 			//Exchange.sendResponseHeaders(200, responseMsg.msg.getBytes().length);
-			//»ñµÃÊä³öÁ÷
+			//è·å¾—è¾“å‡ºæµ
 			OutputStream out = Exchange.getResponseBody();
 			out.write(responseMsg.msg.getBytes());
 			out.flush();
@@ -149,34 +161,50 @@ public class Server {
 		}
 	}
 	
-	//SQLÇëÇó´¦Àí
+	//SQLè¯·æ±‚å¤„ç†
 	static class ExecuteHandler implements HttpHandler {
 		@Override
 		public void handle(HttpExchange Exchange) throws IOException {
-			//ÏìÓ¦ĞÅÏ¢
+			//å“åº”ä¿¡æ¯
 			responseMsg responseMsg = new responseMsg();
+			//å“åº”æ ¼å¼
+			Headers responseHeaders = Exchange.getResponseHeaders();
+			responseHeaders.set("Content-Type", "application/json");
 			
-			//»ñµÃrequest²ÎÊı
-//			Map<String, String> params = (Map<String, String>)Exchange.getAttribute("parameters");
-//			String username = params.get("username");
-//			String password = params.get("password");
-//			String sql = params.get("sql");
-//			System.out.println("username:" + username);
-//			System.out.println("password:" + password);
-//			System.out.println("sql:" + sql);
+			//è·å–è¯·æ±‚æ–¹æ³•
+			String requestMethod = Exchange.getRequestMethod();
+			System.out.println("method:" + requestMethod);
 			
-			//»ñµÃpost²ÎÊı
-			// parse request
-            Map<String, Object> parameters = new HashMap<String, Object>();
-            InputStreamReader isr = new InputStreamReader(Exchange.getRequestBody(), "utf-8");
-            BufferedReader br = new BufferedReader(isr);
-            String query = br.readLine();
-            System.out.println(query);
-            parseQuery(query, parameters);    
-            System.out.println(parameters);
-			String username = (String) parameters.get("username");
-			String password = (String) parameters.get("password");
-			String sql = (String) parameters.get("sql");
+			
+			String username = null;
+			String password = null;
+			String sql = null;
+			if(requestMethod.equals("GET")) {
+				//è·å¾—requestå‚æ•°
+				 // parse request
+                Map<String, Object> parameters = new HashMap<String, Object>();
+                URI requestedUri = Exchange.getRequestURI();
+                String query = requestedUri.getRawQuery();
+                parseQuery(query, parameters);
+				username = (String) parameters.get("username");
+				password = (String) parameters.get("password");
+				sql = (String) parameters.get("sql");
+			}
+			else if(requestMethod.equals("POST")) {
+				//è·å¾—postå‚æ•°
+				// parse request
+	            Map<String, Object> parameters = new HashMap<String, Object>();
+	            InputStreamReader isr = new InputStreamReader(Exchange.getRequestBody(), "utf-8");
+	            BufferedReader br = new BufferedReader(isr);
+	            String query = br.readLine();
+	            System.out.println(query);
+	            parseQuery(query, parameters);    
+	            System.out.println(parameters);
+				username = (String) parameters.get("username");
+				password = (String) parameters.get("password");
+				sql = (String) parameters.get("sql");
+			}
+			
 			System.out.println("username:" + username);
 			System.out.println("password:" + password);
 			System.out.println("sql:" + sql);
@@ -184,23 +212,19 @@ public class Server {
 			try {
 				if(sqlExecute(sql, responseMsg)) {
 					System.out.println("responseMsg:" + responseMsg.msg);
-					//ÏìÓ¦¸ñÊ½
-					Headers responseHeaders = Exchange.getResponseHeaders();
-					responseHeaders.set("Content-Type", "application/json");
+					//å“åº”æ ¼å¼
 					Exchange.sendResponseHeaders(200, responseMsg.msg.getBytes().length);
 				}
 				else {
 					System.out.println("responseMsg:" + responseMsg.msg);
-					//ÏìÓ¦¸ñÊ½
-					Headers responseHeaders = Exchange.getResponseHeaders();
-					responseHeaders.set("Content-Type", "application/json");
+					//å“åº”æ ¼å¼
 					Exchange.sendResponseHeaders(500, responseMsg.msg.getBytes().length);
 				}
 			} catch (ClassNotFoundException e) {
 				System.out.println(e);
 			}
 			
-			//»ñµÃÊä³öÁ÷
+			//è·å¾—è¾“å‡ºæµ
 			OutputStream out = Exchange.getResponseBody();
 			out.write(responseMsg.msg.getBytes());
 			out.flush();
