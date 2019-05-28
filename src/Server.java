@@ -4,7 +4,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;  
 import java.io.OutputStream;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.sun.net.httpserver.Headers;
@@ -20,6 +25,8 @@ import org.antlr.v4.runtime.tree.*;
 import minidb.basic.database.MiniDB;
 import minidb.result.Result;
 import minidb.server.ParameterFilter;
+
+import org.apache.commons.io.IOUtils;
 
 
 public class Server {
@@ -102,26 +109,33 @@ public class Server {
 			//响应信息
 			String responseMsg;
 			
-			//获得输入流
-//			InputStream body = Exchange.getRequestBody(); 
-//			final int bufferSize = 1024;
-//			final char[] buffer = new char[bufferSize];
-//			final StringBuilder builder = new StringBuilder();
-//			Reader in = new InputStreamReader(body, "UTF-8");
-//			for (; ; ) {
-//			    int rsz = in.read(buffer, 0, buffer.length);
-//			    if (rsz < 0)
-//			        break;
-//			    builder.append(buffer, 0, rsz);
-//			}
+			
+//			InputStream in = Exchange.getRequestBody(); //获得输入流  
+//			BufferedReader reader = new BufferedReader(new InputStreamReader(in, "utf-8")); 
+//    	    //将BufferedReader转化为字符串
+//    	    String text = IOUtils.toString(reader);//text是我获取的post提交的数据（现在是字符串的形式）
+//    	    System.out.println("body:" + text);
 			
 			
 			//获得request参数
-			Map<String, String> params = (Map<String, String>)Exchange.getAttribute("parameters");
-			String username = params.get("username");
-			String password = params.get("password");
+//			Map<String, String> params = (Map<String, String>)Exchange.getAttribute("parameters");
+//			String username = params.get("username");
+//			String password = params.get("password");
+//			System.out.println("username:" + username);
+//			System.out.println("password:" + password);
+			
+			//获得post参数
+			// parse request
+            Map<String, Object> parameters = new HashMap<String, Object>();
+            InputStreamReader isr = new InputStreamReader(Exchange.getRequestBody(), "utf-8");
+            BufferedReader br = new BufferedReader(isr);
+            String query = br.readLine();
+            parseQuery(query, parameters);    
+			String username = parameters.get("username").toString();
+			String password = parameters.get("password").toString();
 			System.out.println("username:" + username);
 			System.out.println("password:" + password);
+            
 			
 			//验证用户
 			if(!db.login(username, password)) {
@@ -174,10 +188,24 @@ public class Server {
 //            System.out.println("User-Agent: " + userAgent);
 			
 			//获得request参数
-			Map<String, String> params = (Map<String, String>)Exchange.getAttribute("parameters");
-			String username = params.get("username");
-			String password = params.get("password");
-			String sql = params.get("sql");
+//			Map<String, String> params = (Map<String, String>)Exchange.getAttribute("parameters");
+//			String username = params.get("username");
+//			String password = params.get("password");
+//			String sql = params.get("sql");
+//			System.out.println("username:" + username);
+//			System.out.println("password:" + password);
+//			System.out.println("sql:" + sql);
+			
+			//获得post参数
+			// parse request
+            Map<String, Object> parameters = new HashMap<String, Object>();
+            InputStreamReader isr = new InputStreamReader(Exchange.getRequestBody(), "utf-8");
+            BufferedReader br = new BufferedReader(isr);
+            String query = br.readLine();
+            parseQuery(query, parameters);    
+			String username = parameters.get("username").toString();
+			String password = parameters.get("password").toString();
+			String sql = parameters.get("sql").toString();
 			System.out.println("username:" + username);
 			System.out.println("password:" + password);
 			System.out.println("sql:" + sql);
@@ -208,5 +236,43 @@ public class Server {
 			Exchange.close();
 		}
 	}
+	
+	public static void parseQuery(String query, Map<String, 
+			Object> parameters) throws UnsupportedEncodingException {
+
+		         if (query != null) {
+		                 String pairs[] = query.split("[&]");
+		                 for (String pair : pairs) {
+		                          String param[] = pair.split("[=]");
+		                          String key = null;
+		                          String value = null;
+		                          if (param.length > 0) {
+		                          key = URLDecoder.decode(param[0], 
+		                          	System.getProperty("file.encoding"));
+		                          }
+
+		                          if (param.length > 1) {
+		                                   value = URLDecoder.decode(param[1], 
+		                                   System.getProperty("file.encoding"));
+		                          }
+
+		                          if (parameters.containsKey(key)) {
+		                                   Object obj = parameters.get(key);
+		                                   if (obj instanceof List<?>) {
+		                                            List<String> values = (List<String>) obj;
+		                                            values.add(value);
+
+		                                   } else if (obj instanceof String) {
+		                                            List<String> values = new ArrayList<String>();
+		                                            values.add((String) obj);
+		                                            values.add(value);
+		                                            parameters.put(key, values);
+		                                   }
+		                          } else {
+		                                   parameters.put(key, value);
+		                          }
+		                 }
+		         }
+		}
 	
 }
