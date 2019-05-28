@@ -87,12 +87,12 @@ public class Server {
 		HttpServer httpServer = HttpServer.create(new InetSocketAddress(8080), 100);
 		//监听Login请求
 		HttpContext contextLogin = httpServer.createContext("/login", new LoginHandler());
-		contextLogin.getFilters().add(new ParameterFilter());
+		//contextLogin.getFilters().add(new ParameterFilter());
 		//监听SQL请求
 		HttpContext contextSQL = httpServer.createContext("/execute", new ExecuteHandler());
-		contextSQL.getFilters().add(new ParameterFilter());
+		//contextSQL.getFilters().add(new ParameterFilter());
 		
-		//server.setExecutor(null);
+		httpServer.setExecutor(null);
 		httpServer.start();
 		System.out.println("Server started!");
 	}
@@ -100,24 +100,14 @@ public class Server {
 	//Login请求处理
 	static class LoginHandler implements HttpHandler {
 		@Override
-		public void handle(HttpExchange Exchange) throws IOException {
-			
-//			// 获取请求头
-//            String userAgent = Exchange.getRequestHeaders().getFirst("User-Agent");
-//            System.out.println("User-Agent: " + userAgent);
-			
+		public void handle(HttpExchange Exchange) throws IOException {		
 			//响应信息
-			String responseMsg;
+			responseMsg responseMsg = new responseMsg();
+			responseMsg.msg = "{\"msg\":\"login failed!\"}";
+			Headers responseHeaders = Exchange.getResponseHeaders();
+			responseHeaders.set("Content-Type", "application/json");
 			
-			
-//			InputStream in = Exchange.getRequestBody(); //获得输入流  
-//			BufferedReader reader = new BufferedReader(new InputStreamReader(in, "utf-8")); 
-//    	    //将BufferedReader转化为字符串
-//    	    String text = IOUtils.toString(reader);//text是我获取的post提交的数据（现在是字符串的形式）
-//    	    System.out.println("body:" + text);
-			
-			
-			//获得request参数
+//			//获得request参数
 //			Map<String, String> params = (Map<String, String>)Exchange.getAttribute("parameters");
 //			String username = params.get("username");
 //			String password = params.get("password");
@@ -125,7 +115,7 @@ public class Server {
 //			System.out.println("password:" + password);
 			
 			//获得post参数
-			// parse request
+			//parse request
             Map<String, Object> parameters = new HashMap<String, Object>();
             InputStreamReader isr = new InputStreamReader(Exchange.getRequestBody(), "utf-8");
             BufferedReader br = new BufferedReader(isr);
@@ -140,32 +130,22 @@ public class Server {
 			//验证用户
 			if(!db.login(username, password)) {
 				//响应格式
-				responseMsg = "{\"msg\":\"login failed!\"}";
-				Headers responseHeaders = Exchange.getResponseHeaders();
-				responseHeaders.set("Content-Type", "application/json");
-				Exchange.sendResponseHeaders(401, responseMsg.getBytes().length);
-				
-				
-				//获得输出流
-				OutputStream out = Exchange.getResponseBody();
-				out.write(responseMsg.getBytes());
-				out.flush();
-				Exchange.close();
+				responseMsg.msg = "{\"msg\":\"login failed!\"}";
+				Exchange.sendResponseHeaders(500, responseMsg.msg.getBytes().length);
 			}
 			else {
 				//响应格式
-				responseMsg = db.getInfo();
-				Headers responseHeaders = Exchange.getResponseHeaders();
-				responseHeaders.set("Content-Type", "application/json");
-				Exchange.sendResponseHeaders(200, responseMsg.getBytes().length);
-				
-				
-				//获得输出流
-				OutputStream out = Exchange.getResponseBody();
-				out.write(responseMsg.getBytes());
-				out.flush();
-				Exchange.close();
+				//responseMsg.msg = db.getInfo();
+				responseMsg.msg = "{\"msg\":\"login failed!\"}";
+				Exchange.sendResponseHeaders(200, responseMsg.msg.getBytes().length);
 			}
+			
+			//Exchange.sendResponseHeaders(200, responseMsg.msg.getBytes().length);
+			//获得输出流
+			OutputStream out = Exchange.getResponseBody();
+			out.write(responseMsg.msg.getBytes());
+			out.flush();
+			Exchange.close();
 		}
 	}
 	
@@ -175,17 +155,6 @@ public class Server {
 		public void handle(HttpExchange Exchange) throws IOException {
 			//响应信息
 			responseMsg responseMsg = new responseMsg();
-//			//获得输入流
-//			InputStream in = Exchange.getRequestBody(); 
-//			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-//			String temp = null;
-//			while((temp = reader.readLine()) != null) {
-//				System.out.println("Client request:" + temp);
-//			}
-			
-//			// 获取请求头
-//            String userAgent = Exchange.getRequestHeaders().getFirst("User-Agent");
-//            System.out.println("User-Agent: " + userAgent);
 			
 			//获得request参数
 //			Map<String, String> params = (Map<String, String>)Exchange.getAttribute("parameters");
@@ -202,10 +171,12 @@ public class Server {
             InputStreamReader isr = new InputStreamReader(Exchange.getRequestBody(), "utf-8");
             BufferedReader br = new BufferedReader(isr);
             String query = br.readLine();
+            System.out.println(query);
             parseQuery(query, parameters);    
-			String username = parameters.get("username").toString();
-			String password = parameters.get("password").toString();
-			String sql = parameters.get("sql").toString();
+            System.out.println(parameters);
+			String username = (String) parameters.get("username");
+			String password = (String) parameters.get("password");
+			String sql = (String) parameters.get("sql");
 			System.out.println("username:" + username);
 			System.out.println("password:" + password);
 			System.out.println("sql:" + sql);
