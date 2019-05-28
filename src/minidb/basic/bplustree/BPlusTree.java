@@ -1025,7 +1025,7 @@ public class BPlusTree<K extends Key, V extends Value> {
         // check whether need to condition pages
         if(deleteCount == conditionThreshold) {
             deleteCount = 0; // reset
-            updateSlotPage();
+            //updateSlotPage();
         }
     }
 

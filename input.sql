@@ -15001,5 +15001,5 @@ delete from play where name=9993
 delete from play where name=9995
 delete from play where name=9997
 delete from play where name=9999
-select * from play where id>9000 and name<9050
+select name from play where (name > 9500 and name < 9550)
 drop table play
