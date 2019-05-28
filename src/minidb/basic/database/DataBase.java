@@ -17,11 +17,11 @@ import minidb.result.Result;
 public class DataBase{
 	
 
-	String name;
+	String dbName;
 	HashMap<String,Table> tables;
 	public DataBase(String n) throws ClassNotFoundException, IOException {
 		tables=new HashMap<String,Table>();
-		name=n;
+		dbName=n;
 		open();
 	}
 	
@@ -32,7 +32,7 @@ public class DataBase{
 	}
 	
 	public void open() throws IOException, ClassNotFoundException {
-		File file = new File("schema.log"); 
+		File file = new File(dbName+".log"); 
 		if(!file.exists())
 			return;
 		@SuppressWarnings("resource")
@@ -107,8 +107,10 @@ public class DataBase{
 			res=new BoolResult();
 			break;
 		case Statement.selectA:
+			long startTime = System.nanoTime();
+
 			StatementSelectA sla=(StatementSelectA) st;
-			if(!isRoot&&!perms.get(sla.tableName).canSelect) {
+			if(perms==null||!isRoot&&!perms.get(sla.tableName).canSelect) {
 				throw new IllegalArgumentException("no select permission");
 			}
 			if(!this.tables.containsKey(sla.tableName)) {
@@ -122,20 +124,29 @@ public class DataBase{
 			}
 			else
 				res=tb.queryT(sla.names, sla.existWhere, sla.lt);
+
+			long totalTime = System.nanoTime()- startTime;
+			QueryResult qr=(QueryResult) res;
+			qr.time=totalTime;
 			break;
 		case Statement.selectB:
+			startTime = System.nanoTime();
+
 			StatementSelectB slb=(StatementSelectB) st;
 			for(Pair<String,Integer> jname:slb.jnames) {
-				if(!isRoot&&!perms.get(jname.l).canSelect) {
+				if(perms==null||!isRoot&&!perms.get(jname.l).canSelect) {
 					throw new IllegalArgumentException("no select permission");
 				}
 			}
 			res=Table.queryJT(slb.isStar,tables,slb.cnames,slb.jnames,slb.onConditions,slb.existWhere,slb.lt);
+			totalTime = System.nanoTime()- startTime;
+			qr=(QueryResult) res;
+			qr.time=totalTime;
 			break;
 
 		case Statement.update:
 			StatementUpdate su=(StatementUpdate) st;
-			if(!isRoot&&!perms.get(su.tableName).canUpdate) {
+			if(perms==null||!isRoot&&!perms.get(su.tableName).canUpdate) {
 				throw new IllegalArgumentException("no select permission");
 			}
 			if(!this.tables.containsKey(su.tableName)) {
@@ -164,8 +175,8 @@ public class DataBase{
 	}
 	
 	public void createTable(String tableName, Schema sa,boolean hasPrimary) throws IOException {
-		Table tb =new Table(tableName,sa,hasPrimary);
-		tb.storeToFile(tb.tableName.concat(".schema"));
+		Table tb =new Table(dbName,tableName,sa,hasPrimary);
+		tb.storeToFile(dbName+"_"+tb.tableName.concat(".schema"));
 		addTable(tb);
 	}
 	
@@ -173,14 +184,14 @@ public class DataBase{
 		Table tb=tables.get(name);
 		tables.remove(name);
 		for(String n:tb.schema.descriptors.keySet()) {
-			File filef = new File(name.concat("_").concat(n).concat(".index"));
+			File filef = new File(dbName+"_"+name.concat("_").concat(n).concat(".index"));
 			filef.delete();
 		}
-		File file = new File(name.concat(".schema"));
+		File file = new File(dbName+"_"+name.concat(".schema"));
 		file.delete();
-		File file1 = new File(name.concat(".index"));
+		File file1 = new File(dbName+"_"+name.concat(".index"));
 		file1.delete();
-		File file2 = new File("schema.log");
+		File file2 = new File(dbName+".log");
 		file2.delete();
 		refreshLog();
 	}

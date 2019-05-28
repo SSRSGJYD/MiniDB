@@ -39,8 +39,9 @@ public class Table implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	
-	String tableName;
-	Schema schema;
+	public String tableName;
+	String dbName;
+	public Schema schema;
 	transient PrimaryIndex index;
 	transient HashMap<String,SecondaryIndex> indexs;
 	int keySize;
@@ -49,8 +50,9 @@ public class Table implements Serializable{
 	int gCount=0;
 	boolean hasPrimary=false;
 	
-	public Table(String tableName,Schema schema,boolean hasPrimary) throws IOException {
+	public Table(String dbName,String tableName,Schema schema,boolean hasPrimary) throws IOException {
 		this.tableName=tableName;
+		this.dbName=dbName;
 		this.schema=schema;
 		this.indexs=new HashMap<String,SecondaryIndex>();
 
@@ -91,7 +93,7 @@ public class Table implements Serializable{
 	public void createSecondaryIndex(Entry<String, SchemaDescriptor> entry) throws IOException {
 		SchemaDescriptor sd=entry.getValue();
 		SecondaryIndex si=null;
-		si=new SecondaryIndex(1024, sd.getType(), sd.getSize(), keyType, keySize, keySize, 1024, tableName+"_"+entry.getKey()+".index");
+		si=new SecondaryIndex(1024, sd.getType(), sd.getSize(), keyType, keySize, keySize, 1024,dbName+"_"+ tableName+"_"+entry.getKey()+".index");
 		if(indexs==null)
 			this.indexs=new HashMap<String,SecondaryIndex>();
 		indexs.put(entry.getKey(), si);	
@@ -926,6 +928,9 @@ public class Table implements Serializable{
 		case Statement.eq:
 			vs= indext.search(key,false).rows;
 			break;
+		case Statement.neq:
+			vs=indext.searchNotEqual(key).rows;
+			break;
 		}
 		for(PrimaryKeyValue pk:vs) {
 			PrimaryKey pkey=this.constructPrimaryKeyB(pk.array);
@@ -948,6 +953,8 @@ public class Table implements Serializable{
 			return index.searchByRange(null, false, true,key, true, false).rows;
 		case Statement.eq:
 			return index.search(key).rows;
+		case Statement.neq:
+			return index.searchNotEqual(key).rows;
 		}
 		return null;
 	}
@@ -1180,19 +1187,19 @@ public class Table implements Serializable{
 	public void createPrimaryIndex() throws IOException {
 		switch(keyType) {
 		case TypeConst.VALUE_TYPE_INT:
-			index=new PrimaryIndex<Integer>(1024, keyType, keySize, valueSize, 1024, tableName.concat(".index"));
+			index=new PrimaryIndex<Integer>(1024, keyType, keySize, valueSize, 1024, dbName+"_"+tableName.concat(".index"));
 			break;
 		case TypeConst.VALUE_TYPE_LONG:
-			index=new PrimaryIndex<Long>(1024, keyType, keySize, valueSize, 1024, tableName.concat(".index"));
+			index=new PrimaryIndex<Long>(1024, keyType, keySize, valueSize, 1024, dbName+"_"+tableName.concat(".index"));
 			break;
 		case TypeConst.VALUE_TYPE_DOUBLE:
-			index=new PrimaryIndex<Double>(1024, keyType, keySize, valueSize, 1024, tableName.concat(".index"));
+			index=new PrimaryIndex<Double>(1024, keyType, keySize, valueSize, 1024, dbName+"_"+tableName.concat(".index"));
 			break;
 		case TypeConst.VALUE_TYPE_FLOAT:
-			index=new PrimaryIndex<Float>(1024, keyType, keySize, valueSize, 1024, tableName.concat(".index"));
+			index=new PrimaryIndex<Float>(1024, keyType, keySize, valueSize, 1024, dbName+"_"+tableName.concat(".index"));
 			break;
 		case TypeConst.VALUE_TYPE_STRING:
-			index=new PrimaryIndex<String>(1024, keyType, keySize, valueSize, 1024, tableName.concat(".index"));
+			index=new PrimaryIndex<String>(1024, keyType, keySize, valueSize, 1024, dbName+"_"+tableName.concat(".index"));
 			break;
 		}
 	}
@@ -1212,8 +1219,8 @@ public class Table implements Serializable{
 	}
 
 	public void logToFile () throws IOException {
-	    BufferedWriter writer = new BufferedWriter(new FileWriter("schema.log",true));
-	    writer.append(this.tableName.concat(".schema"));
+	    BufferedWriter writer = new BufferedWriter(new FileWriter(dbName+".log",true));
+	    writer.append(dbName+"_"+this.tableName.concat(".schema"));
 	    writer.append('\n');
 	    writer.close();
 	}

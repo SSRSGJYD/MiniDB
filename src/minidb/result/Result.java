@@ -4,4 +4,5 @@ public abstract class Result {
 	public Result(){
 	}
 	public abstract void display();
+	public abstract String json();
 }

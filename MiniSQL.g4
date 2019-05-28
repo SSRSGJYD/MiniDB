@@ -6,6 +6,8 @@ String : '\'' (.)+? '\''
 	;
 NEWLINE:'\r'?'\n'
      |EOF;
+  
+perm : 'select' | 'update';
    
 withGrant: 'with grant option';
 
@@ -42,8 +44,9 @@ sql : 'create table' Name '(' schema ')' #create
     | 'use database' Name #usedb
     | 'show databases' #show
     | 'show database' Name #showdb
-    | 'grant' Name 'on' Name 'to' Name (withGrant)? #grant
-    | 'revoke' Name 'on' Name 'from' Name #revoke
+    | 'create user' Name 'password' Name #createUser
+    | 'grant' perm 'on' Name 'to' Name (withGrant)? #grant
+    | 'revoke' perm 'on' Name 'from' Name #revoke
     | NEWLINE #newline
     ;
     

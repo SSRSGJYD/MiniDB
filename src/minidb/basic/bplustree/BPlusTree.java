@@ -394,7 +394,7 @@ public class BPlusTree<K extends Key, V extends Value> {
         else { // internal node
             BPlusTreeInternalNode<K,V> internal = (BPlusTreeInternalNode<K,V>)node;
             // padding to account for the last pointer (if needed)
-            if(i != node.getCapacity() && key.compareTo(internal.keyList.get(i), useAll) > 0) {
+            if(i != node.getCapacity() && key.compareTo(internal.keyList.get(i), useAll) >= 0) {
                 i++;
             }
             BPlusTreeNode<K,V> nextToSearch = readNodeFromFile(internal.ptrList.get(i));
@@ -560,6 +560,43 @@ public class BPlusTree<K extends Key, V extends Value> {
             int capacity = leaf.getCapacity();
             for(int i=0; i<capacity; i++) {
             	rows.push(leaf.valueList.get(i));
+            }
+            // move on to nextInternal leaf node
+            long nextLeafIndex = leaf.getNextPageIndex();
+            if(nextLeafIndex != -1L) {
+                leaf = (BPlusTreeLeafNode<K,V>)readNodeFromFile(nextLeafIndex);
+            }
+            else{
+                break;
+            }
+        }
+
+        return new SearchResult<V>(rows);
+    }
+    
+    /**
+     * search except specific value
+     *
+     * @return a search result object
+     * @throws IOException
+     */
+    public SearchResult<V> searchNotEqual(K key) throws IOException {
+        if(root == null) {
+            return new SearchResult<V>();
+        }
+        LinkedList<V> rows = new LinkedList<V>();
+        BPlusTreeNode<K,V> iterator = root;
+        while(iterator.getNodeType() != BPlusTreeConst.NODE_TYPE_LEAF
+            && iterator.getNodeType() != BPlusTreeConst.NODE_TYPE_ROOT_LEAF) {
+            iterator = readNodeFromFile(((BPlusTreeInternalNode<K,V>) iterator).ptrList.getFirst());
+        }
+        // now iterator is at left-bottom leaf node
+        BPlusTreeLeafNode<K,V> leaf = (BPlusTreeLeafNode<K,V>)iterator;
+        while(true) {
+            int capacity = leaf.getCapacity();
+            for(int i=0; i<capacity; i++) {
+            	if(key.compareTo(leaf.keyList.get(i),false) != 0)
+            		rows.push(leaf.valueList.get(i));
             }
             // move on to nextInternal leaf node
             long nextLeafIndex = leaf.getNextPageIndex();
@@ -1203,12 +1240,7 @@ public class BPlusTree<K extends Key, V extends Value> {
                                                           BPlusTreeInternalNode<K,V> parent, int parentPointerIndex, int parentKeyIndex, boolean isLeftOfNext, boolean useNextPointer)
             throws IOException{
         assert left.getCapacity() + right.getCapacity() <= 2*leafNodeDegree-1;
-        if(isLeftOfNext && useNextPointer) {
-            left.keyList.addLast(parent.keyList.get(parentKeyIndex+1));
-        }
-        else {
-            left.keyList.addLast(parent.keyList.get(parentKeyIndex));
-        }
+        
         // move keys and pointers from right to left node
         int capacity = right.getCapacity();
         for(int i=0; i<capacity; i++) {
@@ -1524,7 +1556,7 @@ public class BPlusTree<K extends Key, V extends Value> {
     }
 
     /**
-     * adjust internal node during deletion
+     * adjust leaf node during deletion
      *
      * @param node internal node to be adjusted
      * @param parent parent of node

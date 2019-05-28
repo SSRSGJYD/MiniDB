@@ -18,6 +18,21 @@ public class TypeConst {
 
     public static final int VALUE_SIZE[] = {Integer.BYTES, Long.BYTES, Float.BYTES, Double.BYTES, Character.BYTES};
 
+	public static String toString(int type) {
+    	switch(type) {
+    	case TypeConst.VALUE_TYPE_INT:
+    		return "int";
+    	case TypeConst.VALUE_TYPE_LONG:
+    		return "long";
+    	case TypeConst.VALUE_TYPE_FLOAT:
+    		return "float";
+    	case TypeConst.VALUE_TYPE_DOUBLE:
+    		return "double";
+    	default:
+    		return "string";
+    	}
+
+    }
     public static int fromString(String str) {
     	if(str.equalsIgnoreCase("Int")) return VALUE_TYPE_INT;
     	else if(str.equalsIgnoreCase("Long")) return VALUE_TYPE_LONG;

@@ -82,6 +82,16 @@ public class PrimaryIndex<K extends Comparable<K>> {
     public SearchResult<Row> searchAll() throws IOException {
         return (SearchResult<Row>)tree.searchAll();
     }
+    
+    /**
+     * search except specific key
+     *
+     * @return a SearchResult Object
+     * @throws IOException
+     */
+    public SearchResult<Row> searchNotEqual(PrimaryKey<K> key) throws IOException {
+        return (SearchResult<Row>)tree.searchNotEqual(key);
+    }
 
     /**
      * delete a (key,value) pair
