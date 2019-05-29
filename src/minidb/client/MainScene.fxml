@@ -16,6 +16,8 @@
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem fx:id="openMenuItem" mnemonicParsing="false" onAction="#openScript" text="Open script" />
                   <MenuItem fx:id="saveMenuItem" mnemonicParsing="false" onAction="#saveScript" text="Save script" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="openMenuItem1" mnemonicParsing="false" onAction="#importExecute" text="Import &amp; Execute" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Help">
