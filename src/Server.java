@@ -39,7 +39,7 @@ public class Server {
 		String msg = null;
 		
 		public responseMsg() {
-			// TODO 自动生成的构造函数存根
+			// TODO 鑷姩鐢熸垚鐨勬瀯閫犲嚱鏁板瓨鏍�
 			this.msg = null;
 		}
 	}
@@ -110,25 +110,23 @@ public class Server {
 					return false;
 				}
 			}
-
 		}
 		return true;
 
 	}
 	
-	//启动服务器，监听客户端请求
+	//鍚姩鏈嶅姟鍣紝鐩戝惉瀹㈡埛绔姹�
 	public static void main(String[] args) throws IOException, ClassNotFoundException {
-		//初始化 MiniDB
+		//鍒濆鍖� MiniDB
 		db = new MiniDB();
 		
-		
 		//HttpServerProvider provider = HttpServerProvider.provider();
-		//监听端口8080，同时接收100个请求
+		//鐩戝惉绔彛8080锛屽悓鏃舵帴鏀�100涓姹�
 		HttpServer httpServer = HttpServer.create(new InetSocketAddress(8080), 100);
-		//监听Login请求
+		//鐩戝惉Login璇锋眰
 		HttpContext contextLogin = httpServer.createContext("/login", new LoginHandler());
 		//contextLogin.getFilters().add(new ParameterFilter());
-		//监听SQL请求
+		//鐩戝惉SQL璇锋眰
 		HttpContext contextSQL = httpServer.createContext("/execute", new ExecuteHandler());
 		//contextSQL.getFilters().add(new ParameterFilter());
 		
@@ -137,17 +135,17 @@ public class Server {
 		System.out.println("Server started!");
 	}
 	
-	//Login请求处理
+	//Login璇锋眰澶勭悊
 	static class LoginHandler implements HttpHandler {
 		@Override
 		public void handle(HttpExchange Exchange) throws IOException {		
-			//响应信息
+			//鍝嶅簲淇℃伅
 			responseMsg responseMsg = new responseMsg();
 			responseMsg.msg = "{\"msg\":\"login failed!\"}";
 			Headers responseHeaders = Exchange.getResponseHeaders();
 			responseHeaders.set("Content-Type", "application/json");
 			
-			//获取请求方法
+			//鑾峰彇璇锋眰鏂规硶
 			String requestMethod = Exchange.getRequestMethod();
 			System.out.println("method:" + requestMethod);
 			
@@ -155,7 +153,7 @@ public class Server {
 			String username = null;
 			String password = null;
 			if(requestMethod.equals("GET")) {
-				//获得get参数
+				//鑾峰緱get鍙傛暟
 				Map<String, Object> parameters = new HashMap<String, Object>();
                 URI requestedUri = Exchange.getRequestURI();
                 String query = requestedUri.getRawQuery();
@@ -164,7 +162,7 @@ public class Server {
 				password = (String) parameters.get("password");	
 			}
 			else if(requestMethod.equals("POST")) {
-				//获得post参数
+				//鑾峰緱post鍙傛暟
 				//parse request
 	            Map<String, Object> parameters = new HashMap<String, Object>();
 	            InputStreamReader isr = new InputStreamReader(Exchange.getRequestBody(), "utf-8");
@@ -178,21 +176,21 @@ public class Server {
 			System.out.println("username:" + username);
 			System.out.println("password:" + password);	
 			
-			//验证用户
+			//楠岃瘉鐢ㄦ埛
 			if(!db.login(username, password)) {
-				//响应格式
+				//鍝嶅簲鏍煎紡
 				responseMsg.msg = "{\"msg\":\"login failed!\"}";
 				Exchange.sendResponseHeaders(500, responseMsg.msg.getBytes().length);
 			}
 			else {
-				//响应格式
-				//responseMsg.msg = db.getInfo();
-				responseMsg.msg = "{\"msg\":\"login failed!\"}";
+				//鍝嶅簲鏍煎紡
+				responseMsg.msg = db.getInfo();
+//				responseMsg.msg = "{\"msg\":\"login failed!\"}";
 				Exchange.sendResponseHeaders(200, responseMsg.msg.getBytes().length);
 			}
 			
 			//Exchange.sendResponseHeaders(200, responseMsg.msg.getBytes().length);
-			//获得输出流
+			//鑾峰緱杈撳嚭娴�
 			OutputStream out = Exchange.getResponseBody();
 			out.write(responseMsg.msg.getBytes());
 			out.flush();
@@ -200,17 +198,17 @@ public class Server {
 		}
 	}
 	
-	//SQL请求处理
+	//SQL璇锋眰澶勭悊
 	static class ExecuteHandler implements HttpHandler {
 		@Override
 		public void handle(HttpExchange Exchange) throws IOException {
-			//响应信息
+			//鍝嶅簲淇℃伅
 			responseMsg responseMsg = new responseMsg();
-			//响应格式
+			//鍝嶅簲鏍煎紡
 			Headers responseHeaders = Exchange.getResponseHeaders();
 			responseHeaders.set("Content-Type", "application/json");
 			
-			//获取请求方法
+			//鑾峰彇璇锋眰鏂规硶
 			String requestMethod = Exchange.getRequestMethod();
 			System.out.println("method:" + requestMethod);
 			
@@ -220,7 +218,7 @@ public class Server {
 			String sql = null;
 			String mode = null;
 			if(requestMethod.equals("GET")) {
-				//获得request参数
+				//鑾峰緱request鍙傛暟
 				 // parse request
                 Map<String, Object> parameters = new HashMap<String, Object>();
                 URI requestedUri = Exchange.getRequestURI();
@@ -231,7 +229,7 @@ public class Server {
 				sql = (String) parameters.get("sql");
 			}
 			else if(requestMethod.equals("POST")) {
-				//获得post参数
+				//鑾峰緱post鍙傛暟
 				// parse request
 	            Map<String, Object> parameters = new HashMap<String, Object>();
 	            InputStreamReader isr = new InputStreamReader(Exchange.getRequestBody(), "utf-8");
@@ -253,19 +251,19 @@ public class Server {
 			try {
 				if(sqlExecute(sql, responseMsg,mode)) {
 					System.out.println("responseMsg:" + responseMsg.msg);
-					//响应格式
+					//鍝嶅簲鏍煎紡
 					Exchange.sendResponseHeaders(200, responseMsg.msg.getBytes().length);
 				}
 				else {
 					System.out.println("responseMsg:" + responseMsg.msg);
-					//响应格式
+					//鍝嶅簲鏍煎紡
 					Exchange.sendResponseHeaders(500, responseMsg.msg.getBytes().length);
 				}
 			} catch (ClassNotFoundException e) {
 				System.out.println(e);
 			}
 			
-			//获得输出流
+			//鑾峰緱杈撳嚭娴�
 			OutputStream out = Exchange.getResponseBody();
 			out.write(responseMsg.msg.getBytes());
 			out.flush();

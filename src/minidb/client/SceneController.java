@@ -152,6 +152,7 @@ public class SceneController {
 		    });
 		
 		// toggle group (radio buttons)
+		printResult = true;
 		group = new ToggleGroup();
 		printResultRadio.setToggleGroup(group);
 		printResultRadio.setUserData(0);
@@ -230,10 +231,46 @@ public class SceneController {
 	}
 	
 	public void execute() {
+		final String sql = textArea.getText();
+		doExecute(sql, "single");
+	}
+	
+	public void importExecute() {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Import Script and Execute");
+		File f = fileChooser.showOpenDialog(stage);
+		if(f != null) {
+			if(f.canRead()) {
+				try {
+					FileInputStream reader = new FileInputStream(f);
+					Long fileLength = f.length();
+					byte[] bytes = new byte[fileLength.intValue()];
+					reader.read(bytes);
+					reader.close();
+					textArea.setText("import " + f.getAbsolutePath());
+					doExecute(new String(bytes), "multi");
+				} catch (IOException e) {
+					Alert information = new Alert(Alert.AlertType.ERROR,"cannot read the file!");
+					information.setTitle("error"); 
+					information.setHeaderText("Error!");	
+					information.show();
+					e.printStackTrace();
+				}
+			}
+			else {
+				Alert information = new Alert(Alert.AlertType.ERROR,"cannot read the file!");
+				information.setTitle("error"); 
+				information.setHeaderText("Error!");	
+				information.show();
+			}
+		}
+		
+	}
+	
+	public void doExecute(String sql, String mode) {
 		if(inExecution) {
 			return;
 		}
-		final String sql = textArea.getText();
 		try {
 			String executeURL = connectionInfo.baseURL + "/execute";
 			HttpPost httpPost = new HttpPost(executeURL);
@@ -242,6 +279,7 @@ public class SceneController {
 			pairs.add(new BasicNameValuePair("username", connectionInfo.username));
 			pairs.add(new BasicNameValuePair("password", connectionInfo.password));
 			pairs.add(new BasicNameValuePair("sql", sql));
+			pairs.add(new BasicNameValuePair("mode", mode));
 			httpPost.setEntity(new UrlEncodedFormEntity(pairs, "UTF-8"));
 			
 			// async request
@@ -253,7 +291,7 @@ public class SceneController {
 						Platform.runLater(new Runnable() {
 						    @Override
 						    public void run() {
-						        //更新JavaFX的主线程的代码放在此处
+						        //鏇存柊JavaFX鐨勪富绾跨▼鐨勪唬鐮佹斁鍦ㄦ澶�
 						    	// execute success
 								HttpEntity entity = response.getEntity();
 								if(entity != null) { 
@@ -263,11 +301,13 @@ public class SceneController {
 									} catch (ParseException | IOException e) {
 										e.printStackTrace();
 									}
-									if(responseStr != "") {
+									JSONObject object = JSONObject.parseObject(responseStr);
+									boolean hasData = object.getBooleanValue("data");
+									if(hasData) {
 										if(printResult) {
 											// show result table
 											TableView<Map> tableView = new TableView<>();
-											JSONObject object = JSONObject.parseObject(responseStr);
+											
 											JSONArray attributeArr = (JSONArray) object.get("attributes");
 											for(Object attribute:attributeArr) {
 												TableColumn<Map, String> column = new TableColumn<Map, String>((String)attribute);
@@ -296,7 +336,6 @@ public class SceneController {
 												File f = new File(resultFilePath);
 												FileWriter writer = new FileWriter(f);
 
-												JSONObject object = JSONObject.parseObject(responseStr);
 												JSONArray attributeArr = (JSONArray) object.get("attributes");
 												// attribute header
 												for(Object attribute:attributeArr) {
@@ -322,6 +361,16 @@ public class SceneController {
 											}
 										}
 									}
+									else { // no data
+										// show msg in result area
+										String msg = object.getString("msg");
+										TextArea area = new TextArea();
+										area.setText(msg);
+										resultScroll.setContent(area);
+										// show execution time
+										float time = object.getFloatValue("time");
+										bottomLabel.setText(String.format("execution time:%f", time));
+									}
 								}
 						    }
 						});
@@ -331,7 +380,7 @@ public class SceneController {
 						Platform.runLater(new Runnable() {
 						    @Override
 						    public void run() {
-						        //更新JavaFX的主线程的代码放在此处
+						        //鏇存柊JavaFX鐨勪富绾跨▼鐨勪唬鐮佹斁鍦ㄦ澶�
 						    	HttpEntity entity = response.getEntity();
 								if(entity != null) { 
 									String responseStr = null;
@@ -340,19 +389,17 @@ public class SceneController {
 									} catch (ParseException | IOException e) {
 										e.printStackTrace();
 									}
-									if(responseStr != "") {
-										JSONObject object = JSONObject.parseObject(responseStr);
-										String errorMsg = object.getString("msg");
-										// show error msg in result area
-										TextArea area = new TextArea();
-										area.setText(errorMsg);
-										resultScroll.setContent(area);
-										// show error msg in alert dialog
-										Alert information = new Alert(Alert.AlertType.ERROR, errorMsg);
-										information.setTitle("error"); 
-										information.setHeaderText("Error!");	
-										information.show();
-									}
+									JSONObject object = JSONObject.parseObject(responseStr);
+									String errorMsg = object.getString("msg");
+									// show error msg in result area
+									TextArea area = new TextArea();
+									area.setText(errorMsg);
+									resultScroll.setContent(area);
+									// show error msg in alert dialog
+									Alert information = new Alert(Alert.AlertType.ERROR, errorMsg);
+									information.setTitle("error"); 
+									information.setHeaderText("Error!");	
+									information.show();
 								}
 						    }
 						});
@@ -365,7 +412,7 @@ public class SceneController {
                 	Platform.runLater(new Runnable() {
                 	    @Override
                 	    public void run() {
-                	        //更新JavaFX的主线程的代码放在此处
+                	        //鏇存柊JavaFX鐨勪富绾跨▼鐨勪唬鐮佹斁鍦ㄦ澶�
                 	    	inExecution = false;
         					Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
         					information.setTitle("error"); 
@@ -380,7 +427,7 @@ public class SceneController {
                 	Platform.runLater(new Runnable() {
                 	    @Override
                 	    public void run() {
-                	        //更新JavaFX的主线程的代码放在此处
+                	        //鏇存柊JavaFX鐨勪富绾跨▼鐨勪唬鐮佹斁鍦ㄦ澶�
                 	    	inExecution = false;
         					Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
         					information.setTitle("error"); 
@@ -433,54 +480,60 @@ public class SceneController {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Open Script");
 		File f = fileChooser.showOpenDialog(stage);
-		if(f.canRead()) {
-			try {
-				FileInputStream reader = new FileInputStream(f);
-				Long fileLength = f.length();
-				byte[] bytes = new byte[fileLength.intValue()];
-				reader.read(bytes);
-				reader.close();
-				textArea.setText(new String(bytes));
-			} catch (IOException e) {
+		if(f != null) {
+			if(f.canRead()) {
+				try {
+					FileInputStream reader = new FileInputStream(f);
+					Long fileLength = f.length();
+					byte[] bytes = new byte[fileLength.intValue()];
+					reader.read(bytes);
+					reader.close();
+					textArea.setText(new String(bytes));
+				} catch (IOException e) {
+					Alert information = new Alert(Alert.AlertType.ERROR,"cannot read the file!");
+					information.setTitle("error"); 
+					information.setHeaderText("Error!");	
+					information.show();
+					e.printStackTrace();
+				}
+			}
+			else {
 				Alert information = new Alert(Alert.AlertType.ERROR,"cannot read the file!");
 				information.setTitle("error"); 
 				information.setHeaderText("Error!");	
 				information.show();
-				e.printStackTrace();
 			}
 		}
-		else {
-			Alert information = new Alert(Alert.AlertType.ERROR,"cannot read the file!");
-			information.setTitle("error"); 
-			information.setHeaderText("Error!");	
-			information.show();
-		}
+		
 	}
 	
 	public void saveScript() {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Save Script");
 		File f = fileChooser.showOpenDialog(stage);
-		if(f.canWrite()) {
-			try {
-				FileOutputStream writer = new FileOutputStream(f);
-				byte[] bytes = textArea.getText().getBytes();
-				writer.write(bytes);
-				writer.close();
-			} catch (IOException e) {
+		if(f != null) {
+			if(f.canWrite()) {
+				try {
+					FileOutputStream writer = new FileOutputStream(f);
+					byte[] bytes = textArea.getText().getBytes();
+					writer.write(bytes);
+					writer.close();
+				} catch (IOException e) {
+					Alert information = new Alert(Alert.AlertType.ERROR,"cannot write to the file!");
+					information.setTitle("error"); 
+					information.setHeaderText("Error!");	
+					information.show();
+					e.printStackTrace();
+				}
+			}
+			else {
 				Alert information = new Alert(Alert.AlertType.ERROR,"cannot write to the file!");
 				information.setTitle("error"); 
 				information.setHeaderText("Error!");	
 				information.show();
-				e.printStackTrace();
 			}
 		}
-		else {
-			Alert information = new Alert(Alert.AlertType.ERROR,"cannot write to the file!");
-			information.setTitle("error"); 
-			information.setHeaderText("Error!");	
-			information.show();
-		}
+		
 	}
 	
 	public void about() {
