@@ -5,15 +5,20 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.ParseException;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
@@ -232,13 +237,13 @@ public class SceneController {
 		try {
 			String executeURL = connectionInfo.baseURL + "/execute";
 			HttpPost httpPost = new HttpPost(executeURL);
-			httpPost.addHeader(HTTP.CONTENT_TYPE,"application/x-www-form-urlencoded");
-			String json = String.format("{'username':%s,'password':%s,'sql':%s}", 
-					connectionInfo.username, connectionInfo.password, sql);
-			StringEntity se = new StringEntity(json);
-			se.setContentEncoding("UTF-8");
-			se.setContentType("application/json");
-			httpPost.setEntity(se);
+			httpPost.addHeader(HTTP.CONTENT_TYPE,"application/json");
+			List<NameValuePair> pairs = new ArrayList<NameValuePair>();
+			pairs.add(new BasicNameValuePair("username", connectionInfo.username));
+			pairs.add(new BasicNameValuePair("password", connectionInfo.password));
+			pairs.add(new BasicNameValuePair("sql", sql));
+			httpPost.setEntity(new UrlEncodedFormEntity(pairs, "UTF-8"));
+			
 			// async request
 			inExecution = true;
 			connectionInfo.httpClient.start();
