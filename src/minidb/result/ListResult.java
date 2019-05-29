@@ -10,14 +10,13 @@ import org.json.simple.JSONObject;
 public class ListResult extends Result {
 
 	public ArrayList<String> data;
-	public long time;
 	@Override
 	public void display() {
 		System.out.print(data);
 
 	}
 	@Override
-	public String json() {
+	public String json(long timeT) {
 
 		  JSONObject obj = new JSONObject();
 	      JSONArray list =new JSONArray();
@@ -30,7 +29,7 @@ public class ListResult extends Result {
 	      }
 	      obj.put("attributes",list);
 	      obj.put("rows",rows);
-	      obj.put("time",time);
+	      obj.put("time",timeT);
 	      obj.put("data",true);
 	      return obj.toString();
 

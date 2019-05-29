@@ -12,7 +12,6 @@ public class QueryResult extends Result {
 	//TODO HashMap
 	public ArrayList<LinkedHashMap<String,Object>> data;
 	public HashMap<String,Integer> types;
-	public long time;
 	public QueryResult() {
 	}
 	@Override
@@ -20,7 +19,7 @@ public class QueryResult extends Result {
 		System.out.print(data);
 	}
 	@SuppressWarnings("unchecked")
-	public String json() {
+	public String json(long timeT) {
 		  JSONObject obj = new JSONObject();
 	      JSONArray list =new JSONArray();
 	      JSONArray rows=new JSONArray();
@@ -36,7 +35,7 @@ public class QueryResult extends Result {
 	      }
 	      obj.put("attributes",list);
 	      obj.put("rows",rows);
-	      obj.put("time",time);
+	      obj.put("time",timeT);
 	      obj.put("data",true);
 	      return obj.toString();
 
