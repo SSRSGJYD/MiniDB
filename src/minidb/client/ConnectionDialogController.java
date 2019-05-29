@@ -88,11 +88,11 @@ public class ConnectionDialogController {
 					     .build();
 			
 			HttpPost httpPost = new HttpPost(loginURL);
-			httpPost.addHeader(HTTP.CONTENT_TYPE,"application/x-www-form-urlencoded");
+			httpPost.addHeader(HTTP.CONTENT_TYPE,"text/plain");
 			String json = String.format("{'username':%s,'password':%s}", usernameTextField.getText(), passwordTextField.getText());
 			StringEntity se = new StringEntity(json);
 			se.setContentEncoding("UTF-8");
-			se.setContentType("application/json");
+			se.setContentType("text/plain");
 			httpPost.setEntity(se);
 			// async request
 			httpClient.start();
