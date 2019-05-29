@@ -96,7 +96,6 @@ public class MiniDB {
 
 	public void open() throws IOException, ClassNotFoundException {
 		this.loadUserFromFile();
-		System.out.print(users);
 		File file = new File("log.dbs"); 
 		if(!file.exists())
 			return;
@@ -189,8 +188,6 @@ public class MiniDB {
 				if(!dbs.containsKey(sdb.dbName)) {
 					throw new IllegalArgumentException("database not exist");
 				}
-
-
 				this.dropTable(sdb.dbName);
 
 				res=new BoolResult();
@@ -207,12 +204,16 @@ public class MiniDB {
 				res=new BoolResult();
 				break;
 			case StatementDB.show:
+				long startTime = System.nanoTime();
 				ListResult lr=new ListResult();
 				ArrayList<String> ls=new ArrayList<String>(dbs.keySet());
 				lr.data=ls;
+				long totalTime = System.nanoTime()- startTime;
+				lr.time=totalTime;
 				res=lr;
 				break;
 			case StatementDB.showdb:
+				startTime = System.nanoTime();
 				if(!dbs.containsKey(sdb.dbName)) {
 					throw new IllegalArgumentException("database not exist");
 				}
@@ -220,6 +221,8 @@ public class MiniDB {
 				ListResult tlr=new ListResult();
 				ArrayList<String> tls=new ArrayList<String>(tdb.tables.keySet());
 				tlr.data=tls;
+				totalTime = System.nanoTime()- startTime;
+				tlr.time=totalTime;
 				res=tlr;
 				break;
 			}
@@ -234,12 +237,12 @@ public class MiniDB {
 	private void dropTable(String dbName) throws IOException {
 		File file = new File("log.dbs");
 		file.delete();
-		this.refreshLog();
 		DataBase db = dbs.get(dbName);
 		for(String name:db.tables.keySet()) {
 			db.dropTable(name);
 		}
 		dbs.remove(dbName);
+		this.refreshLog();
 	}
 
 	private void logToFile(String dbName) throws IOException {

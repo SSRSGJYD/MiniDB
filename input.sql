@@ -17,3 +17,5 @@ delete from play where name=5
 delete from play where name=7
 delete from play where name=9
 select name from play where (name > 9500 and name < 9550)
+
+drop database db

@@ -21,6 +21,7 @@ public class BoolResult extends Result {
 	public String json() {
 		JSONObject obj=new JSONObject();
 		obj.put("msg", "");
+	    obj.put("data",false);
 		return obj.toString();
 	}
 

@@ -12,7 +12,7 @@ public class QueryResult extends Result {
 	//TODO HashMap
 	public ArrayList<LinkedHashMap<String,Object>> data;
 	public HashMap<String,Integer> types;
-	public double time;
+	public long time;
 	public QueryResult() {
 	}
 	@Override
@@ -37,6 +37,7 @@ public class QueryResult extends Result {
 	      obj.put("attributes",list);
 	      obj.put("rows",rows);
 	      obj.put("time",time);
+	      obj.put("data",true);
 	      return obj.toString();
 
 	}
