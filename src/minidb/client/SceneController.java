@@ -152,6 +152,7 @@ public class SceneController {
 		    });
 		
 		// toggle group (radio buttons)
+		printResult = true;
 		group = new ToggleGroup();
 		printResultRadio.setToggleGroup(group);
 		printResultRadio.setUserData(0);
@@ -263,11 +264,13 @@ public class SceneController {
 									} catch (ParseException | IOException e) {
 										e.printStackTrace();
 									}
-									if(responseStr != "") {
+									JSONObject object = JSONObject.parseObject(responseStr);
+									boolean data = object.getBooleanValue("data");
+									if(data) {
 										if(printResult) {
 											// show result table
 											TableView<Map> tableView = new TableView<>();
-											JSONObject object = JSONObject.parseObject(responseStr);
+											
 											JSONArray attributeArr = (JSONArray) object.get("attributes");
 											for(Object attribute:attributeArr) {
 												TableColumn<Map, String> column = new TableColumn<Map, String>((String)attribute);
@@ -296,7 +299,6 @@ public class SceneController {
 												File f = new File(resultFilePath);
 												FileWriter writer = new FileWriter(f);
 
-												JSONObject object = JSONObject.parseObject(responseStr);
 												JSONArray attributeArr = (JSONArray) object.get("attributes");
 												// attribute header
 												for(Object attribute:attributeArr) {
@@ -322,6 +324,16 @@ public class SceneController {
 											}
 										}
 									}
+									else { // no data
+										// show msg in result area
+										String msg = object.getString("msg");
+										TextArea area = new TextArea();
+										area.setText(msg);
+										resultScroll.setContent(area);
+										// show execution time
+										float time = object.getFloatValue("time");
+										bottomLabel.setText(String.format("execution time:%f", time));
+									}
 								}
 						    }
 						});
@@ -340,19 +352,17 @@ public class SceneController {
 									} catch (ParseException | IOException e) {
 										e.printStackTrace();
 									}
-									if(responseStr != "") {
-										JSONObject object = JSONObject.parseObject(responseStr);
-										String errorMsg = object.getString("msg");
-										// show error msg in result area
-										TextArea area = new TextArea();
-										area.setText(errorMsg);
-										resultScroll.setContent(area);
-										// show error msg in alert dialog
-										Alert information = new Alert(Alert.AlertType.ERROR, errorMsg);
-										information.setTitle("error"); 
-										information.setHeaderText("Error!");	
-										information.show();
-									}
+									JSONObject object = JSONObject.parseObject(responseStr);
+									String errorMsg = object.getString("msg");
+									// show error msg in result area
+									TextArea area = new TextArea();
+									area.setText(errorMsg);
+									resultScroll.setContent(area);
+									// show error msg in alert dialog
+									Alert information = new Alert(Alert.AlertType.ERROR, errorMsg);
+									information.setTitle("error"); 
+									information.setHeaderText("Error!");	
+									information.show();
 								}
 						    }
 						});

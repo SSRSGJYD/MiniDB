@@ -59,7 +59,7 @@ public class MiniDB {
 				table.put("attributes", attrs);
 				list.add(table);
 			}
-			obj.put("database_name",current.dbName);
+			obj.put("database_name",db.dbName);
 			obj.put("schemas",list);
 			objs.add(obj);
 		}
@@ -69,7 +69,7 @@ public class MiniDB {
 		User user=users.get(un);
 		if(user == null)
 			return false;
-		if(user.password==pw) {
+		if(pw.equals(user.password)) {
 			curUser=user;
 			return true;
 		}

@@ -71,7 +71,7 @@ public class Server {
 			return true;
 		}
 		catch(Exception e) {
-			responseMsg.msg = "{\"msg\":\"syntax error!\"}";
+			responseMsg.msg = "{\"msg\":\"server error!\"}";
 			return false;
 		}
 
@@ -81,7 +81,6 @@ public class Server {
 	public static void main(String[] args) throws IOException, ClassNotFoundException {
 		//初始化 MiniDB
 		db = new MiniDB();
-		
 		
 		//HttpServerProvider provider = HttpServerProvider.provider();
 		//监听端口8080，同时接收100个请求
@@ -147,7 +146,7 @@ public class Server {
 			}
 			else {
 				//响应格式
-				//responseMsg.msg = db.getInfo();
+				responseMsg.msg = db.getInfo();
 				responseMsg.msg = "{\"msg\":\"login failed!\"}";
 				Exchange.sendResponseHeaders(200, responseMsg.msg.getBytes().length);
 			}
