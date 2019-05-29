@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;  
 import java.io.InputStream;  
 import java.io.InputStreamReader;  
@@ -43,36 +44,74 @@ public class Server {
 		}
 	}
 	
-	public static boolean sqlExecute(String sql, responseMsg responseMsg) throws ClassNotFoundException, IOException {
+	public static boolean sqlExecute(String sql, responseMsg responseMsg,String mode) throws ClassNotFoundException, IOException {
 		if(sql==null || sql.length()==0) {
 			responseMsg = null;
 			return true;
 		}
-		CharStream input = CharStreams.fromString(sql);
-		MiniSQLLexer lexer = new MiniSQLLexer(input);
-		lexer.removeErrorListeners();
-		lexer.addErrorListener(ThrowingErrorListener.INSTANCE);
+		if(mode.equals("single")) {
+			CharStream input = CharStreams.fromString(sql);
+			MiniSQLLexer lexer = new MiniSQLLexer(input);
+			lexer.removeErrorListeners();
+			lexer.addErrorListener(ThrowingErrorListener.INSTANCE);
 
-		CommonTokenStream tokens = new CommonTokenStream(lexer);
+			CommonTokenStream tokens = new CommonTokenStream(lexer);
 
-		MiniSQLParser parser = new MiniSQLParser(tokens);
-		parser.removeErrorListeners();
-		parser.addErrorListener(ThrowingErrorListener.INSTANCE);
+			MiniSQLParser parser = new MiniSQLParser(tokens);
+			parser.removeErrorListeners();
+			parser.addErrorListener(ThrowingErrorListener.INSTANCE);
 
-		try {
-			ParseTree tree = parser.sql();
-			
-			MyListener extractor = new MyListener();
-			ParseTreeWalker walker=new ParseTreeWalker();
-			walker.walk(extractor, tree);		
-			
-			Result res = db.execute(extractor.st);
-			responseMsg.msg = res.json();
-			return true;
+			try {
+				ParseTree tree = parser.sql();
+				
+				MyListener extractor = new MyListener();
+				ParseTreeWalker walker=new ParseTreeWalker();
+				walker.walk(extractor, tree);		
+				
+				Result res = db.execute(extractor.st);
+				responseMsg.msg = res.json();
+				return true;
+			}
+			catch(Exception e) {
+				responseMsg.msg = "{\"msg\":\"syntax error!\"}";
+				return false;
+			}
 		}
-		catch(Exception e) {
-			responseMsg.msg = "{\"msg\":\"syntax error!\"}";
-			return false;
+		else {
+			InputStream targetStream = new ByteArrayInputStream(sql.getBytes());
+			InputStreamReader in=new InputStreamReader(targetStream);
+			BufferedReader br=new BufferedReader(in);
+			String cmd;
+			while((cmd=br.readLine())!=null) {
+				if(cmd.length()==0)continue;
+				CharStream input = CharStreams.fromString(cmd);
+				MiniSQLLexer lexer = new MiniSQLLexer(input);
+				lexer.removeErrorListeners();
+				lexer.addErrorListener(ThrowingErrorListener.INSTANCE);
+
+				CommonTokenStream tokens = new CommonTokenStream(lexer);
+
+				MiniSQLParser parser = new MiniSQLParser(tokens);
+				parser.removeErrorListeners();
+				parser.addErrorListener(ThrowingErrorListener.INSTANCE);
+
+				try {
+					ParseTree tree = parser.sql();
+					
+					MyListener extractor = new MyListener();
+					ParseTreeWalker walker=new ParseTreeWalker();
+					walker.walk(extractor, tree);		
+					
+					Result res = db.execute(extractor.st);
+					responseMsg.msg = res.json();
+					return true;
+				}
+				catch(Exception e) {
+					responseMsg.msg = "{\"msg\":\"syntax error!\"}";
+					return false;
+				}
+			}
+
 		}
 
 	}
@@ -179,6 +218,7 @@ public class Server {
 			String username = null;
 			String password = null;
 			String sql = null;
+			String mode = null;
 			if(requestMethod.equals("GET")) {
 				//获得request参数
 				 // parse request
@@ -203,6 +243,7 @@ public class Server {
 				username = (String) parameters.get("username");
 				password = (String) parameters.get("password");
 				sql = (String) parameters.get("sql");
+				mode = (String) parameters.get("mode");
 			}
 			
 			System.out.println("username:" + username);
@@ -210,7 +251,7 @@ public class Server {
 			System.out.println("sql:" + sql);
 			
 			try {
-				if(sqlExecute(sql, responseMsg)) {
+				if(sqlExecute(sql, responseMsg,mode)) {
 					System.out.println("responseMsg:" + responseMsg.msg);
 					//响应格式
 					Exchange.sendResponseHeaders(200, responseMsg.msg.getBytes().length);
