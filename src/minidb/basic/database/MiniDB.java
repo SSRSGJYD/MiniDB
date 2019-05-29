@@ -59,7 +59,7 @@ public class MiniDB {
 				table.put("attributes", attrs);
 				list.add(table);
 			}
-			obj.put("database_name",current.dbName);
+			obj.put("database_name",db.dbName);
 			obj.put("schemas",list);
 			objs.add(obj);
 		}
@@ -69,7 +69,7 @@ public class MiniDB {
 		User user=users.get(un);
 		if(user == null)
 			return false;
-		if(user.password==pw) {
+		if(pw.equals(user.password)) {
 			curUser=user;
 			return true;
 		}
@@ -188,8 +188,6 @@ public class MiniDB {
 				if(!dbs.containsKey(sdb.dbName)) {
 					throw new IllegalArgumentException("database not exist");
 				}
-
-
 				this.dropTable(sdb.dbName);
 
 				res=new BoolResult();
@@ -206,12 +204,16 @@ public class MiniDB {
 				res=new BoolResult();
 				break;
 			case StatementDB.show:
+				long startTime = System.nanoTime();
 				ListResult lr=new ListResult();
 				ArrayList<String> ls=new ArrayList<String>(dbs.keySet());
 				lr.data=ls;
+				long totalTime = System.nanoTime()- startTime;
+				lr.time=totalTime;
 				res=lr;
 				break;
 			case StatementDB.showdb:
+				startTime = System.nanoTime();
 				if(!dbs.containsKey(sdb.dbName)) {
 					throw new IllegalArgumentException("database not exist");
 				}
@@ -219,6 +221,8 @@ public class MiniDB {
 				ListResult tlr=new ListResult();
 				ArrayList<String> tls=new ArrayList<String>(tdb.tables.keySet());
 				tlr.data=tls;
+				totalTime = System.nanoTime()- startTime;
+				tlr.time=totalTime;
 				res=tlr;
 				break;
 			}
@@ -233,12 +237,12 @@ public class MiniDB {
 	private void dropTable(String dbName) throws IOException {
 		File file = new File("log.dbs");
 		file.delete();
-		this.refreshLog();
 		DataBase db = dbs.get(dbName);
 		for(String name:db.tables.keySet()) {
 			db.dropTable(name);
 		}
 		dbs.remove(dbName);
+		this.refreshLog();
 	}
 
 	private void logToFile(String dbName) throws IOException {

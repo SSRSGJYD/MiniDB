@@ -1,10 +1,16 @@
 package minidb.result;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 public class ListResult extends Result {
 
 	public ArrayList<String> data;
+	public long time;
 	@Override
 	public void display() {
 		System.out.print(data);
@@ -12,8 +18,22 @@ public class ListResult extends Result {
 	}
 	@Override
 	public String json() {
-		// TODO Auto-generated method stub
-		return null;
+
+		  JSONObject obj = new JSONObject();
+	      JSONArray list =new JSONArray();
+	      JSONArray rows=new JSONArray();
+		  list.add("name");
+	      for(String row:data) {
+			  JSONObject objt = new JSONObject();
+			  objt.put("name", row);
+	    	  rows.add(objt);
+	      }
+	      obj.put("attributes",list);
+	      obj.put("rows",rows);
+	      obj.put("time",time);
+	      obj.put("data",true);
+	      return obj.toString();
+
 	}
 
 }
