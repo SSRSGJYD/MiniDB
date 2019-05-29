@@ -94,7 +94,6 @@ public class MiniDB {
 
 	public void open() throws IOException, ClassNotFoundException {
 		this.loadUserFromFile();
-		System.out.print(users);
 		File file = new File("log.dbs"); 
 		if(!file.exists())
 			return;
