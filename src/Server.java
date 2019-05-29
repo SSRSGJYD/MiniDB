@@ -104,7 +104,6 @@ public class Server {
 					
 					Result res = db.execute(extractor.st);
 					responseMsg.msg = res.json();
-					return true;
 				}
 				catch(Exception e) {
 					responseMsg.msg = "{\"msg\":\"syntax error!\"}";
@@ -113,6 +112,7 @@ public class Server {
 			}
 
 		}
+		return true;
 
 	}
 	
