@@ -254,7 +254,7 @@ public class SceneController {
 						Platform.runLater(new Runnable() {
 						    @Override
 						    public void run() {
-						        //鏇存柊JavaFX鐨勪富绾跨▼鐨勪唬鐮佹斁鍦ㄦ澶�
+						        //更新JavaFX的主线程的代码放在此处
 						    	// execute success
 								HttpEntity entity = response.getEntity();
 								if(entity != null) { 
@@ -343,7 +343,7 @@ public class SceneController {
 						Platform.runLater(new Runnable() {
 						    @Override
 						    public void run() {
-						        //鏇存柊JavaFX鐨勪富绾跨▼鐨勪唬鐮佹斁鍦ㄦ澶�
+						        //更新JavaFX的主线程的代码放在此处
 						    	HttpEntity entity = response.getEntity();
 								if(entity != null) { 
 									String responseStr = null;
@@ -375,7 +375,7 @@ public class SceneController {
                 	Platform.runLater(new Runnable() {
                 	    @Override
                 	    public void run() {
-                	        //鏇存柊JavaFX鐨勪富绾跨▼鐨勪唬鐮佹斁鍦ㄦ澶�
+                	        //更新JavaFX的主线程的代码放在此处
                 	    	inExecution = false;
         					Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
         					information.setTitle("error"); 
@@ -390,7 +390,7 @@ public class SceneController {
                 	Platform.runLater(new Runnable() {
                 	    @Override
                 	    public void run() {
-                	        //鏇存柊JavaFX鐨勪富绾跨▼鐨勪唬鐮佹斁鍦ㄦ澶�
+                	        //更新JavaFX的主线程的代码放在此处
                 	    	inExecution = false;
         					Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
         					information.setTitle("error"); 
