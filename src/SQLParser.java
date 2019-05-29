@@ -48,9 +48,9 @@ public class SQLParser{
 		InputStreamReader in=new InputStreamReader(targetStream);
 		BufferedReader br=new BufferedReader(in);
 		MiniDB db=new MiniDB();
-		while(true) {
-			String cmd=br.readLine();
-			if(cmd==null || cmd.length()==0)continue;
+		String cmd;
+		while((cmd=br.readLine())!=null) {
+			if(cmd.length()==0)continue;
 			CharStream input = CharStreams.fromString(cmd);
 			MiniSQLLexer lexer = new MiniSQLLexer(input);
 			lexer.removeErrorListeners();
