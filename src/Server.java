@@ -59,7 +59,7 @@ public class Server {
 		parser.removeErrorListeners();
 		parser.addErrorListener(ThrowingErrorListener.INSTANCE);
 
-//		try {
+		try {
 			ParseTree tree = parser.sql();
 			
 			MyListener extractor = new MyListener();
@@ -69,12 +69,11 @@ public class Server {
 			Result res = db.execute(extractor.st);
 			responseMsg.msg = res.json();
 			return true;
-//		}
-//		catch(Exception e) {
-//			System.out.print(e);
-////			responseMsg.msg = "{\"msg\":\"syntax error!\"}";
-//			return false;
-//		}
+		}
+		catch(Exception e) {
+			responseMsg.msg = "{\"msg\":\"server error!\"}";
+			return false;
+		}
 
 	}
 	
