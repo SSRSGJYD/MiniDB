@@ -5,15 +5,20 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.ParseException;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
@@ -147,6 +152,7 @@ public class SceneController {
 		    });
 		
 		// toggle group (radio buttons)
+		printResult = true;
 		group = new ToggleGroup();
 		printResultRadio.setToggleGroup(group);
 		printResultRadio.setUserData(0);
@@ -232,13 +238,13 @@ public class SceneController {
 		try {
 			String executeURL = connectionInfo.baseURL + "/execute";
 			HttpPost httpPost = new HttpPost(executeURL);
-			httpPost.addHeader(HTTP.CONTENT_TYPE,"application/x-www-form-urlencoded");
-			String json = String.format("{'username':%s,'password':%s,'sql':%s}", 
-					connectionInfo.username, connectionInfo.password, sql);
-			StringEntity se = new StringEntity(json);
-			se.setContentEncoding("UTF-8");
-			se.setContentType("application/json");
-			httpPost.setEntity(se);
+			httpPost.addHeader(HTTP.CONTENT_TYPE,"application/json");
+			List<NameValuePair> pairs = new ArrayList<NameValuePair>();
+			pairs.add(new BasicNameValuePair("username", connectionInfo.username));
+			pairs.add(new BasicNameValuePair("password", connectionInfo.password));
+			pairs.add(new BasicNameValuePair("sql", sql));
+			httpPost.setEntity(new UrlEncodedFormEntity(pairs, "UTF-8"));
+			
 			// async request
 			inExecution = true;
 			connectionInfo.httpClient.start();
@@ -248,7 +254,7 @@ public class SceneController {
 						Platform.runLater(new Runnable() {
 						    @Override
 						    public void run() {
-						        //¸üĞÂJavaFXµÄÖ÷Ïß³ÌµÄ´úÂë·ÅÔÚ´Ë´¦
+						        //é‡å­˜æŸŠJavaFXé¨å‹ªå¯Œç»¾è·¨â–¼é¨å‹ªå”¬é®ä½¹æ–é¦ã„¦î„æ¾¶ï¿½
 						    	// execute success
 								HttpEntity entity = response.getEntity();
 								if(entity != null) { 
@@ -258,11 +264,13 @@ public class SceneController {
 									} catch (ParseException | IOException e) {
 										e.printStackTrace();
 									}
-									if(responseStr != "") {
+									JSONObject object = JSONObject.parseObject(responseStr);
+									boolean data = object.getBooleanValue("data");
+									if(data) {
 										if(printResult) {
 											// show result table
 											TableView<Map> tableView = new TableView<>();
-											JSONObject object = JSONObject.parseObject(responseStr);
+											
 											JSONArray attributeArr = (JSONArray) object.get("attributes");
 											for(Object attribute:attributeArr) {
 												TableColumn<Map, String> column = new TableColumn<Map, String>((String)attribute);
@@ -291,7 +299,6 @@ public class SceneController {
 												File f = new File(resultFilePath);
 												FileWriter writer = new FileWriter(f);
 
-												JSONObject object = JSONObject.parseObject(responseStr);
 												JSONArray attributeArr = (JSONArray) object.get("attributes");
 												// attribute header
 												for(Object attribute:attributeArr) {
@@ -317,6 +324,16 @@ public class SceneController {
 											}
 										}
 									}
+									else { // no data
+										// show msg in result area
+										String msg = object.getString("msg");
+										TextArea area = new TextArea();
+										area.setText(msg);
+										resultScroll.setContent(area);
+										// show execution time
+										float time = object.getFloatValue("time");
+										bottomLabel.setText(String.format("execution time:%f", time));
+									}
 								}
 						    }
 						});
@@ -326,7 +343,7 @@ public class SceneController {
 						Platform.runLater(new Runnable() {
 						    @Override
 						    public void run() {
-						        //¸üĞÂJavaFXµÄÖ÷Ïß³ÌµÄ´úÂë·ÅÔÚ´Ë´¦
+						        //é‡å­˜æŸŠJavaFXé¨å‹ªå¯Œç»¾è·¨â–¼é¨å‹ªå”¬é®ä½¹æ–é¦ã„¦î„æ¾¶ï¿½
 						    	HttpEntity entity = response.getEntity();
 								if(entity != null) { 
 									String responseStr = null;
@@ -335,19 +352,17 @@ public class SceneController {
 									} catch (ParseException | IOException e) {
 										e.printStackTrace();
 									}
-									if(responseStr != "") {
-										JSONObject object = JSONObject.parseObject(responseStr);
-										String errorMsg = object.getString("msg");
-										// show error msg in result area
-										TextArea area = new TextArea();
-										area.setText(errorMsg);
-										resultScroll.setContent(area);
-										// show error msg in alert dialog
-										Alert information = new Alert(Alert.AlertType.ERROR, errorMsg);
-										information.setTitle("error"); 
-										information.setHeaderText("Error!");	
-										information.show();
-									}
+									JSONObject object = JSONObject.parseObject(responseStr);
+									String errorMsg = object.getString("msg");
+									// show error msg in result area
+									TextArea area = new TextArea();
+									area.setText(errorMsg);
+									resultScroll.setContent(area);
+									// show error msg in alert dialog
+									Alert information = new Alert(Alert.AlertType.ERROR, errorMsg);
+									information.setTitle("error"); 
+									information.setHeaderText("Error!");	
+									information.show();
 								}
 						    }
 						});
@@ -360,7 +375,7 @@ public class SceneController {
                 	Platform.runLater(new Runnable() {
                 	    @Override
                 	    public void run() {
-                	        //¸üĞÂJavaFXµÄÖ÷Ïß³ÌµÄ´úÂë·ÅÔÚ´Ë´¦
+                	        //é‡å­˜æŸŠJavaFXé¨å‹ªå¯Œç»¾è·¨â–¼é¨å‹ªå”¬é®ä½¹æ–é¦ã„¦î„æ¾¶ï¿½
                 	    	inExecution = false;
         					Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
         					information.setTitle("error"); 
@@ -375,7 +390,7 @@ public class SceneController {
                 	Platform.runLater(new Runnable() {
                 	    @Override
                 	    public void run() {
-                	        //¸üĞÂJavaFXµÄÖ÷Ïß³ÌµÄ´úÂë·ÅÔÚ´Ë´¦
+                	        //é‡å­˜æŸŠJavaFXé¨å‹ªå¯Œç»¾è·¨â–¼é¨å‹ªå”¬é®ä½¹æ–é¦ã„¦î„æ¾¶ï¿½
                 	    	inExecution = false;
         					Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
         					information.setTitle("error"); 

@@ -1,5 +1,6 @@
-
+create database db
 use database db
+create table play(id int,name int, primary key(id))
 insert into play values(1,1)
 insert into play values(2,2)
 insert into play values(3,3)

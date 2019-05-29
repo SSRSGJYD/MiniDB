@@ -44,6 +44,7 @@ public class SQLParser{
 //				+ "drop table playt\n";
 
 		InputStream targetStream = new ByteArrayInputStream(bArray);
+		//InputStream targetStream = new ByteArrayInputStream(cmds.getBytes());
 		InputStreamReader in=new InputStreamReader(targetStream);
 		BufferedReader br=new BufferedReader(in);
 		MiniDB db=new MiniDB();
