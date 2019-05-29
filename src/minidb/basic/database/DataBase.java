@@ -107,6 +107,8 @@ public class DataBase{
 			res=new BoolResult();
 			break;
 		case Statement.selectA:
+			long startTime = System.nanoTime();
+
 			StatementSelectA sla=(StatementSelectA) st;
 			if(perms==null||!isRoot&&!perms.get(sla.tableName).canSelect) {
 				throw new IllegalArgumentException("no select permission");
@@ -122,8 +124,14 @@ public class DataBase{
 			}
 			else
 				res=tb.queryT(sla.names, sla.existWhere, sla.lt);
+
+			long totalTime = System.nanoTime()- startTime;
+			QueryResult qr=(QueryResult) res;
+			qr.time=totalTime;
 			break;
 		case Statement.selectB:
+			startTime = System.nanoTime();
+
 			StatementSelectB slb=(StatementSelectB) st;
 			for(Pair<String,Integer> jname:slb.jnames) {
 				if(perms==null||!isRoot&&!perms.get(jname.l).canSelect) {
@@ -131,6 +139,9 @@ public class DataBase{
 				}
 			}
 			res=Table.queryJT(slb.isStar,tables,slb.cnames,slb.jnames,slb.onConditions,slb.existWhere,slb.lt);
+			totalTime = System.nanoTime()- startTime;
+			qr=(QueryResult) res;
+			qr.time=totalTime;
 			break;
 
 		case Statement.update:

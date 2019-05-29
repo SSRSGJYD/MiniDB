@@ -42,26 +42,28 @@ public class MiniDB {
 	
 	@SuppressWarnings("unchecked")
 	public String getInfo() {
-		JSONObject obj=new JSONObject();
-		JSONArray list=new JSONArray();
-		for(Table tb:current.tables.values()) {
-			JSONObject table=new JSONObject();
-			table.put("schema_name", tb.tableName);
-			JSONArray attrs=new JSONArray();
-			for(Map.Entry<String,SchemaDescriptor> e:tb.schema.descriptors.entrySet()) {
-				JSONObject objt=new JSONObject();
-				objt.put("name",e.getKey());
-				objt.put("type",TypeConst.toString(e.getValue().getType()));
-				attrs.add(objt);
+		JSONArray objs=new JSONArray();
+		for(DataBase db:dbs.values()) {
+			JSONObject obj=new JSONObject();
+			JSONArray list=new JSONArray();
+			for(Table tb:db.tables.values()) {
+				JSONObject table=new JSONObject();
+				table.put("schema_name", tb.tableName);
+				JSONArray attrs=new JSONArray();
+				for(Map.Entry<String,SchemaDescriptor> e:tb.schema.descriptors.entrySet()) {
+					JSONObject objt=new JSONObject();
+					objt.put("name",e.getKey());
+					objt.put("type",TypeConst.toString(e.getValue().getType()));
+					attrs.add(objt);
+				}
+				table.put("attributes", attrs);
+				list.add(table);
 			}
-			table.put("attributes", attrs);
-			list.add(table);
+			obj.put("database_name",current.dbName);
+			obj.put("schemas",list);
+			objs.add(obj);
 		}
-		
-		
-		obj.put("database_name",current.dbName);
-		obj.put("schemas",list);
-		return obj.toString();
+		return objs.toString();
 	}
 	public boolean login(String un,String pw) {
 		User user=users.get(un);
