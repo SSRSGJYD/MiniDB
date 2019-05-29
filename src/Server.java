@@ -73,7 +73,7 @@ public class Server {
 				return true;
 			}
 			catch(Exception e) {
-				responseMsg.msg = "{\"msg\":\"syntax error!\"}";
+				responseMsg.msg = "{\"msg\":\""+e.toString()+"\"}";
 				return false;
 			}
 		}
@@ -82,6 +82,7 @@ public class Server {
 			InputStreamReader in=new InputStreamReader(targetStream);
 			BufferedReader br=new BufferedReader(in);
 			String cmd;
+			Result res = null;
 			while((cmd=br.readLine())!=null) {
 				if(cmd.length()==0)continue;
 				CharStream input = CharStreams.fromString(cmd);
@@ -102,14 +103,19 @@ public class Server {
 					ParseTreeWalker walker=new ParseTreeWalker();
 					walker.walk(extractor, tree);		
 					
-					Result res = db.execute(extractor.st);
-					responseMsg.msg = res.json();
+					res = db.execute(extractor.st);
 				}
 				catch(Exception e) {
-					responseMsg.msg = "{\"msg\":\"syntax error!\"}";
+					responseMsg.msg = "{\"msg\":\""+e.toString()+"\"}";
 					return false;
 				}
 			}
+			if(res==null) {
+				responseMsg.msg = "{\"msg\":\"empty file!\"}";
+				return false;
+			}
+			else
+				responseMsg.msg = res.json();
 
 		}
 		return true;
