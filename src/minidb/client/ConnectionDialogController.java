@@ -98,7 +98,7 @@ public class ConnectionDialogController {
 			pairs.add(new BasicNameValuePair("username", usernameTextField.getText()));
 			pairs.add(new BasicNameValuePair("password", passwordTextField.getText()));
 			httpPost.setEntity(new UrlEncodedFormEntity(pairs, "UTF-8"));
-
+      
 			// async request
 			httpClient.start();
 			httpClient.execute(httpPost, new FutureCallback<HttpResponse>() {

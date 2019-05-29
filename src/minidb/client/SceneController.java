@@ -253,7 +253,7 @@ public class SceneController {
 						Platform.runLater(new Runnable() {
 						    @Override
 						    public void run() {
-						        //¸üĞÂJavaFXµÄÖ÷Ïß³ÌµÄ´úÂë·ÅÔÚ´Ë´¦
+						        //æ›´æ–°JavaFXçš„ä¸»çº¿ç¨‹çš„ä»£ç æ”¾åœ¨æ­¤å¤„
 						    	// execute success
 								HttpEntity entity = response.getEntity();
 								if(entity != null) { 
@@ -331,7 +331,7 @@ public class SceneController {
 						Platform.runLater(new Runnable() {
 						    @Override
 						    public void run() {
-						        //¸üĞÂJavaFXµÄÖ÷Ïß³ÌµÄ´úÂë·ÅÔÚ´Ë´¦
+						        //æ›´æ–°JavaFXçš„ä¸»çº¿ç¨‹çš„ä»£ç æ”¾åœ¨æ­¤å¤„
 						    	HttpEntity entity = response.getEntity();
 								if(entity != null) { 
 									String responseStr = null;
@@ -365,7 +365,7 @@ public class SceneController {
                 	Platform.runLater(new Runnable() {
                 	    @Override
                 	    public void run() {
-                	        //¸üĞÂJavaFXµÄÖ÷Ïß³ÌµÄ´úÂë·ÅÔÚ´Ë´¦
+                	        //æ›´æ–°JavaFXçš„ä¸»çº¿ç¨‹çš„ä»£ç æ”¾åœ¨æ­¤å¤„
                 	    	inExecution = false;
         					Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
         					information.setTitle("error"); 
@@ -380,7 +380,7 @@ public class SceneController {
                 	Platform.runLater(new Runnable() {
                 	    @Override
                 	    public void run() {
-                	        //¸üĞÂJavaFXµÄÖ÷Ïß³ÌµÄ´úÂë·ÅÔÚ´Ë´¦
+                	        //æ›´æ–°JavaFXçš„ä¸»çº¿ç¨‹çš„ä»£ç æ”¾åœ¨æ­¤å¤„
                 	    	inExecution = false;
         					Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
         					information.setTitle("error"); 
