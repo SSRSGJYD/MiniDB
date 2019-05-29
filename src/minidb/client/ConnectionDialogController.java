@@ -1,11 +1,15 @@
 package minidb.client;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.ParseException;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
@@ -18,6 +22,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
@@ -88,12 +93,12 @@ public class ConnectionDialogController {
 					     .build();
 			
 			HttpPost httpPost = new HttpPost(loginURL);
-			httpPost.addHeader(HTTP.CONTENT_TYPE,"text/plain");
-			String json = String.format("{'username':%s,'password':%s}", usernameTextField.getText(), passwordTextField.getText());
-			StringEntity se = new StringEntity(json);
-			se.setContentEncoding("UTF-8");
-			se.setContentType("text/plain");
-			httpPost.setEntity(se);
+			httpPost.addHeader(HTTP.CONTENT_TYPE,"application/json");
+			List<NameValuePair> pairs = new ArrayList<NameValuePair>();
+			pairs.add(new BasicNameValuePair("username", usernameTextField.getText()));
+			pairs.add(new BasicNameValuePair("password", passwordTextField.getText()));
+			httpPost.setEntity(new UrlEncodedFormEntity(pairs, "UTF-8"));
+      
 			// async request
 			httpClient.start();
 			httpClient.execute(httpPost, new FutureCallback<HttpResponse>() {
@@ -102,7 +107,7 @@ public class ConnectionDialogController {
 						Platform.runLater(new Runnable() {
 						    @Override
 						    public void run() {
-						        //¸üĞÂJavaFXµÄÖ÷Ïß³ÌµÄ´úÂë·ÅÔÚ´Ë´¦
+						        //æ›´æ–°JavaFXçš„ä¸»çº¿ç¨‹çš„ä»£ç æ”¾åœ¨æ­¤å¤„
 								// login success
 							    connectionInfo.httpClient = httpClient;
 							    connectionInfo.requestConfig = requestConfig;
@@ -127,7 +132,7 @@ public class ConnectionDialogController {
 						Platform.runLater(new Runnable() {
 						    @Override
 						    public void run() {
-						        //¸üĞÂJavaFXµÄÖ÷Ïß³ÌµÄ´úÂë·ÅÔÚ´Ë´¦
+						        //æ›´æ–°JavaFXçš„ä¸»çº¿ç¨‹çš„ä»£ç æ”¾åœ¨æ­¤å¤„
 						    	// login failed
 								Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
 								information.setTitle("error"); 
@@ -143,7 +148,7 @@ public class ConnectionDialogController {
                 	Platform.runLater(new Runnable() {
                 	    @Override
                 	    public void run() {
-                	        //¸üĞÂJavaFXµÄÖ÷Ïß³ÌµÄ´úÂë·ÅÔÚ´Ë´¦
+                	        //æ›´æ–°JavaFXçš„ä¸»çº¿ç¨‹çš„ä»£ç æ”¾åœ¨æ­¤å¤„
                 	    	// login failed
         					Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
         					information.setTitle("error"); 
@@ -158,7 +163,7 @@ public class ConnectionDialogController {
                 	Platform.runLater(new Runnable() {
                 	    @Override
                 	    public void run() {
-                	        //¸üĞÂJavaFXµÄÖ÷Ïß³ÌµÄ´úÂë·ÅÔÚ´Ë´¦
+                	        //æ›´æ–°JavaFXçš„ä¸»çº¿ç¨‹çš„ä»£ç æ”¾åœ¨æ­¤å¤„
                 	    	// login failed
         					Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
         					information.setTitle("error"); 
