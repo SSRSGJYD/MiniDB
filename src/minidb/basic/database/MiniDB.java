@@ -67,6 +67,8 @@ public class MiniDB {
 	}
 	public boolean login(String un,String pw) {
 		User user=users.get(un);
+		if(user == null)
+			return false;
 		if(user.password==pw) {
 			curUser=user;
 			return true;
