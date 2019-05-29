@@ -14,10 +14,14 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.ParseException;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
+import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
@@ -328,7 +332,7 @@ public class SceneController {
 											resultScroll.setContent(tableView);
 											// show execution time
 											float time = object.getFloatValue("time");
-											bottomLabel.setText(String.format("execution time:%f", time));
+											bottomLabel.setText(String.format("execution time: %f ms", time/1000000));
 										}
 										else {
 											// save to file
@@ -352,10 +356,10 @@ public class SceneController {
 													writer.write("\n");
 												}
 												float time = object.getFloatValue("time");
-												writer.write(String.format("execution time:%f", time));
+												writer.write(String.format("execution time: %f ms", time/1000000));
 												writer.close();
 												// show execution time
-												bottomLabel.setText(String.format("execution time:%f", time));
+												bottomLabel.setText(String.format("execution time: %f ms", time/1000000));
 											} catch (Exception e) {
 												// TODO: handle exception
 											}
@@ -369,7 +373,7 @@ public class SceneController {
 										resultScroll.setContent(area);
 										// show execution time
 										float time = object.getFloatValue("time");
-										bottomLabel.setText(String.format("execution time:%f", time));
+										bottomLabel.setText(String.format("execution time: %f ms", time/1000000));
 									}
 								}
 						    }
@@ -541,6 +545,111 @@ public class SceneController {
 		information.setTitle("About"); 
 		information.setHeaderText("About Minidb");	
 		information.show();
+	}
+	
+	public void refresh() {
+		if(connectionInfo == null) {
+			// no connection yet
+			connect();
+			return;
+		}
+		String baseURL = connectionInfo.baseURL;
+		String loginURL = baseURL + "/login";
+		try {
+			HttpClientContext context = HttpClientContext.create();
+			RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(120000).setSocketTimeout(60000)
+					       .setConnectionRequestTimeout(60000).build();
+			CloseableHttpAsyncClient httpClient = HttpAsyncClients.custom()
+					     .setDefaultRequestConfig(requestConfig)
+					     .build();
+			
+			HttpPost httpPost = new HttpPost(loginURL);
+			httpPost.addHeader(HTTP.CONTENT_TYPE,"application/json");
+			List<NameValuePair> pairs = new ArrayList<NameValuePair>();
+			pairs.add(new BasicNameValuePair("username", connectionInfo.username));
+			pairs.add(new BasicNameValuePair("password", connectionInfo.password));
+			httpPost.setEntity(new UrlEncodedFormEntity(pairs, "UTF-8"));
+      
+			// async request
+			httpClient.start();
+			httpClient.execute(httpPost, new FutureCallback<HttpResponse>() {
+				public void completed(final HttpResponse response) {
+					if(response.getStatusLine().getStatusCode() == 200) {
+						Platform.runLater(new Runnable() {
+						    @Override
+						    public void run() {
+						        //更新JavaFX的主线程的代码放在此处
+								// login success
+							    connectionInfo.httpClient = httpClient;
+							    // receive schemas and update treeView
+								try {
+									schemas.set(EntityUtils.toString(response.getEntity(), "utf-8"));
+								} catch (ParseException | IOException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+						    }
+						});
+
+					}
+					else {
+						Platform.runLater(new Runnable() {
+						    @Override
+						    public void run() {
+						        //更新JavaFX的主线程的代码放在此处
+						    	// login failed
+						    	connectionInfo = null;
+								Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
+								information.setTitle("error"); 
+								information.setHeaderText("Error!");	
+								information.show();
+						    }
+						});
+						
+					}
+                }
+
+                public void failed(final Exception ex) {
+                	Platform.runLater(new Runnable() {
+                	    @Override
+                	    public void run() {
+                	        //更新JavaFX的主线程的代码放在此处
+                	    	// login failed
+                	    	connectionInfo = null;
+        					Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
+        					information.setTitle("error"); 
+        					information.setHeaderText("Error!");	
+        					information.show();
+                	    }
+                	});
+                	
+                }
+
+                public void cancelled() {
+                	Platform.runLater(new Runnable() {
+                	    @Override
+                	    public void run() {
+                	        //更新JavaFX的主线程的代码放在此处
+                	    	// login failed
+                	    	connectionInfo = null;
+        					Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
+        					information.setTitle("error"); 
+        					information.setHeaderText("Error!");	
+        					information.show();
+                	    }
+                	});
+                	
+                }
+			});
+		} 
+		catch (Exception e) {
+			// login failed
+			connectionInfo = null;
+			Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
+			information.setTitle("error"); 
+			information.setHeaderText("Error!");	
+			information.show();
+		}
 	}
 	
 	

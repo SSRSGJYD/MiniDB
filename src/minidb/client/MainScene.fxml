@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.text.*?>
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
@@ -18,6 +19,8 @@
                   <MenuItem fx:id="saveMenuItem" mnemonicParsing="false" onAction="#saveScript" text="Save script" />
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem fx:id="openMenuItem1" mnemonicParsing="false" onAction="#importExecute" text="Import &amp; Execute" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="openMenuItem11" mnemonicParsing="false" onAction="#refresh" text="refresh" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Help">
@@ -86,10 +89,13 @@
                   </SplitPane>
                </children>
             </AnchorPane>
-            <Label id="label" fx:id="bottomLabel" alignment="CENTER" minHeight="35.0" prefHeight="35.0" prefWidth="179.0" text="execute time:">
+            <Label id="label" fx:id="bottomLabel" maxWidth="1.7976931348623157E308" minHeight="35.0" prefHeight="35.0" prefWidth="179.0" text="execute time:" translateX="30.0">
                <font>
                   <Font size="18.0" />
                </font>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
             </Label>
          </children>
       </VBox>
