@@ -18,10 +18,11 @@ public class BoolResult extends Result {
 		System.out.println(isOk);
 	}
 
-	public String json() {
+	public String json(long timeT) {
 		JSONObject obj=new JSONObject();
 		obj.put("msg", "");
 	    obj.put("data",false);
+	    obj.put("time",timeT);
 		return obj.toString();
 	}
 

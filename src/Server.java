@@ -69,11 +69,11 @@ public class Server {
 				walker.walk(extractor, tree);		
 				
 				Result res = db.execute(extractor.st);
-				responseMsg.msg = res.json();
+				responseMsg.msg = res.json(res.time);
 				return true;
 			}
 			catch(Exception e) {
-				responseMsg.msg = "{\"msg\":\"syntax error!\"}";
+				responseMsg.msg = "{\"msg\":\""+e.toString()+"\"}";
 				return false;
 			}
 		}
@@ -82,6 +82,8 @@ public class Server {
 			InputStreamReader in=new InputStreamReader(targetStream);
 			BufferedReader br=new BufferedReader(in);
 			String cmd;
+			Result res = null;
+			long time=0;
 			while((cmd=br.readLine())!=null) {
 				if(cmd.length()==0)continue;
 				CharStream input = CharStreams.fromString(cmd);
@@ -102,17 +104,24 @@ public class Server {
 					ParseTreeWalker walker=new ParseTreeWalker();
 					walker.walk(extractor, tree);		
 					
-					Result res = db.execute(extractor.st);
-					responseMsg.msg = res.json();
+					res = db.execute(extractor.st);
+					time+=res.time;
 				}
 				catch(Exception e) {
-					responseMsg.msg = "{\"msg\":\"syntax error!\"}";
+					responseMsg.msg = "{\"msg\":\""+e.toString()+"\"}";
 					return false;
 				}
 			}
+			if(res==null) {
+				responseMsg.msg = "{\"msg\":\"empty file!\"}";
+				return false;
+			}
+			else {
+				responseMsg.msg = res.json(time);
+			}
+
 		}
 		return true;
-
 	}
 	
 	//鍚姩鏈嶅姟鍣紝鐩戝惉瀹㈡埛绔姹�

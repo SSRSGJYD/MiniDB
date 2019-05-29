@@ -114,6 +114,7 @@ public class MiniDB {
 
 	public Result execute(Statement st) throws IOException, ClassNotFoundException {
 		Result res = null;
+		long startTime = System.nanoTime();
 		if(st.type==Statement.User) {
 			StatementUser suser=(StatementUser)st;
 			User user=new User(suser.username,suser.password);
@@ -204,12 +205,9 @@ public class MiniDB {
 				res=new BoolResult();
 				break;
 			case StatementDB.show:
-				long startTime = System.nanoTime();
 				ListResult lr=new ListResult();
 				ArrayList<String> ls=new ArrayList<String>(dbs.keySet());
 				lr.data=ls;
-				long totalTime = System.nanoTime()- startTime;
-				lr.time=totalTime;
 				res=lr;
 				break;
 			case StatementDB.showdb:
@@ -221,8 +219,6 @@ public class MiniDB {
 				ListResult tlr=new ListResult();
 				ArrayList<String> tls=new ArrayList<String>(tdb.tables.keySet());
 				tlr.data=tls;
-				totalTime = System.nanoTime()- startTime;
-				tlr.time=totalTime;
 				res=tlr;
 				break;
 			}
@@ -231,6 +227,8 @@ public class MiniDB {
 		else {
 			res=current.execute(st,curUser.perms.get(current.dbName),curUser.isRoot);
 		}
+		long totalTime = System.nanoTime()- startTime;
+		res.time=totalTime;
 		return res;
 	}
 
