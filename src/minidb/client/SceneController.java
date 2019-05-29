@@ -232,12 +232,12 @@ public class SceneController {
 		try {
 			String executeURL = connectionInfo.baseURL + "/execute";
 			HttpPost httpPost = new HttpPost(executeURL);
-			httpPost.addHeader(HTTP.CONTENT_TYPE,"application/x-www-form-urlencoded");
+			httpPost.addHeader(HTTP.CONTENT_TYPE,"text/plain");
 			String json = String.format("{'username':%s,'password':%s,'sql':%s}", 
 					connectionInfo.username, connectionInfo.password, sql);
 			StringEntity se = new StringEntity(json);
 			se.setContentEncoding("UTF-8");
-			se.setContentType("application/json");
+			se.setContentType("text/plain");
 			httpPost.setEntity(se);
 			// async request
 			inExecution = true;
