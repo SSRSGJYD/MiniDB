@@ -1,23 +1,24 @@
-### MiniDB
+# MiniDB
 
 
 
-#### 简介
+## 简介
 
 MiniDB是一个轻量级的关系数据库，支持多数据库的存储，实现了基本的select、insert、delete、join等语句。
 
 
 
-#### 功能
+## 功能
 
-##### 数据库操作
+### 数据库操作
 
 + create database
 + drop database
 + use database
-+ show database
++ show databases
++ show database dbName
 
-##### 表操作
+### 表操作
 
 + create
 + drop
@@ -25,11 +26,11 @@ MiniDB是一个轻量级的关系数据库，支持多数据库的存储，实�
 + delete
 + select
 
-##### 权限管理
+### 权限管理
 
 
 
-##### 图形界面客户端
+### 图形界面客户端
 
 + 登录
 + 查看数据库、表、属性信息
@@ -40,9 +41,9 @@ MiniDB是一个轻量级的关系数据库，支持多数据库的存储，实�
 
 
 
-#### 实现
+## 实现
 
-##### 总体架构
+### 总体架构
 
 系统分为以下主要模块：
 
@@ -52,7 +53,7 @@ MiniDB是一个轻量级的关系数据库，支持多数据库的存储，实�
 + server模块：监听端口，调用执行模块，将结果返回client
 + client模块：图形界面客户端，通过http与server进行通信
 
-##### 存储、索引模块
+### 存储、索引模块
 
 数据库支持在单一属性上的Primary Index和Secondary Index，其中Secondary Index中查询到的数据是主键。所有的数据和索引都采用B+树进行存储管理，数据直接存储在主键索引的叶节点中。
 
@@ -60,23 +61,23 @@ MiniDB是一个轻量级的关系数据库，支持多数据库的存储，实�
 
 
 
-##### client模块
+### client模块
 
 图形界面客户端基于JavaFX框架，利用HttpClient和httpasyncclient实现http异步通信。
 
 
 
-#### 亮点
+## 亮点
 
-##### dynamic syntax error check
++ B+树+缓存机制实现高效的存储
++ 可以创建或删除数据库实例，可以在数据库实例中切换
++ 数据库级别的用户权限
++ where子句的条件支持and和or
++ 支持outer join操作
 
-##### where子句的and or
-
-##### outer join
 
 
-
-#### 组内分工
+## 组内分工
 
 苏乐：
 
