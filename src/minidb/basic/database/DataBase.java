@@ -109,8 +109,10 @@ public class DataBase{
 		case Statement.selectA:
 
 			StatementSelectA sla=(StatementSelectA) st;
-			if(perms==null||!isRoot&&!perms.get(sla.tableName).canSelect) {
-				throw new IllegalArgumentException("no select permission");
+			if(!isRoot&&perms!=null) {
+				if(!perms.get(sla.tableName).canSelect) {
+					throw new IllegalArgumentException("no select permission");
+				}
 			}
 			if(!this.tables.containsKey(sla.tableName)) {
 				throw new IllegalArgumentException("table not exist");
@@ -130,9 +132,11 @@ public class DataBase{
 
 			StatementSelectB slb=(StatementSelectB) st;
 			for(Pair<String,Integer> jname:slb.jnames) {
-				if(perms==null||!isRoot&&!perms.get(jname.l).canSelect) {
-					throw new IllegalArgumentException("no select permission");
-				}
+				if(!isRoot&&perms!=null) {
+					if(!perms.get(jname.l).canSelect) {
+						throw new IllegalArgumentException("no select permission");
+					}
+				}	
 			}
 			res=Table.queryJT(slb.isStar,tables,slb.cnames,slb.jnames,slb.onConditions,slb.existWhere,slb.lt);
 			qr=(QueryResult) res;
@@ -140,7 +144,7 @@ public class DataBase{
 
 		case Statement.update:
 			StatementUpdate su=(StatementUpdate) st;
-			if(perms==null||!isRoot&&!perms.get(su.tableName).canUpdate) {
+			if((!isRoot&&!perms.get(su.tableName).canUpdate)||perms==null) {
 				throw new IllegalArgumentException("no select permission");
 			}
 			if(!this.tables.containsKey(su.tableName)) {

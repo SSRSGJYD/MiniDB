@@ -70,7 +70,7 @@ public class SQLParser{
 				walker.walk(extractor, tree);		
 				
 				Result res=db.execute(extractor.st);
-				System.out.println(res.json());
+				System.out.println(res.json(res.time));
 //			}
 //			catch(Exception e) {
 //				System.out.println(e);
