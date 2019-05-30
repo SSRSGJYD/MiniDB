@@ -134,6 +134,7 @@ public class ConnectionDialogController {
 						    public void run() {
 						        //更新JavaFX的主线程的代码放在此处
 						    	// login failed
+						    	connectionInfo = null;
 								Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
 								information.setTitle("error"); 
 								information.setHeaderText("Error!");	
@@ -150,6 +151,7 @@ public class ConnectionDialogController {
                 	    public void run() {
                 	        //更新JavaFX的主线程的代码放在此处
                 	    	// login failed
+                	    	connectionInfo = null;
         					Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
         					information.setTitle("error"); 
         					information.setHeaderText("Error!");	
@@ -165,6 +167,7 @@ public class ConnectionDialogController {
                 	    public void run() {
                 	        //更新JavaFX的主线程的代码放在此处
                 	    	// login failed
+                	    	connectionInfo = null;
         					Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
         					information.setTitle("error"); 
         					information.setHeaderText("Error!");	
@@ -177,6 +180,7 @@ public class ConnectionDialogController {
 		} 
 		catch (Exception e) {
 			// login failed
+			connectionInfo = null;
 			Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
 			information.setTitle("error"); 
 			information.setHeaderText("Error!");	
