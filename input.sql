@@ -1,4 +1,5 @@
 use database db
+select name from play where (name > 9500 and name < 9550)
 insert into play values(1,1)
 insert into play values(2,2)
 insert into play values(3,3)
