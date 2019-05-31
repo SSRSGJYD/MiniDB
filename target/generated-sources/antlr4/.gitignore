@@ -1,0 +1,10 @@
+/MiniSQL.interp
+/MiniSQL.tokens
+/MiniSQLBaseListener.java
+/MiniSQLBaseVisitor.java
+/MiniSQLLexer.interp
+/MiniSQLLexer.java
+/MiniSQLLexer.tokens
+/MiniSQLListener.java
+/MiniSQLParser.java
+/MiniSQLVisitor.java

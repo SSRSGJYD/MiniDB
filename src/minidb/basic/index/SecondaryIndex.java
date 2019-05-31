@@ -120,4 +120,8 @@ public class SecondaryIndex<K extends Comparable<K>, PK extends Comparable<PK>> 
 //    public void update(SecondaryKey<K,PK> key, PrimaryKeyValue value) throws IOException {
 //        tree.update(key, value);
 //    }
+    
+    public void commit() throws IOException {
+    	tree.commit();
+    }
 }
