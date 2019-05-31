@@ -9,7 +9,7 @@ import java.io.RandomAccessFile;
 import java.util.Collection;
 import java.util.HashMap;
 
-public class Cache<T> {
+public class Cache<T extends BPlusTreeNode> {
 	private RandomAccessFile fa; // file access
 	private int pageSize;   	// page size
 	private int headerSize;
@@ -66,8 +66,7 @@ public class Cache<T> {
         for(long i=0; i<numToRemove; i++) {
             long key = keyList.pop();
             T value = valueMap.get(key);
-            BPlusTreeNode node = (BPlusTreeNode)value;
-            node.writeNode(fa, pageSize, headerSize, keyType, keySize);
+            value.writeNode(fa, pageSize, headerSize, keyType, keySize);
             valueMap.remove(key);
         }
         indexMap.clear();
