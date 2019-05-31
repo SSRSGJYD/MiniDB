@@ -32,7 +32,7 @@ public class DataBase{
 		open();
 	}
 	
-	public void commit() {
+	public void commit() throws IOException {
 		for(Table tb:tables.values()) {
 			tb.commit();
 		}

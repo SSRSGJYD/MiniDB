@@ -17,5 +17,6 @@ main = do
   mapM_ (insertOne h) [1..10000]
   mapM_ (deleteOne h) [1,3..10000]
   hPutStrLn h "select name from play where (name > 9500 and name < 9550)"
+  hPutStrLn h "drop database db"
   hClose h
 

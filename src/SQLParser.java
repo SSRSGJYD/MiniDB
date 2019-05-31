@@ -69,7 +69,7 @@ public class SQLParser{
 				ParseTreeWalker walker=new ParseTreeWalker();
 				walker.walk(extractor, tree);		
 				
-				Result res=db.execute(extractor.st);
+				Result res=db.execute(extractor.st,true);
 				System.out.println(res.json(res.time));
 //			}
 //			catch(Exception e) {
