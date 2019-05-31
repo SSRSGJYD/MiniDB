@@ -115,8 +115,8 @@ public class BPlusTree<K extends Key, V extends Value> {
         this.deleteCount = 0;
         this.conditionThreshold = conditionThreshold;
         // initialize node cache
-        internalNodeCache = new Cache<>(internalCacheSize);
-        leafNodeCache = new Cache<>(leafCacheSize);
+        internalNodeCache = new Cache<>(fa, pageSize, treeHeaderSize, keyType, keySize, internalCacheSize);
+        leafNodeCache = new Cache<>(fa, pageSize, treeHeaderSize, keyType, keySize, leafCacheSize);
 
         File f = new File(path);
         if(f.exists()) {
@@ -996,19 +996,21 @@ public class BPlusTree<K extends Key, V extends Value> {
         switch (node.getNodeType()) {
             case BPlusTreeConst.NODE_TYPE_ROOT_INTERNAL:
             case BPlusTreeConst.NODE_TYPE_INTERNAL:
-                if(internalNodeCache.containsKey(node.getPageIndex())) {
-                    internalNodeCache.put(node.getPageIndex(), (BPlusTreeInternalNode<K,V>)node);
-                }
+//                if(internalNodeCache.containsKey(node.getPageIndex())) {
+//                    internalNodeCache.put(node.getPageIndex(), (BPlusTreeInternalNode<K,V>)node);
+//                }
+                internalNodeCache.put(node.getPageIndex(), (BPlusTreeInternalNode<K,V>)node);
                 break;
             case BPlusTreeConst.NODE_TYPE_ROOT_LEAF:
             case BPlusTreeConst.NODE_TYPE_LEAF:
-                if(leafNodeCache.containsKey(node.getPageIndex())) {
-                    leafNodeCache.put(node.getPageIndex(), (BPlusTreeLeafNode<K,V>)node);
-                }
+//                if(leafNodeCache.containsKey(node.getPageIndex())) {
+//                    leafNodeCache.put(node.getPageIndex(), (BPlusTreeLeafNode<K,V>)node);
+//                }
+                leafNodeCache.put(node.getPageIndex(), (BPlusTreeLeafNode<K,V>)node);
                 break;
         }
         // write to file
-        node.writeNode(fa, pageSize, treeHeaderSize, keyType, keySize);
+//        node.writeNode(fa, pageSize, treeHeaderSize, keyType, keySize);
         return;
     }
 
@@ -1654,6 +1656,11 @@ public class BPlusTree<K extends Key, V extends Value> {
         byte[] tmp = new byte[valueSize];
         fa.read(tmp, 0, valueSize);
         return new PrimaryKeyValue(tmp, PKType);
+    }
+    
+    public void commit() throws IOException {
+    	leafNodeCache.commitAll();
+    	internalNodeCache.commitAll();
     }
 
 }
