@@ -114,5 +114,9 @@ public class PrimaryIndex<K extends Comparable<K>> {
     public void update(PrimaryKey<K> key, Row value) throws IOException {
         tree.update(key, value);
     }
+    
+    public void commit() throws IOException {
+    	tree.commit();
+    }
 
 }

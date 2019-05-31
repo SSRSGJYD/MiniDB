@@ -55,6 +55,8 @@ public class ConnectionDialogController {
 	public void initialize() {
 		ipTextField.setText("127.0.0.1");
 		portTextField.setText("8080");
+		usernameTextField.setText("root");
+		passwordTextField.setText("root");
 	}
 	
 	public Stage getStage() {
@@ -107,7 +109,7 @@ public class ConnectionDialogController {
 						Platform.runLater(new Runnable() {
 						    @Override
 						    public void run() {
-						        //更新JavaFX的主线程的代码放在此处
+						        //鏇存柊JavaFX鐨勪富绾跨▼鐨勪唬鐮佹斁鍦ㄦ澶�
 								// login success
 							    connectionInfo.httpClient = httpClient;
 							    connectionInfo.requestConfig = requestConfig;
@@ -132,7 +134,7 @@ public class ConnectionDialogController {
 						Platform.runLater(new Runnable() {
 						    @Override
 						    public void run() {
-						        //更新JavaFX的主线程的代码放在此处
+						        //鏇存柊JavaFX鐨勪富绾跨▼鐨勪唬鐮佹斁鍦ㄦ澶�
 						    	// login failed
 						    	connectionInfo = null;
 								Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
@@ -149,7 +151,7 @@ public class ConnectionDialogController {
                 	Platform.runLater(new Runnable() {
                 	    @Override
                 	    public void run() {
-                	        //更新JavaFX的主线程的代码放在此处
+                	        //鏇存柊JavaFX鐨勪富绾跨▼鐨勪唬鐮佹斁鍦ㄦ澶�
                 	    	// login failed
                 	    	connectionInfo = null;
         					Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
@@ -165,7 +167,7 @@ public class ConnectionDialogController {
                 	Platform.runLater(new Runnable() {
                 	    @Override
                 	    public void run() {
-                	        //更新JavaFX的主线程的代码放在此处
+                	        //鏇存柊JavaFX鐨勪富绾跨▼鐨勪唬鐮佹斁鍦ㄦ澶�
                 	    	// login failed
                 	    	connectionInfo = null;
         					Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");

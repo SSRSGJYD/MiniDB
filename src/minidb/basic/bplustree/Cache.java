@@ -1,22 +1,39 @@
 package minidb.basic.bplustree;
 
 import java.util.LinkedList;
+
+import javax.imageio.IIOException;
+
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.util.Collection;
 import java.util.HashMap;
 
 public class Cache<T> {
-    private HashMap<Long, T> valueMap;
-    private HashMap<Long, Integer> indexMap;
-    private LinkedList<Long> keyList;
+	private RandomAccessFile fa; // file access
+	private int pageSize;   	// page size
+	private int headerSize;
+	private int keyType;        // type of key
+    private int keySize;    	// key size
+    
+    private HashMap<Long, T> valueMap;		 //(key, value)
+    private HashMap<Long, Integer> indexMap; //(key, index)
+    private LinkedList<Long> keyList;		 //[key], for LRU
     private int capacity;
 
-    public Cache(int capacity) {
-        this.capacity = capacity;
+    public Cache(RandomAccessFile fa, int pageSize, int headerSize, int keyType, int keySize, int capacity) {
+        this.fa = fa;
+    	this.pageSize = pageSize;
+    	this.headerSize = headerSize;
+    	this.keyType = keyType;
+    	this.keySize = keySize;
+    	this.capacity = capacity;
         this.valueMap = new HashMap<>();
         this.indexMap = new HashMap<>();
         this.keyList = new LinkedList<>();
     }
 
-    public void put(Long key, T value) {
+    public void put(Long key, T value) throws IOException {
         if(valueMap.size() == capacity) {
             release();
         }
@@ -44,10 +61,13 @@ public class Cache<T> {
         return valueMap.get(key);
     }
 
-    private void release() {
+    private void release() throws IOException {
         long numToRemove = capacity / 2;
         for(long i=0; i<numToRemove; i++) {
             long key = keyList.pop();
+            T value = valueMap.get(key);
+            BPlusTreeNode node = (BPlusTreeNode)value;
+            node.writeNode(fa, pageSize, headerSize, keyType, keySize);
             valueMap.remove(key);
         }
         indexMap.clear();
@@ -56,5 +76,14 @@ public class Cache<T> {
             indexMap.put(key, index);
             index++;
         }
+    }
+    
+    public void commitAll() throws IOException {
+    	for(long i=0; i<capacity; i++) {
+    		Collection<T> values = valueMap.values();
+    		for(T value : values) {
+    			((BPlusTreeNode)value).writeNode(fa, pageSize, headerSize, keyType, keySize);
+    		}
+    	}
     }
 }
