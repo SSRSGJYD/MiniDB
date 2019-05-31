@@ -49,6 +49,7 @@ public class SQLParser{
 		BufferedReader br=new BufferedReader(in);
 		MiniDB db=new MiniDB();
 		String cmd;
+		long time=0;
 		while((cmd=br.readLine())!=null) {
 			if(cmd.length()==0)continue;
 			CharStream input = CharStreams.fromString(cmd);
@@ -69,13 +70,14 @@ public class SQLParser{
 				ParseTreeWalker walker=new ParseTreeWalker();
 				walker.walk(extractor, tree);		
 				
-				Result res=db.execute(extractor.st,true);
+				Result res=db.execute(extractor.st,false);
 				System.out.println(res.json(res.time));
+				time+=res.time;
 //			}
 //			catch(Exception e) {
 //				System.out.println(e);
 //			}
-
 		}
+		System.out.println(time);
 	}
 } 
