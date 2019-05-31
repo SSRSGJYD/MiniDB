@@ -8,6 +8,7 @@ import java.io.RandomAccessFile;
 
 import minidb.basic.index.Key;
 import minidb.basic.index.PrimaryKeyValue;
+import minidb.basic.index.SecondaryKey;
 import minidb.basic.index.Value;
 import minidb.result.DeleteResult;
 import minidb.types.TypeConst;
@@ -187,16 +188,21 @@ public class BPlusTree<K extends Key, V extends Value> {
         if(index < 0) {
             return(null);
         }
+        // try to find in cache
+        if(internalNodeCache.containsKey(index)) {
+            return internalNodeCache.get(index);
+        }
+        // try to find in cache
+        if(leafNodeCache.containsKey(index)) {
+            return leafNodeCache.get(index);
+        }
+        // not in cache, seek in file
         fa.seek(index);
         int nodeType = (int)fa.readShort();
 
         switch (nodeType) {
             case BPlusTreeConst.NODE_TYPE_INTERNAL:
             case BPlusTreeConst.NODE_TYPE_ROOT_INTERNAL: {
-                // try to find in cache
-                if(internalNodeCache.containsKey(index)) {
-                    return internalNodeCache.get(index);
-                }
                 // not in cache
                 BPlusTreeInternalNode<K,V> node = new BPlusTreeInternalNode<K,V>(nodeType, index, valueSize);
                 int curCapacity = fa.readInt();
@@ -221,10 +227,6 @@ public class BPlusTree<K extends Key, V extends Value> {
             }
             case BPlusTreeConst.NODE_TYPE_LEAF:
             case BPlusTreeConst.NODE_TYPE_ROOT_LEAF: {
-                // try to find in cache
-                if(leafNodeCache.containsKey(index)) {
-                    return leafNodeCache.get(index);
-                }
                 // not in cache
                 long nextptr = fa.readLong();
                 long prevptr = fa.readLong();
@@ -623,7 +625,7 @@ public class BPlusTree<K extends Key, V extends Value> {
     public void insert(K key, V value) throws IOException {
 
         assert root != null;
-
+        
         if(isFullNode(root)) {
             // create a new root
             BPlusTreeNode<K,V> childNode = this.root;
@@ -992,7 +994,7 @@ public class BPlusTree<K extends Key, V extends Value> {
      * @throws IOException
      */
     private void writeNodeToFile(BPlusTreeNode<K,V> node)  throws IOException {
-        // update node cache
+    	// update node cache
         switch (node.getNodeType()) {
             case BPlusTreeConst.NODE_TYPE_ROOT_INTERNAL:
             case BPlusTreeConst.NODE_TYPE_INTERNAL:
@@ -1008,6 +1010,9 @@ public class BPlusTree<K extends Key, V extends Value> {
 //                }
                 leafNodeCache.put(node.getPageIndex(), (BPlusTreeLeafNode<K,V>)node);
                 break;
+            default:
+            	node.writeNode(fa, pageSize, treeHeaderSize, keyType, keySize);
+            	break;
         }
         // write to file
 //        node.writeNode(fa, pageSize, treeHeaderSize, keyType, keySize);
