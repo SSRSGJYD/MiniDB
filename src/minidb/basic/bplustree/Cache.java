@@ -39,7 +39,7 @@ public class Cache<T extends BPlusTreeNode> {
         }
         valueMap.put(key, value);
         if(indexMap.containsKey(key)) {
-            long index = indexMap.get(key);
+            int index = indexMap.get(key);
             keyList.remove(index);
             keyList.addLast(key);
         }
@@ -55,7 +55,7 @@ public class Cache<T extends BPlusTreeNode> {
 
     public T get(long key) {
         int index = indexMap.get(key);
-        keyList.remove(index);
+        keyList.remove((int)index);
         keyList.addLast(key);
         indexMap.put(key, keyList.size()-1);
         return valueMap.get(key);
@@ -81,7 +81,7 @@ public class Cache<T extends BPlusTreeNode> {
     	for(long i=0; i<capacity; i++) {
     		Collection<T> values = valueMap.values();
     		for(T value : values) {
-    			((BPlusTreeNode)value).writeNode(fa, pageSize, headerSize, keyType, keySize);
+    			value.writeNode(fa, pageSize, headerSize, keyType, keySize);
     		}
     	}
     }

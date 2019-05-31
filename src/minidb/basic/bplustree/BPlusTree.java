@@ -115,10 +115,7 @@ public class BPlusTree<K extends Key, V extends Value> {
         this.maxPageNumber = 0L;
         this.deleteCount = 0;
         this.conditionThreshold = conditionThreshold;
-        // initialize node cache
-        internalNodeCache = new Cache<>(fa, pageSize, treeHeaderSize, keyType, keySize, internalCacheSize);
-        leafNodeCache = new Cache<>(fa, pageSize, treeHeaderSize, keyType, keySize, leafCacheSize);
-
+        
         File f = new File(path);
         if(f.exists()) {
         	this.fa = new RandomAccessFile(path, "rw");
@@ -126,16 +123,26 @@ public class BPlusTree<K extends Key, V extends Value> {
             readHeaderFromFile(fa);
             initializeSlotPage(true);
             System.out.println("Tree file loaded");
+            // initialize node cache
+            internalNodeCache = new Cache<>(fa, pageSize, treeHeaderSize, keyType, keySize, internalCacheSize);
+            leafNodeCache = new Cache<>(fa, pageSize, treeHeaderSize, keyType, keySize, leafCacheSize);
+
         }
         else {
             System.out.println("Creating new tree file");
             this.fa = new RandomAccessFile(path, "rw");
             fa.setLength(0);
             initializeSlotPage(false);
+            // initialize node cache
+            internalNodeCache = new Cache<>(fa, pageSize, treeHeaderSize, keyType, keySize, internalCacheSize);
+            leafNodeCache = new Cache<>(fa, pageSize, treeHeaderSize, keyType, keySize, leafCacheSize);
+            //create tree
             createTree();
             writeFileHeader();
             System.out.println("Tree file created");
         }
+        
+        
     }
 
     /**

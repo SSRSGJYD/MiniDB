@@ -1,0 +1,3 @@
+create database db
+use database db
+create table play(id int,name int, primary key(id))
