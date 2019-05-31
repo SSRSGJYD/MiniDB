@@ -90,6 +90,13 @@ public class Table implements Serializable{
 
 	}
 	
+	public void commit() throws IOException {
+		this.index.commit();
+		for(SecondaryIndex index:this.indexs.values()) {
+			index.commit();
+		}
+	}
+	
 	public void createSecondaryIndex(Entry<String, SchemaDescriptor> entry) throws IOException {
 		SchemaDescriptor sd=entry.getValue();
 		SecondaryIndex si=null;

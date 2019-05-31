@@ -19,6 +19,7 @@ public class DataBase{
 
 	String dbName;
 	HashMap<String,Table> tables;
+
 	public DataBase(String n) throws ClassNotFoundException, IOException {
 		tables=new HashMap<String,Table>();
 		dbName=n;
@@ -29,6 +30,12 @@ public class DataBase{
 	public DataBase() throws ClassNotFoundException, IOException {
 		tables=new HashMap<String,Table>();
 		open();
+	}
+	
+	public void commit() {
+		for(Table tb:tables.values()) {
+			tb.commit();
+		}
 	}
 	
 	public void open() throws IOException, ClassNotFoundException {
@@ -55,7 +62,7 @@ public class DataBase{
 
     }
 	
-	public Result execute(Statement st,HashMap<String,Permission> perms,boolean isRoot) throws IOException, ClassNotFoundException {
+	public Result execute(Statement st,HashMap<String,Permission> perms,boolean isRoot,boolean willCommit) throws IOException, ClassNotFoundException {
 		Result res = null;
 		Table tb;
 		Pair<Object,Row> pair;
@@ -67,9 +74,9 @@ public class DataBase{
 				sa.types=sc.types;
 				this.createTable(sc.tableName,sa,sc.hasPrimary);
 			}
-//			else {
-//				throw new IllegalArgumentException("table already exist");
-//			}
+			else {
+				throw new IllegalArgumentException("table already exist");
+			}
 			res=new BoolResult();
 			break;
 		case Statement.drop:
@@ -92,6 +99,9 @@ public class DataBase{
 			pair=tb.mkRow(values);
 			tb.simpleInsert(pair.l,pair.r);
 			tb.insertIndexs(pair.l, values);
+			if(willCommit) {
+				tb.commit();
+			}
 			res=new BoolResult();
 			break;
 		case Statement.insertB:
@@ -104,6 +114,9 @@ public class DataBase{
 			pair=tb.mkRowB(pairs);
 			tb.simpleInsert(pair.l,pair.r);
 			tb.insertIndexsB(pair.l, pairs);
+			if(willCommit) {
+				tb.commit();
+			}
 			res=new BoolResult();
 			break;
 		case Statement.selectA:
@@ -152,6 +165,9 @@ public class DataBase{
 			}
 			tb=tables.get(su.tableName);
 			tb.update(su.lt,su.setName,su.setValue);
+			if(willCommit) {
+				tb.commit();
+			}
 			res=new BoolResult();
 			break;
 
@@ -162,6 +178,9 @@ public class DataBase{
 			}
 			tb=tables.get(sds.tableName);
 			tb.delete(sds.lt);
+			if(willCommit) {
+				tb.commit();
+			}
 			res=new BoolResult();
 			break;
 		}

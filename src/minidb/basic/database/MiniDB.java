@@ -40,6 +40,12 @@ public class MiniDB {
 		users.put(un, new User(un,pw));
 	}
 	
+	public void commit() throws IOException {
+		for(DataBase db:dbs.values()) {
+			db.commit();
+		}
+	}
+	
 	@SuppressWarnings("unchecked")
 	public String getInfo() {
 		JSONArray objs=new JSONArray();
@@ -112,7 +118,7 @@ public class MiniDB {
     }
 
 
-	public Result execute(Statement st) throws IOException, ClassNotFoundException {
+	public Result execute(Statement st,boolean willCommit) throws IOException, ClassNotFoundException {
 		Result res = null;
 		long startTime = System.nanoTime();
 		if(st.type==Statement.User) {
@@ -225,7 +231,7 @@ public class MiniDB {
 				
 		}
 		else {
-			res=current.execute(st,curUser.perms.get(current.dbName),curUser.isRoot);
+			res=current.execute(st,curUser.perms.get(current.dbName),curUser.isRoot,willCommit);
 		}
 		long totalTime = System.nanoTime()- startTime;
 		res.time=totalTime;

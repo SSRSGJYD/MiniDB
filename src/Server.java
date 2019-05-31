@@ -68,7 +68,7 @@ public class Server {
 				ParseTreeWalker walker=new ParseTreeWalker();
 				walker.walk(extractor, tree);		
 				
-				Result res = db.execute(extractor.st);
+				Result res = db.execute(extractor.st,true);
 				responseMsg.msg = res.json(res.time);
 				return true;
 			}
@@ -90,9 +90,7 @@ public class Server {
 				MiniSQLLexer lexer = new MiniSQLLexer(input);
 				lexer.removeErrorListeners();
 				lexer.addErrorListener(ThrowingErrorListener.INSTANCE);
-
 				CommonTokenStream tokens = new CommonTokenStream(lexer);
-
 				MiniSQLParser parser = new MiniSQLParser(tokens);
 				parser.removeErrorListeners();
 				parser.addErrorListener(ThrowingErrorListener.INSTANCE);
@@ -103,8 +101,7 @@ public class Server {
 					MyListener extractor = new MyListener();
 					ParseTreeWalker walker=new ParseTreeWalker();
 					walker.walk(extractor, tree);		
-					
-					res = db.execute(extractor.st);
+					res = db.execute(extractor.st,false);
 					time+=res.time;
 				}
 				catch(Exception e) {
@@ -118,6 +115,7 @@ public class Server {
 			}
 			else {
 				responseMsg.msg = res.json(time);
+				db.commit();
 			}
 
 		}
