@@ -1,1 +1,2 @@
+use database db
 select * from play where (id > 500 and id < 550)

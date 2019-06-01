@@ -11,7 +11,7 @@ import org.json.simple.JSONObject;
 public class QueryResult extends Result {
 	//TODO HashMap
 	public ArrayList<LinkedHashMap<String,Object>> data;
-	public HashMap<String,Integer> types;
+	public LinkedHashMap<String,Integer> types;
 	public QueryResult() {
 	}
 	@Override

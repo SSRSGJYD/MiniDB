@@ -12,18 +12,18 @@ public class Schema implements Serializable{
     private static final long serialVersionUID = 1L;
 
 	LinkedHashMap<String,SchemaDescriptor> descriptors;
-	public HashMap<String,Integer> types;
+	public LinkedHashMap<String,Integer> types;
 
 	int keyType;
 	String primaryKey;
 	
 	public Schema() {
 		descriptors=new LinkedHashMap<String,SchemaDescriptor>();
-		types=new HashMap<String,Integer>();
+		types=new LinkedHashMap<String,Integer>();
 	}
 	public Schema(LinkedHashMap<String,SchemaDescriptor> data) {
 		this.descriptors=data;
-		types=new HashMap<String,Integer>();
+		types=new LinkedHashMap<String,Integer>();
 	}
 	public int getPrimaryKeyType() {
 		for (SchemaDescriptor value : descriptors.values()) {

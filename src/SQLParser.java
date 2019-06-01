@@ -21,7 +21,7 @@ public class SQLParser{
 	
 	public static void main( String[] args) throws Exception 
 	{
-        Path path = Paths.get("test/select/select_pk_1000.script");
+       Path path = Paths.get("test/delete/delete_10000.script");
 		byte[] bArray = Files.readAllBytes(path);
  
 		String cmds="create database db\n"
@@ -78,6 +78,7 @@ public class SQLParser{
 //				System.out.println(e);
 //			}
 		}
+		db.commit();
 		System.out.println(time);
 	}
 } 

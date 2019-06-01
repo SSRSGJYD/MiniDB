@@ -117,7 +117,7 @@ public class BPlusTree<K extends Key, V extends Value> {
         this.deleteCount = 0;
         this.conditionThreshold = conditionThreshold;
         
-        this.useCache = true; //change here to test cache
+        this.useCache = false; //change here to test cache
         
         File f = new File(path);
         if(f.exists()) {
