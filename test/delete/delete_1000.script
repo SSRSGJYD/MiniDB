@@ -1,3 +1,4 @@
+use database db
 delete from play where name=1
 delete from play where name=3
 delete from play where name=5

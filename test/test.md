@@ -4,11 +4,11 @@
 
 #### 测试环境
 
-操作系统：
+操作系统: 4.19.45-1-MANJARO
 
-CPU:
+CPU: Intel Core i7-8565U
 
-内存：
+内存: 7863M
 
 
 
@@ -30,8 +30,8 @@ create table play(id int, name int, primary key(id))
 
 | scale | hsqldb | minidb(no cache) | minidb(cache 1024) |
 | ----- | ------ | ---------------- | ------------------ |
-| 1000  |        |                  |                    |
-| 10000 |        |                  |                    |
+| 1000  |   70.9ms  |      617.253435ms           |                   |
+| 10000 |   165.6ms     |     42138.957818ms             |                    |
 
 
 
@@ -40,10 +40,12 @@ create table play(id int, name int, primary key(id))
 - hsqldb的测试：在insert测试的基础上，点击open script导入select_xxxx.script脚本并执行
 - minidb的测试：在insert测试的基础上，执行脚本select_xxxx.script进行测试
 
-| scale | hsqldb | minidb(no cache) | minidb(cache 1024) |
-| ----- | ------ | ---------------- | ------------------ |
-| 1000  |        |                  |                    |
-| 10000 |        |                  |                    |
+|type| scale | hsqldb | minidb(no cache) | minidb(cache 1024) |
+|-----| ----- | ------ | ---------------- | ------------------ |
+|pk | 1000 |   0.4ms  |     11.743167 ms        |                    |
+|pk| 10000 | 0.8ms  |   74.171247ms        |                    |
+|sk | 1000 |  0.6ms     |  83.751510 ms            |                    |
+|sk| 10000 | 6.0ms  |        3586.476549ms          |                    |
 
 
 
@@ -61,8 +63,8 @@ create table play2(id int, age int, primary key(id))
 
 | scale | hsqldb | minidb(no cache) | minidb(cache 1024) |
 | ----- | ------ | ---------------- | ------------------ |
-| 1000  |        |                  |                    |
-| 10000 |        |                  |                    |
+| 1000  |   2.7ms     |    83.861124ms              |                    |
+| 10000 |   15.1ms     |   4067.273535ms               |                    |
 
 
 
@@ -73,6 +75,6 @@ create table play2(id int, age int, primary key(id))
 
 | scale | hsqldb | minidb(no cache) | minidb(cache 1024) |
 | ----- | ------ | ---------------- | ------------------ |
-| 1000  |        |                  |                    |
-| 10000 |        |                  |                    |
+| 1000  |   33.9ms     |      908.504563 ms            |                    |
+| 10000 |  1588.4ms      |        8961.646596ms          |                    |
 

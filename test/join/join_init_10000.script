@@ -1,3 +1,4 @@
+use database db
 create table play2(id int, age int, primary key(id))
 insert into play2 values(1,1)
 insert into play2 values(3,3)

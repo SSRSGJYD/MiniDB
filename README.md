@@ -28,6 +28,11 @@ MiniDB是一个轻量级的关系数据库，支持多数据库的存储，实�
 
 ### 权限管理
 
++ create user
++ grant select on table to user [with grant option]
++ grant update on table to user [with grant option]
++ revoke select on table from user
++ revoke update on table from user
 
 
 ### 图形界面客户端
@@ -74,6 +79,7 @@ MiniDB是一个轻量级的关系数据库，支持多数据库的存储，实�
 + 数据库级别的用户权限
 + where子句的条件支持and和or
 + 支持outer join操作
++ 支持三张表以上的join
 
 
 

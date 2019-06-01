@@ -6,7 +6,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import minidb.result.BoolResult;
@@ -153,6 +155,7 @@ public class DataBase{
 			}
 			res=Table.queryJT(slb.isStar,tables,slb.cnames,slb.jnames,slb.onConditions,slb.existWhere,slb.lt);
 			qr=(QueryResult) res;
+			qr.types=getTypes(slb.jnames);
 			break;
 
 		case Statement.update:
@@ -187,6 +190,18 @@ public class DataBase{
 		return res;
 	}
 	
+	private LinkedHashMap<String, Integer> getTypes(List<Pair<String, Integer>> jnames) {
+		LinkedHashMap<String, Integer> types = new LinkedHashMap<String,Integer>();
+		for(Pair<String,Integer> jname:jnames) {
+			Table tb=tables.get(jname.l);
+			for(Map.Entry<String,SchemaDescriptor> e:tb.schema.descriptors.entrySet()) {
+				types.put(tb.tableName+"."+e.getKey(),e.getValue().getType());
+			}
+		}
+		return types;
+	}
+
+
 	protected void addTable(Table tb) {
 		tables.put(tb.tableName, tb);
 	}

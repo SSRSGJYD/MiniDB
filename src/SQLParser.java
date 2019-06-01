@@ -21,7 +21,7 @@ public class SQLParser{
 	
 	public static void main( String[] args) throws Exception 
 	{
-        Path path = Paths.get("input.sql");
+       Path path = Paths.get("test/delete/delete_10000.script");
 		byte[] bArray = Files.readAllBytes(path);
  
 		String cmds="create database db\n"
@@ -49,6 +49,7 @@ public class SQLParser{
 		BufferedReader br=new BufferedReader(in);
 		MiniDB db=new MiniDB();
 		String cmd;
+		long time=0;
 		while((cmd=br.readLine())!=null) {
 			if(cmd.length()==0)continue;
 			CharStream input = CharStreams.fromString(cmd);
@@ -69,13 +70,15 @@ public class SQLParser{
 				ParseTreeWalker walker=new ParseTreeWalker();
 				walker.walk(extractor, tree);		
 				
-				Result res=db.execute(extractor.st,true);
+				Result res=db.execute(extractor.st,false);
 				System.out.println(res.json(res.time));
+				time+=res.time;
 //			}
 //			catch(Exception e) {
 //				System.out.println(e);
 //			}
-
 		}
+		db.commit();
+		System.out.println(time);
 	}
 } 
