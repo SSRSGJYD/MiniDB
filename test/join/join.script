@@ -1,0 +1,1 @@
+select * from play join play2 on play.id = play2.id
