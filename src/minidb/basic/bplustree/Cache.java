@@ -1,20 +1,18 @@
 package minidb.basic.bplustree;
 
 import java.util.LinkedList;
-
-import javax.imageio.IIOException;
-
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Collection;
 import java.util.HashMap;
 
+
 public class Cache<T extends BPlusTreeNode> {
 	private RandomAccessFile fa; // file access
-	private int pageSize;   	// page size
+	private int pageSize;   	 // page size
 	private int headerSize;
-	private int keyType;        // type of key
-    private int keySize;    	// key size
+	private int keyType;         // type of key
+    private int keySize;    	 // key size
     
     private HashMap<Long, T> valueMap;		 //(key, value)
     private HashMap<Long, Integer> indexMap; //(key, index)
