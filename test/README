@@ -1,0 +1,10 @@
+init.script文件是最初创建db数据库、创建play表的脚本。
+insert,select,join,delete文件夹中分别存放着相关的测试脚本。
+test.md文件中有对于测试流程的说明，建议的测试流程是：
+	1. 依次进行hsqldb的1000数据量的insert,select,join,delete测试
+	2. 删除hsqldb所有数据之后依次进行10000数据量的insert,select,join,delete测试
+	3. 启用minidb缓存机制，依次进行1000数据量的insert,select,join,delete测试
+	4. 删除minidb所有数据，依次进行10000数据量的insert,select,join,delete测试
+	5. 修改BPlusTree.java文件禁用minidb缓存机制，然后依次进行1000数据量的insert,select,join,delete测试
+	6. 删除minidb所有数据，依次进行10000数据量的insert,select,join,delete测试
+其中，对minidb进行测试时可以执行sql parser进行测试，也可以使用图形界面客户端进行测试

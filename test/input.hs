@@ -3,7 +3,7 @@ module Main where
 import System.IO
 
 
-insertOne h i= hPutStrLn h $"insert into play values("++show i++","++show i++")"
+insertOne h i= hPutStrLn h $"insert into play2 values("++show i++","++show i++")"
 
 deleteOne h i= hPutStrLn h $"delete from play where name="++show i++""
 
@@ -14,7 +14,7 @@ main = do
   -- hPutStrLn h "create database db"
   -- hPutStrLn h "use database db"
   -- hPutStrLn h "create table play(id int,name int, primary key(id))"
-  -- mapM_ (insertOne h) [1..1000]
-  mapM_ (deleteOne h) [1,3..10000]
+  mapM_ (insertOne h) [1,3..10000]
+  -- mapM_ (deleteOne h) [1,3..10000]
   hClose h
 
