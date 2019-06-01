@@ -21,7 +21,7 @@ public class SQLParser{
 	
 	public static void main( String[] args) throws Exception 
 	{
-        Path path = Paths.get("input.sql");
+        Path path = Paths.get("test/select/select_pk_1000.script");
 		byte[] bArray = Files.readAllBytes(path);
  
 		String cmds="create database db\n"

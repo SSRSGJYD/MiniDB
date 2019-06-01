@@ -1,0 +1,1 @@
+select * from play where (name > 500 and name < 550)
