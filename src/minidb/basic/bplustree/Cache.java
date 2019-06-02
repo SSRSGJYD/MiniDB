@@ -23,6 +23,7 @@ public class Cache<T extends BPlusTreeNode> {
 
     public Cache(RandomAccessFile fa, Path path, int pageSize, int headerSize, int keyType, int keySize, int capacity) {
         this.fa = fa;
+        this.path = path;
     	this.pageSize = pageSize;
     	this.headerSize = headerSize;
     	this.keyType = keyType;

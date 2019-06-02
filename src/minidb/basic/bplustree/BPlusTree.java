@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import minidb.basic.index.Key;
 import minidb.basic.index.PrimaryKeyValue;
@@ -136,9 +137,9 @@ public class BPlusTree<K extends Key, V extends Value> {
             this.fa = new RandomAccessFile(path, "rw");
             fa.setLength(0);
             // initialize node cache
-            File f2 = new File(path);
-            internalNodeCache = new Cache<>(fa, f2.toPath(), pageSize, treeHeaderSize, keyType, keySize, internalCacheSize);
-            leafNodeCache = new Cache<>(fa, f2.toPath(), pageSize, treeHeaderSize, keyType, keySize, leafCacheSize);
+            Path p = Paths.get(path);
+            internalNodeCache = new Cache<>(fa, p, pageSize, treeHeaderSize, keyType, keySize, internalCacheSize);
+            leafNodeCache = new Cache<>(fa, p, pageSize, treeHeaderSize, keyType, keySize, leafCacheSize);
             initializeSlotPage(false);
             //create tree
             createTree();
