@@ -1,4 +1,4 @@
-package minidb.client;
+package application;
 
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.protocol.HttpClientContext;

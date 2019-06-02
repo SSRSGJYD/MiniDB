@@ -1,4 +1,4 @@
-package minidb.client;
+package application;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -295,8 +295,7 @@ public class SceneController {
 						Platform.runLater(new Runnable() {
 						    @Override
 						    public void run() {
-						        //鏇存柊JavaFX鐨勪富绾跨▼鐨勪唬鐮佹斁鍦ㄦ澶�
-						    	// execute success
+						        // execute success
 								HttpEntity entity = response.getEntity();
 								if(entity != null) { 
 									String responseStr = null;
@@ -384,8 +383,7 @@ public class SceneController {
 						Platform.runLater(new Runnable() {
 						    @Override
 						    public void run() {
-						        //鏇存柊JavaFX鐨勪富绾跨▼鐨勪唬鐮佹斁鍦ㄦ澶�
-						    	HttpEntity entity = response.getEntity();
+						        HttpEntity entity = response.getEntity();
 								if(entity != null) { 
 									String responseStr = null;
 									try {
@@ -416,8 +414,7 @@ public class SceneController {
                 	Platform.runLater(new Runnable() {
                 	    @Override
                 	    public void run() {
-                	        //鏇存柊JavaFX鐨勪富绾跨▼鐨勪唬鐮佹斁鍦ㄦ澶�
-                	    	inExecution = false;
+                	        inExecution = false;
         					Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
         					information.setTitle("error"); 
         					information.setHeaderText("Error!");	
@@ -431,8 +428,7 @@ public class SceneController {
                 	Platform.runLater(new Runnable() {
                 	    @Override
                 	    public void run() {
-                	        //鏇存柊JavaFX鐨勪富绾跨▼鐨勪唬鐮佹斁鍦ㄦ澶�
-                	    	inExecution = false;
+                	        inExecution = false;
         					Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
         					information.setTitle("error"); 
         					information.setHeaderText("Error!");	
@@ -578,8 +574,7 @@ public class SceneController {
 						Platform.runLater(new Runnable() {
 						    @Override
 						    public void run() {
-						        //更新JavaFX的主线程的代码放在此处
-								// login success
+						        // login success
 							    connectionInfo.httpClient = httpClient;
 							    // receive schemas and update treeView
 								try {
@@ -596,8 +591,7 @@ public class SceneController {
 						Platform.runLater(new Runnable() {
 						    @Override
 						    public void run() {
-						        //更新JavaFX的主线程的代码放在此处
-						    	// login failed
+						        // login failed
 						    	connectionInfo = null;
 								Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
 								information.setTitle("error"); 
@@ -613,8 +607,7 @@ public class SceneController {
                 	Platform.runLater(new Runnable() {
                 	    @Override
                 	    public void run() {
-                	        //更新JavaFX的主线程的代码放在此处
-                	    	// login failed
+                	        // login failed
                 	    	connectionInfo = null;
         					Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
         					information.setTitle("error"); 
@@ -629,8 +622,7 @@ public class SceneController {
                 	Platform.runLater(new Runnable() {
                 	    @Override
                 	    public void run() {
-                	        //更新JavaFX的主线程的代码放在此处
-                	    	// login failed
+                	        // login failed
                 	    	connectionInfo = null;
         					Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
         					information.setTitle("error"); 
