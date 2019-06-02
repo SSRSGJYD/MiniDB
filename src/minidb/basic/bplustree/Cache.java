@@ -32,6 +32,7 @@ public class Cache<T extends BPlusTreeNode> {
     }
 
     public void put(Long key, T value) throws IOException {
+    	// put into cache
         if(valueMap.size() == capacity) {
             release();
         }
@@ -45,6 +46,7 @@ public class Cache<T extends BPlusTreeNode> {
             keyList.addLast(key);
             indexMap.put(key, keyList.size()-1);
         }
+        value.writeNode(fa, pageSize, headerSize, keyType, keySize);
     }
 
     public boolean containsKey(long key) {
@@ -63,8 +65,8 @@ public class Cache<T extends BPlusTreeNode> {
         long numToRemove = capacity / 2;
         for(long i=0; i<numToRemove; i++) {
             long key = keyList.pop();
-            T value = valueMap.get(key);
-            value.writeNode(fa, pageSize, headerSize, keyType, keySize);
+//            T value = valueMap.get(key);
+//            value.writeNode(fa, pageSize, headerSize, keyType, keySize);
             valueMap.remove(key);
         }
         indexMap.clear();
@@ -76,11 +78,11 @@ public class Cache<T extends BPlusTreeNode> {
     }
     
     public void commitAll() throws IOException {
-    	for(long i=0; i<capacity; i++) {
-    		Collection<T> values = valueMap.values();
-    		for(T value : values) {
-    			value.writeNode(fa, pageSize, headerSize, keyType, keySize);
-    		}
-    	}
+//    	for(long i=0; i<capacity; i++) {
+//    		Collection<T> values = valueMap.values();
+//    		for(T value : values) {
+//    			value.writeNode(fa, pageSize, headerSize, keyType, keySize);
+//    		}
+//    	}
     }
 }

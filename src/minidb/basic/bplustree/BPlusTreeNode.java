@@ -78,6 +78,9 @@ abstract class BPlusTreeNode<K extends Key, V extends Value> {
      */
     public abstract void writeNode(RandomAccessFile fa, int pageSize, int headerSize, int keyType, int keySize)
             throws IOException;
+    
+    public abstract void writeNodeAsync(RandomAccessFile fa, String filename, int pageSize, int headerSize, int keyType, int keySize)
+            throws IOException;
 
     /**
      * check if node is full

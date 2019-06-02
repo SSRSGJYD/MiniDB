@@ -66,8 +66,8 @@ public class BPlusTree<K extends Key, V extends Value> {
     boolean useCache; //whether use cache or not
     private Cache<BPlusTreeInternalNode<K,V>> internalNodeCache;
     private Cache<BPlusTreeLeafNode<K,V>> leafNodeCache;
-    private int internalCacheSize = 10000;
-    private int leafCacheSize = 10000;
+    private int internalCacheSize = 1000;
+    private int leafCacheSize = 1000;
 
     /**
      * constructor
