@@ -30,8 +30,8 @@ create table play(id int, name int, primary key(id))
 
 | scale | hsqldb | minidb(no cache) | minidb(cache 1024) |
 | ----- | ------ | ---------------- | ------------------ |
-| 1000  |   70.9ms  |      617.253435ms           |                   |
-| 10000 |   165.6ms     |     42138.957818ms             |                    |
+| 1000  |   70.9ms  |      617.253435ms           |   525.376677ms            |
+| 10000 |   165.6ms     |     42138.957818ms             |      4280.601352ms              |
 
 
 
@@ -42,10 +42,10 @@ create table play(id int, name int, primary key(id))
 
 |type| scale | hsqldb | minidb(no cache) | minidb(cache 1024) |
 |-----| ----- | ------ | ---------------- | ------------------ |
-|pk | 1000 |   0.4ms  |     11.743167 ms        |                    |
-|pk| 10000 | 0.8ms  |   74.171247ms        |                    |
-|sk | 1000 |  0.6ms     |  83.751510 ms            |                    |
-|sk| 10000 | 6.0ms  |        3586.476549ms          |                    |
+|pk | 1000 |   0.4ms  |     11.743167 ms        |        12.033778ms            |
+|pk| 10000 | 0.8ms  |   74.171247ms        |        74.694115ms            |
+|sk | 1000 |  0.6ms     |  83.751510 ms            |    26.623606ms                |
+|sk| 10000 | 6.0ms  |        3586.476549ms          |     219.747083ms               |
 
 
 
@@ -63,8 +63,8 @@ create table play2(id int, age int, primary key(id))
 
 | scale | hsqldb | minidb(no cache) | minidb(cache 1024) |
 | ----- | ------ | ---------------- | ------------------ |
-| 1000  |   2.7ms     |    83.861124ms              |                    |
-| 10000 |   15.1ms     |   4067.273535ms               |                    |
+| 1000  |   2.7ms     |    83.861124ms              |      25.022497ms              |
+| 10000 |   15.1ms     |   4067.273535ms               |       143.270791ms             |
 
 
 
@@ -75,6 +75,6 @@ create table play2(id int, age int, primary key(id))
 
 | scale | hsqldb | minidb(no cache) | minidb(cache 1024) |
 | ----- | ------ | ---------------- | ------------------ |
-| 1000  |   33.9ms     |      908.504563 ms            |                    |
-| 10000 |  1588.4ms      |        8961.646596ms          |                    |
+| 1000  |   33.9ms     |      908.504563 ms            |      607.182396ms              |
+| 10000 |  1588.4ms      |        8961.646596ms          |      3275.003313ms              |
 
