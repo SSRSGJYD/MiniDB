@@ -123,21 +123,21 @@ public class BPlusTree<K extends Key, V extends Value> {
         if(f.exists()) {
         	this.fa = new RandomAccessFile(path, "rw");
             System.out.println("File already exists, path: "+path+",size: " + fa.length() + " bytes");
-            readHeaderFromFile(fa);
-            initializeSlotPage(true);
-            System.out.println("Tree file loaded");
             // initialize node cache
             internalNodeCache = new Cache<>(fa, pageSize, treeHeaderSize, keyType, keySize, internalCacheSize);
             leafNodeCache = new Cache<>(fa, pageSize, treeHeaderSize, keyType, keySize, leafCacheSize);
+            readHeaderFromFile(fa);
+            initializeSlotPage(true);
+            System.out.println("Tree file loaded");
         }
         else {
             System.out.println("Creating new tree file");
             this.fa = new RandomAccessFile(path, "rw");
             fa.setLength(0);
-            initializeSlotPage(false);
             // initialize node cache
             internalNodeCache = new Cache<>(fa, pageSize, treeHeaderSize, keyType, keySize, internalCacheSize);
             leafNodeCache = new Cache<>(fa, pageSize, treeHeaderSize, keyType, keySize, leafCacheSize);
+            initializeSlotPage(false);
             //create tree
             createTree();
             writeFileHeader();
@@ -1014,11 +1014,11 @@ public class BPlusTree<K extends Key, V extends Value> {
     	    switch (node.getNodeType()) {
 		        case BPlusTreeConst.NODE_TYPE_ROOT_INTERNAL:
 		        case BPlusTreeConst.NODE_TYPE_INTERNAL:
-		            internalNodeCache.put(node.getPageIndex(), (BPlusTreeInternalNode<K,V>)node);
+		            internalNodeCache.putWrite(node.getPageIndex(), (BPlusTreeInternalNode<K,V>)node);
 		            break;
 		        case BPlusTreeConst.NODE_TYPE_ROOT_LEAF:
 		        case BPlusTreeConst.NODE_TYPE_LEAF:
-		            leafNodeCache.put(node.getPageIndex(), (BPlusTreeLeafNode<K,V>)node);
+		            leafNodeCache.putWrite(node.getPageIndex(), (BPlusTreeLeafNode<K,V>)node);
 		            break;
 		        default:
 		      	  node.writeNode(fa, pageSize, treeHeaderSize, keyType, keySize);
