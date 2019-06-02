@@ -7,6 +7,7 @@ import minidb.types.TypeConst;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
 import org.antlr.v4.parse.ANTLRParser.v3tokenSpec_return;
@@ -238,6 +239,15 @@ public class BPlusTreeUtils {
     public static void writeRowToFile(RandomAccessFile fa, Value row)
         throws IOException {
         fa.write(row.array);
+    }
+    
+    public static void writeKeyToBuffer(ByteBuffer buffer, Key key) throws IOException {
+        key.writeToBuffer(buffer);
+    }
+
+    public static void writeRowToBuffer(ByteBuffer buffer, Value row)
+        throws IOException {
+        buffer.put(row.array);
     }
 
     /**

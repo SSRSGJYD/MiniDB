@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.file.Path;
 
 import minidb.basic.index.Key;
 import minidb.basic.index.PrimaryKeyValue;
@@ -124,8 +125,8 @@ public class BPlusTree<K extends Key, V extends Value> {
         	this.fa = new RandomAccessFile(path, "rw");
             System.out.println("File already exists, path: "+path+",size: " + fa.length() + " bytes");
             // initialize node cache
-            internalNodeCache = new Cache<>(fa, pageSize, treeHeaderSize, keyType, keySize, internalCacheSize);
-            leafNodeCache = new Cache<>(fa, pageSize, treeHeaderSize, keyType, keySize, leafCacheSize);
+            internalNodeCache = new Cache<>(fa, f.toPath(), pageSize, treeHeaderSize, keyType, keySize, internalCacheSize);
+            leafNodeCache = new Cache<>(fa, f.toPath(), pageSize, treeHeaderSize, keyType, keySize, leafCacheSize);
             readHeaderFromFile(fa);
             initializeSlotPage(true);
             System.out.println("Tree file loaded");
@@ -135,8 +136,9 @@ public class BPlusTree<K extends Key, V extends Value> {
             this.fa = new RandomAccessFile(path, "rw");
             fa.setLength(0);
             // initialize node cache
-            internalNodeCache = new Cache<>(fa, pageSize, treeHeaderSize, keyType, keySize, internalCacheSize);
-            leafNodeCache = new Cache<>(fa, pageSize, treeHeaderSize, keyType, keySize, leafCacheSize);
+            File f2 = new File(path);
+            internalNodeCache = new Cache<>(fa, f2.toPath(), pageSize, treeHeaderSize, keyType, keySize, internalCacheSize);
+            leafNodeCache = new Cache<>(fa, f2.toPath(), pageSize, treeHeaderSize, keyType, keySize, leafCacheSize);
             initializeSlotPage(false);
             //create tree
             createTree();
