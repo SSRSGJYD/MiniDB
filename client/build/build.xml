@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<project name="client" default="do-deploy" basedir="."  xmlns:fx="javafx:com.sun.javafx.tools.ant">
+	<target name="init-fx-tasks">
+		<path id="fxant">
+			<filelist>
+				<file name="${java.home}\..\lib\ant-javafx.jar"/>
+				<file name="${java.home}\lib\jfxrt.jar"/>
+			</filelist>
+		</path>
+	
+		<taskdef resource="com/sun/javafx/tools/ant/antlib.xml"
+			uri="javafx:com.sun.javafx.tools.ant"
+			classpathref="fxant"/>
+	</target>
+	<target name="setup-staging-area">
+		<delete dir="externalLibs" />
+		<delete dir="project" />
+		<delete dir="projectRefs" />
+	
+		<mkdir dir="externalLibs" />
+	
+		<copy todir="externalLibs">
+			<fileset dir="C:\zzp\_MyWorkingPlace\jars\javafx-sdk-11.0.2\lib">
+				<filename name="javafx.graphics.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\zzp\_MyWorkingPlace\jars\httpcomponents-core-4.4.11\lib">
+				<filename name="httpcore-ab-4.4.11.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\zzp\_MyWorkingPlace\jars">
+				<filename name="fastjson-1.2.57.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\zzp\_MyWorkingPlace\jars\javafx-sdk-11.0.2\lib">
+				<filename name="javafx.controls.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\zzp\_MyWorkingPlace\jars\javafx-sdk-11.0.2\lib">
+				<filename name="javafx.media.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\zzp\_MyWorkingPlace\jars\javafx-sdk-11.0.2\lib">
+				<filename name="javafx.fxml.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\zzp\_MyWorkingPlace\jars\httpcomponents-client-4.5.8\lib">
+				<filename name="httpclient-4.5.8.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\zzp\_MyWorkingPlace\jars\httpcomponents-core-4.4.11\lib">
+				<filename name="httpcore-nio-4.4.11.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\zzp\_MyWorkingPlace\jars\httpcomponents-client-4.5.8\lib">
+				<filename name="httpclient-osgi-4.5.8.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\zzp\_MyWorkingPlace\jars">
+				<filename name="json-simple-1.1.1.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\zzp\_MyWorkingPlace\jars">
+				<filename name="commons-io-2.6.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\zzp\_MyWorkingPlace\jars\httpcomponents-client-4.5.8\lib">
+				<filename name="httpmime-4.5.8.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\zzp\_MyWorkingPlace\jars\httpcomponents-client-4.5.8\lib">
+				<filename name="commons-codec-1.11.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\zzp\_MyWorkingPlace\jars\httpcomponents-client-4.5.8\lib">
+				<filename name="httpclient-cache-4.5.8.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\zzp\_MyWorkingPlace\jars">
+				<filename name="httpasyncclient-4.1.4.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\zzp\_MyWorkingPlace\jars\httpcomponents-client-4.5.8\lib">
+				<filename name="commons-logging-1.2.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\zzp\_MyWorkingPlace\jars\httpcomponents-core-4.4.11\lib">
+				<filename name="httpcore-osgi-4.4.11.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\zzp\_MyWorkingPlace\jars\httpcomponents-client-4.5.8\lib">
+				<filename name="httpclient-win-4.5.8.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\zzp\_MyWorkingPlace\jars\javafx-sdk-11.0.2\lib">
+				<filename name="javafx.web.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\zzp\_MyWorkingPlace\jars\httpcomponents-client-4.5.8\lib">
+				<filename name="jna-platform-4.5.2.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\zzp\_MyWorkingPlace\jars">
+				<filename name="antlr-4.7.2-complete.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\zzp\_MyWorkingPlace\jars\httpcomponents-client-4.5.8\lib">
+				<filename name="httpcore-4.4.11.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\zzp\_MyWorkingPlace\jars\javafx-sdk-11.0.2\lib">
+				<filename name="javafx-swt.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\zzp\_MyWorkingPlace\jars\httpcomponents-core-4.4.11\lib">
+				<filename name="commons-cli-1.2.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\zzp\_MyWorkingPlace\jars\javafx-sdk-11.0.2\lib">
+				<filename name="javafx.swing.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\zzp\_MyWorkingPlace\jars\httpcomponents-client-4.5.8\lib">
+				<filename name="jna-4.5.2.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\zzp\_MyWorkingPlace\jars\httpcomponents-core-4.4.11\lib">
+				<filename name="httpcore-4.4.11.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\zzp\_MyWorkingPlace\jars\javafx-sdk-11.0.2\lib">
+				<filename name="javafx.base.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="externalLibs">
+			<fileset dir="C:\zzp\_MyWorkingPlace\jars\httpcomponents-client-4.5.8\lib">
+				<filename name="fluent-hc-4.5.8.jar"/>
+			</fileset>
+		</copy>
+	
+		<mkdir dir="project" />
+		<copy todir="project">
+			<fileset dir="C:\zzp\_MyWorkingPlace\eclipse\MiniDB\client">
+				<include name="src/**" />
+			</fileset>
+		</copy>
+	
+		<mkdir dir="projectRefs" />
+	</target>
+	<target name='do-compile'>
+		<delete dir="build" />
+		<mkdir dir="build/src" />
+		<mkdir dir="build/libs" />
+		<mkdir dir="build/classes" />
+	
+		<!-- Copy project-libs references -->
+		<copy todir="build/libs">
+			<fileset dir="externalLibs">
+				<include name="httpcore-nio-4.4.11.jar"/>
+				<include name="javafx-swt.jar"/>
+				<include name="commons-cli-1.2.jar"/>
+				<include name="javafx.fxml.jar"/>
+				<include name="javafx.controls.jar"/>
+				<include name="javafx.media.jar"/>
+				<include name="commons-logging-1.2.jar"/>
+				<include name="fluent-hc-4.5.8.jar"/>
+				<include name="commons-codec-1.11.jar"/>
+				<include name="javafx.swing.jar"/>
+				<include name="javafx.graphics.jar"/>
+				<include name="httpmime-4.5.8.jar"/>
+				<include name="httpcore-4.4.11.jar"/>
+				<include name="antlr-4.7.2-complete.jar"/>
+				<include name="httpasyncclient-4.1.4.jar"/>
+				<include name="httpclient-osgi-4.5.8.jar"/>
+				<include name="httpclient-4.5.8.jar"/>
+				<include name="httpclient-cache-4.5.8.jar"/>
+				<include name="javafx.web.jar"/>
+				<include name="httpcore-ab-4.4.11.jar"/>
+				<include name="httpclient-win-4.5.8.jar"/>
+				<include name="commons-io-2.6.jar"/>
+				<include name="fastjson-1.2.57.jar"/>
+				<include name="json-simple-1.1.1.jar"/>
+				<include name="httpcore-osgi-4.4.11.jar"/>
+				<include name="jna-platform-4.5.2.jar"/>
+				<include name="javafx.base.jar"/>
+				<include name="jna-4.5.2.jar"/>
+			</fileset>
+		</copy>
+	
+		<!-- Copy project references -->
+	
+		<!-- Copy project sources itself -->
+		<copy todir="build/src">
+			<fileset dir="project/src">
+				<include name="**/*"/>
+			</fileset>
+		</copy>
+	
+		<javac includeantruntime="false" source="1.8" target="1.8" srcdir="build/src" destdir="build/classes" encoding="GBK">
+			<classpath>
+				<fileset dir="build/libs">
+					<include name="*"/>
+				</fileset>
+			</classpath>
+		</javac>
+	
+		<!-- Copy over none Java-Files -->
+		<copy todir="build/classes">
+		<fileset dir="project/src">
+			<exclude name="**/*.java"/>
+		</fileset>
+		</copy>
+	
+	
+	</target>
+	<target name="do-deploy" depends="setup-staging-area, do-compile, init-fx-tasks">
+		<delete file="dist"/>
+		<delete file="deploy" />
+	
+		<mkdir dir="dist" />
+		<mkdir dir="dist/libs" />
+	
+		<copy todir="dist/libs">
+			<fileset dir="externalLibs">
+				<include name="*" />
+			</fileset>
+		</copy>
+	
+	
+		<fx:resources id="appRes">
+			<fx:fileset dir="dist" includes="client.jar"/>
+			<fx:fileset dir="dist" includes="libs/*"/>
+		</fx:resources>
+	
+		<fx:application id="fxApplication"
+			name=""
+			mainClass="application.ClientDialog"
+		/>
+	
+		<mkdir dir="build/classes/META-INF" />
+	
+	
+	
+		<fx:jar destfile="dist/client.jar">
+			<fx:application refid="fxApplication"/>
+			<fileset dir="build/classes">
+			</fileset>
+			<fx:resources refid="appRes"/>
+	
+			<manifest>
+				<attribute name="Implementation-Vendor" value=""/>
+				<attribute name="Implementation-Title" value=""/>
+				<attribute name="Implementation-Version" value="1.0"/>
+				<attribute name="JavaFX-Feature-Proxy" value="None"/>
+			</manifest>
+		</fx:jar>
+	
+	
+	
+	
+	</target>
+</project>

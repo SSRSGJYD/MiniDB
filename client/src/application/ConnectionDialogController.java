@@ -1,4 +1,4 @@
-package minidb.client;
+package application;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -109,7 +109,6 @@ public class ConnectionDialogController {
 						Platform.runLater(new Runnable() {
 						    @Override
 						    public void run() {
-						        //鏇存柊JavaFX鐨勪富绾跨▼鐨勪唬鐮佹斁鍦ㄦ澶�
 								// login success
 							    connectionInfo.httpClient = httpClient;
 							    connectionInfo.requestConfig = requestConfig;
@@ -134,8 +133,7 @@ public class ConnectionDialogController {
 						Platform.runLater(new Runnable() {
 						    @Override
 						    public void run() {
-						        //鏇存柊JavaFX鐨勪富绾跨▼鐨勪唬鐮佹斁鍦ㄦ澶�
-						    	// login failed
+						        // login failed
 						    	connectionInfo = null;
 								Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
 								information.setTitle("error"); 
@@ -151,8 +149,7 @@ public class ConnectionDialogController {
                 	Platform.runLater(new Runnable() {
                 	    @Override
                 	    public void run() {
-                	        //鏇存柊JavaFX鐨勪富绾跨▼鐨勪唬鐮佹斁鍦ㄦ澶�
-                	    	// login failed
+                	        // login failed
                 	    	connectionInfo = null;
         					Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
         					information.setTitle("error"); 
@@ -167,8 +164,7 @@ public class ConnectionDialogController {
                 	Platform.runLater(new Runnable() {
                 	    @Override
                 	    public void run() {
-                	        //鏇存柊JavaFX鐨勪富绾跨▼鐨勪唬鐮佹斁鍦ㄦ澶�
-                	    	// login failed
+                	        // login failed
                 	    	connectionInfo = null;
         					Alert information = new Alert(Alert.AlertType.ERROR,"connection failed!");
         					information.setTitle("error"); 
