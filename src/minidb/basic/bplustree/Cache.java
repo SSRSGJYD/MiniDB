@@ -46,6 +46,22 @@ public class Cache<T extends BPlusTreeNode> {
             keyList.addLast(key);
             indexMap.put(key, keyList.size()-1);
         }
+    }
+    
+    public void putWrite(Long key, T value) throws IOException {
+        if(valueMap.size() == capacity) {
+            release();
+        }
+        valueMap.put(key, value);
+        if(indexMap.containsKey(key)) {
+            int index = indexMap.get(key);
+            keyList.remove(index);
+            keyList.addLast(key);
+        }
+        else {
+            keyList.addLast(key);
+            indexMap.put(key, keyList.size()-1);
+        }
         value.writeNode(fa, pageSize, headerSize, keyType, keySize);
     }
 

@@ -1014,11 +1014,11 @@ public class BPlusTree<K extends Key, V extends Value> {
     	    switch (node.getNodeType()) {
 		        case BPlusTreeConst.NODE_TYPE_ROOT_INTERNAL:
 		        case BPlusTreeConst.NODE_TYPE_INTERNAL:
-		            internalNodeCache.put(node.getPageIndex(), (BPlusTreeInternalNode<K,V>)node);
+		            internalNodeCache.putWrite(node.getPageIndex(), (BPlusTreeInternalNode<K,V>)node);
 		            break;
 		        case BPlusTreeConst.NODE_TYPE_ROOT_LEAF:
 		        case BPlusTreeConst.NODE_TYPE_LEAF:
-		            leafNodeCache.put(node.getPageIndex(), (BPlusTreeLeafNode<K,V>)node);
+		            leafNodeCache.putWrite(node.getPageIndex(), (BPlusTreeLeafNode<K,V>)node);
 		            break;
 		        default:
 		      	  node.writeNode(fa, pageSize, treeHeaderSize, keyType, keySize);
