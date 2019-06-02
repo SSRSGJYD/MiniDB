@@ -28,10 +28,10 @@ create table play(id int, name int, primary key(id))
 
 + minidb的测试：删除原有的数据库文件，之后执行脚本insert_xxxx.script
 
-| scale | hsqldb | minidb(no cache) | minidb(cache 1024) |
-| ----- | ------ | ---------------- | ------------------ |
-| 1000  |   70.9ms  |      617.253435ms           |   525.376677ms            |
-| 10000 |   165.6ms     |     42138.957818ms             |      4280.601352ms              |
+| scale | hsqldb | minidb(no cache) | minidb(cache 1024) |minidb(new cache)|
+| ----- | ------ | ---------------- | ------------------ |  ------------------ |
+| 1000  |   70.9ms  |      617.253435ms           |   525.376677ms            | 354.878979ms|
+| 10000 |   165.6ms     |     42138.957818ms             |      4280.601352ms   |    941.955378ms       |
 
 
 
@@ -40,12 +40,12 @@ create table play(id int, name int, primary key(id))
 - hsqldb的测试：在insert测试的基础上，点击open script导入select_xxxx.script脚本并执行
 - minidb的测试：在insert测试的基础上，执行脚本select_xxxx.script进行测试
 
-|type| scale | hsqldb | minidb(no cache) | minidb(cache 1024) |
-|-----| ----- | ------ | ---------------- | ------------------ |
-|pk | 1000 |   0.4ms  |     11.743167 ms        |        12.033778ms            |
-|pk| 10000 | 0.8ms  |   74.171247ms        |        74.694115ms            |
-|sk | 1000 |  0.6ms     |  83.751510 ms            |    26.623606ms                |
-|sk| 10000 | 6.0ms  |        3586.476549ms          |     219.747083ms               |
+|type| scale | hsqldb | minidb(no cache) | minidb(cache 1024) |minidb(new cache)|
+|-----| ----- | ------ | ---------------- | ------------------ |------------------ |
+|pk | 1000 |   0.4ms  |     11.743167 ms        |        12.033778ms            | 55.216255ms |
+|pk| 10000 | 0.8ms  |   74.171247ms        |        74.694115ms   | 22.007795ms`         | 
+|sk | 1000 |  0.6ms     |  83.751510 ms            |    26.623606ms     |   56.070855ms         |
+|sk| 10000 | 6.0ms  |        3586.476549ms          |     219.747083ms   |   29.427447ms         |
 
 
 
@@ -61,10 +61,10 @@ create table play2(id int, age int, primary key(id))
 
 + minidb：在select测试的基础上，执行join_init_xxxx.script脚本进行初始化，然后执行join.script进行测试
 
-| scale | hsqldb | minidb(no cache) | minidb(cache 1024) |
-| ----- | ------ | ---------------- | ------------------ |
-| 1000  |   2.7ms     |    83.861124ms              |      25.022497ms              |
-| 10000 |   15.1ms     |   4067.273535ms               |       143.270791ms             |
+| scale | hsqldb | minidb(no cache) | minidb(cache 1024) |minidb(new cache)|
+| ----- | ------ | ---------------- | ------------------ |------------------ |
+| 1000  |   2.7ms     |    83.861124ms              |      25.022497ms    |  41.140142ms        |
+| 10000 |   15.1ms     |   4067.273535ms               |       143.270791ms |   32.289638ms         |
 
 
 
@@ -73,8 +73,8 @@ create table play2(id int, age int, primary key(id))
 + hsqldb：点击open script导入delete_xxxx.script脚本并执行
 + minidb：执行脚本delete_xxxx.script进行测试
 
-| scale | hsqldb | minidb(no cache) | minidb(cache 1024) |
-| ----- | ------ | ---------------- | ------------------ |
-| 1000  |   33.9ms     |      908.504563 ms            |      607.182396ms              |
-| 10000 |  1588.4ms      |        8961.646596ms          |      3275.003313ms              |
+| scale | hsqldb | minidb(no cache) | minidb(cache 1024) |minidb(new cache)|
+| ----- | ------ | ---------------- | ------------------ |------------------ |
+| 1000  |   33.9ms     |      908.504563 ms            |      607.182396ms   | 412.800708ms           |
+| 10000 |  1588.4ms      |        8961.646596ms          |      3275.003313ms |     737.548812ms        |
 
