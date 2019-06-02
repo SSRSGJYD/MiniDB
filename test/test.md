@@ -30,7 +30,7 @@ create table play(id int, name int, primary key(id))
 
 | scale | hsqldb | minidb(no cache) | minidb(cache 1024) |
 | ----- | ------ | ---------------- | ------------------ |
-| 1000  |   70.9ms  |      617.253435ms           |      521.772190ms            |
+| 1000  |   70.9ms  |      617.253435ms           |    4016.050383ms            |
 | 10000 |   165.6ms     |     42138.957818ms             |                    |
 
 
