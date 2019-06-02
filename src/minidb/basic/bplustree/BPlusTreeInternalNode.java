@@ -46,8 +46,39 @@ public class BPlusTreeInternalNode<K extends Key, V extends Value> extends BPlus
      * @param keySize
      * @throws IOException
      */
-    //@Override
     public void writeNode(RandomAccessFile fa, int pageSize, int headerSize, int keyType, int keySize) throws IOException {
+
+        if(this.getNodeType() == BPlusTreeConst.NODE_TYPE_ROOT_INTERNAL ||
+                this.getNodeType() == BPlusTreeConst.NODE_TYPE_ROOT_LEAF) {
+            fa.seek(headerSize-16);
+            fa.writeLong(getPageIndex());
+        }
+        fa.seek(getPageIndex());
+        fa.writeShort(getNodeType());
+        int capacity = getCapacity();
+        fa.writeInt(capacity);
+        for(int i = 0; i < capacity; i++) {
+            BPlusTreeUtils.writeKeyToFile(fa, keyList.get(i));
+            fa.writeLong(ptrList.get(i));   // Pointer
+        }
+        fa.writeLong(ptrList.get(capacity));
+
+        if(fa.length() < getPageIndex() + pageSize) {
+            fa.setLength(getPageIndex() + pageSize);
+        }
+    }
+    
+    /**
+     *  write node to tree file
+     *
+     * @param fa file descriptor
+     * @param pageSize
+     * @param headerSize
+     * @param keyType
+     * @param keySize
+     * @throws IOException
+     */
+    public void writeNodeAsync(RandomAccessFile fa, String filename, int pageSize, int headerSize, int keyType, int keySize) throws IOException {
 
         if(this.getNodeType() == BPlusTreeConst.NODE_TYPE_ROOT_INTERNAL ||
                 this.getNodeType() == BPlusTreeConst.NODE_TYPE_ROOT_LEAF) {

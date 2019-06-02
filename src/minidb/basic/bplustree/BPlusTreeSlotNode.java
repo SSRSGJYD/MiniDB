@@ -61,6 +61,19 @@ public class BPlusTreeSlotNode<K extends Key, V extends Value> extends BPlusTree
             fa.writeLong(freeSlots.get(i));
         }
     }
+    
+    
+    public void writeNodeAsync(RandomAccessFile fa, String filename, int pageSize, int headerSize, int keyType, int keySize)
+            throws IOException {
+        fa.seek(getPageIndex());
+        fa.writeShort(getNodeType());
+        fa.writeLong(nextPageIndex);
+        int capacity = getCapacity();
+        fa.writeInt(capacity);
+        for(int i = 0; i < capacity; i++) {
+            fa.writeLong(freeSlots.get(i));
+        }
+    }
 
     /**
      * invalid for slot node
