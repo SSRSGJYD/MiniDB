@@ -1,6 +1,8 @@
 package minidb.basic.index;
 
 import minidb.types.TypeConst;
+
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 import java.io.IOException;
@@ -72,6 +74,27 @@ public class PrimaryKey<K extends Comparable<K>> extends Key {
                 break;
             default:  //TypeConst.VALUE_TYPE_STRING:
             	fa.writeChars((String)key);
+                break;
+        }
+    }
+    
+    @Override
+    public void writeToBuffer(ByteBuffer buffer) {
+        switch (keyType) {
+            case TypeConst.VALUE_TYPE_INT:
+                buffer.putInt((Integer)key);
+                break;
+            case TypeConst.VALUE_TYPE_LONG:
+            	buffer.putLong((Long)key);
+                break;
+            case TypeConst.VALUE_TYPE_FLOAT:
+            	buffer.putFloat((Float)key);
+                break;
+            case TypeConst.VALUE_TYPE_DOUBLE:
+            	buffer.putDouble((Double)key);
+                break;
+            default:  //TypeConst.VALUE_TYPE_STRING:
+            	buffer.put(((String)key).getBytes());
                 break;
         }
     }

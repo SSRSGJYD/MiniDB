@@ -6,6 +6,7 @@ import minidb.basic.index.Value;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.file.Path;
 import java.util.LinkedList;
 
 
@@ -63,16 +64,9 @@ public class BPlusTreeSlotNode<K extends Key, V extends Value> extends BPlusTree
     }
     
     
-    public void writeNodeAsync(RandomAccessFile fa, String filename, int pageSize, int headerSize, int keyType, int keySize)
+    public void writeNodeAsync(RandomAccessFile fa, Path path, int pageSize, int headerSize, int keyType, int keySize)
             throws IOException {
-        fa.seek(getPageIndex());
-        fa.writeShort(getNodeType());
-        fa.writeLong(nextPageIndex);
-        int capacity = getCapacity();
-        fa.writeInt(capacity);
-        for(int i = 0; i < capacity; i++) {
-            fa.writeLong(freeSlots.get(i));
-        }
+        
     }
 
     /**

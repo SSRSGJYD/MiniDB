@@ -3,12 +3,14 @@ package minidb.basic.bplustree;
 import java.util.LinkedList;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
 
 
 public class Cache<T extends BPlusTreeNode> {
 	private RandomAccessFile fa; // file access
+	private Path path;			 // file path
 	private int pageSize;   	 // page size
 	private int headerSize;
 	private int keyType;         // type of key
@@ -19,8 +21,9 @@ public class Cache<T extends BPlusTreeNode> {
     private LinkedList<Long> keyList;		 //[key], for LRU
     private int capacity;
 
-    public Cache(RandomAccessFile fa, int pageSize, int headerSize, int keyType, int keySize, int capacity) {
+    public Cache(RandomAccessFile fa, Path path, int pageSize, int headerSize, int keyType, int keySize, int capacity) {
         this.fa = fa;
+        this.path = path;
     	this.pageSize = pageSize;
     	this.headerSize = headerSize;
     	this.keyType = keyType;
@@ -62,7 +65,7 @@ public class Cache<T extends BPlusTreeNode> {
             keyList.addLast(key);
             indexMap.put(key, keyList.size()-1);
         }
-        value.writeNode(fa, pageSize, headerSize, keyType, keySize);
+        value.writeNodeAsync(fa, path, pageSize, headerSize, keyType, keySize);
     }
 
     public boolean containsKey(long key) {
