@@ -74,7 +74,13 @@ MiniDB是一个轻量级的关系数据库，支持多数据库的存储，实�
 
 为了提高性能，对B+树的内部节点和叶节点进行缓存，采用**LRU**策略。另外，在slot节点链表中存储空页的位置，避免文件中空间浪费。
 
+### 词法语法解析模块
 
+使用antler4进行词法语法解析，通过继承MiniSQLBaseListener来遍历抽象语法树生成Statement
+
+### 执行模块
+
+执行Statement，对数据库进行各种操作
 
 ### client模块
 
@@ -175,7 +181,7 @@ create table play2(id int, age int, primary key(id))
 
 ## 组内分工
 
-苏乐：
+苏乐： 词法语法解析模块、执行模块
 
 周展平：B+树索引、client
 
