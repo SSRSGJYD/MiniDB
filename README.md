@@ -44,6 +44,14 @@ MiniDB是一个轻量级的关系数据库，支持多数据库的存储，实�
 + 保存查询结果到文件
 + 从文件中直接读取sql语句并执行（import操作）
 
+### 服务端
+
+* 构建MiniDB
+* 启动服务器，监听本地8080端口
+* 解析GET、POST请求参数
+* 处理登录请求
+* 处理sql请求
+
 
 
 ## 实现
@@ -58,6 +66,8 @@ MiniDB是一个轻量级的关系数据库，支持多数据库的存储，实�
 + server模块：监听端口，调用执行模块，将结果返回client
 + client模块：图形界面客户端，通过http与server进行通信
 
+
+
 ### 存储、索引模块
 
 数据库支持在单一属性上的Primary Index和Secondary Index，其中Secondary Index中查询到的数据是主键。所有的数据和索引都采用B+树进行存储管理，数据直接存储在主键索引的叶节点中。
@@ -69,6 +79,14 @@ MiniDB是一个轻量级的关系数据库，支持多数据库的存储，实�
 ### client模块
 
 图形界面客户端基于JavaFX框架，利用HttpClient和httpasyncclient实现http异步通信。
+
+
+
+### server模块
+
+服务端基于JDK内置的com.sun.net.httpserver包，利用HttpServer、HttpContext、HttpHandler和HttpExchange实现了HTTPS服务，处理HTTPS请求。
+
+由于HttpExchange没有参数解析的功能，因此，需要实现类ParameterFilter和方法parseQuery来解析GET、POST请求的参数。
 
 
 
@@ -89,4 +107,4 @@ MiniDB是一个轻量级的关系数据库，支持多数据库的存储，实�
 
 周展平：B+树索引、client
 
-周泽龙：
+周泽龙：server
