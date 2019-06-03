@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousFileChannel;
+import java.nio.channels.CompletionHandler;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,6 +38,7 @@ public class BPlusTreeLeafNode<K extends Key, V extends Value> extends BPlusTree
     private long prevPageIndex;
     protected LinkedList<K> keyList;
     protected LinkedList<V> valueList;
+    public boolean dirty;
 
     /**
      * constructor
@@ -48,6 +50,7 @@ public class BPlusTreeLeafNode<K extends Key, V extends Value> extends BPlusTree
         this.prevPageIndex = prevPageIndex;
         this.keyList = new LinkedList<K>();
         this.valueList = new LinkedList<V>();
+        this.dirty = false;
     }
 
     public long getNextPageIndex() {
@@ -133,8 +136,20 @@ public class BPlusTreeLeafNode<K extends Key, V extends Value> extends BPlusTree
             BPlusTreeUtils.writeRowToBuffer(buffer, valueList.get(i));
         }
         buffer.flip();
-        Future<Integer> operation = fileChannel.write(buffer, position);
-        buffer.clear();
+        fileChannel.write(buffer, position, buffer, new CompletionHandler<Integer, ByteBuffer>() {
+
+            @Override
+            public void completed(Integer result, ByteBuffer attachment) {
+//                System.out.println("bytes written: " + result);
+            	dirty = false;
+            }
+
+            @Override
+            public void failed(Throwable exc, ByteBuffer attachment) {
+//                System.out.println("Write failed");
+//                exc.printStackTrace();
+            }
+        });
     }
 
     /**

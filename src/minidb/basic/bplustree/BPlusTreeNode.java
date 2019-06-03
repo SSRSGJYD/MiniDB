@@ -22,6 +22,7 @@ abstract class BPlusTreeNode<K extends Key, V extends Value> {
     private int capacity;       // current capacity
     private boolean valid;      // valid(useful) or not
     private int valueSize;      // type of value
+    public boolean dirty;
 
     /**
      * constructor
@@ -35,6 +36,7 @@ abstract class BPlusTreeNode<K extends Key, V extends Value> {
         this.capacity = 0;
         this.valid = false;
         this.valueSize = valueSize;
+        this.dirty = false;
     }
 
     public long getPageIndex() {
