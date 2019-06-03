@@ -106,7 +106,7 @@ public class BPlusTree<K extends Key, V extends Value> {
         this.leafNodeHeaderSize = (Short.SIZE + 2 * Long.SIZE + Integer.SIZE) / 8;
         this.slotNodeHeaderSize = 14;
 
-        this.internalNodeDegree = ((int)((pageSize - internalNodeHeaderSize)/(2*Long.BYTES+2*keySize)));
+        this.internalNodeDegree = ((int)((pageSize - internalNodeHeaderSize)/(2*Long.BYTES+2*keySize)))-1;
         this.leafNodeDegree = ((int)((pageSize - leafNodeHeaderSize)/(2*keySize+2*valueSize)));
 //        this.overflowNodeDegree = calculateDegree(entrySize, leafNodeHeaderSize);
         this.slotNodeDegree = ((int)((pageSize - slotNodeHeaderSize)/(Long.BYTES)));

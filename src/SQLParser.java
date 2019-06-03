@@ -24,7 +24,7 @@ public class SQLParser{
 	
 	public static void main( String[] args) throws Exception 
 	{
-// 
+
 //		String cmds="create database db\n"
 //				+ "use database db\n";
 //				+ "create table playr(id char(4),name int)\n"
@@ -48,7 +48,8 @@ public class SQLParser{
 		MiniDB db=new MiniDB();
 		String cmd;
 		long time=0;
-		Scanner scan = new Scanner(new File("test/insert/insert_10000.script"));
+		Scanner scan = new Scanner(new File("test/delete/delete_10000.script"));
+//		Scanner scan = new Scanner(new File("test/insert/insert_10000.script"));
 		scan.useDelimiter(Pattern.compile("\n"));
 		while (scan.hasNext()) {
 		    cmd = scan.next();

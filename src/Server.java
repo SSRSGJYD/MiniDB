@@ -190,6 +190,7 @@ public class Server {
 	            parseQuery(query, parameters);    
 				username = (String) parameters.get("username");
 				password = (String) parameters.get("password");
+		
 			}
             
 			System.out.println("username:" + username);
