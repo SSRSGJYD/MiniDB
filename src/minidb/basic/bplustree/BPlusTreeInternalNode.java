@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousFileChannel;
+import java.nio.channels.CompletionHandler;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -31,7 +32,8 @@ public class BPlusTreeInternalNode<K extends Key, V extends Value> extends BPlus
 
     protected LinkedList<K> keyList;
     protected LinkedList<Long> ptrList; // list of pointers to child nodes
-
+    public boolean dirty;
+    
     /**
      * constructor
      *
@@ -40,6 +42,7 @@ public class BPlusTreeInternalNode<K extends Key, V extends Value> extends BPlus
         super(nodeType, pageIndex, valueSize);
         keyList = new LinkedList<K>();
         ptrList = new LinkedList<Long>();
+        dirty = false;
     }
 
     /**
@@ -107,8 +110,20 @@ public class BPlusTreeInternalNode<K extends Key, V extends Value> extends BPlus
         }
         buffer.putLong(ptrList.get(capacity));
         buffer.flip();
-        Future<Integer> operation = fileChannel.write(buffer, position);
-        buffer.clear();    
+        fileChannel.write(buffer, position, buffer, new CompletionHandler<Integer, ByteBuffer>() {
+
+            @Override
+            public void completed(Integer result, ByteBuffer attachment) {
+//                System.out.println("bytes written: " + result);
+            	dirty = false;
+            }
+
+            @Override
+            public void failed(Throwable exc, ByteBuffer attachment) {
+//                System.out.println("Write failed");
+//                exc.printStackTrace();
+            }
+        });
     }
 
 
