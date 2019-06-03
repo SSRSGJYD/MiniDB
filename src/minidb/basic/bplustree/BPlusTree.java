@@ -1082,8 +1082,7 @@ public class BPlusTree<K extends Key, V extends Value> {
             }
         }
         else { // need extra slot page
-            int maxSlotNumPerPage = 2 * slotNodeDegree - 1;
-            int slotPageNum = (int) Math.ceil((slotPool.size()-(pageSize-treeHeaderSize) / Long.SIZE) / maxSlotNumPerPage);
+            int slotPageNum = (int) Math.ceil((slotPool.size()-(pageSize-treeHeaderSize) / Long.SIZE) / slotNodeDegree);
             for(int i=0; i<slotPageNum; i++) {
                 slotPagePool.add(slotPool.removeFirst());
             }
@@ -1094,7 +1093,7 @@ public class BPlusTree<K extends Key, V extends Value> {
             int curSlot = (pageSize-treeHeaderSize) / Long.SIZE;
             for(int i=0; i<slotPageNum; i++) {
                 slotNode = createSlotNode(slotPagePool.get(i),slotPagePool.get(i+1));
-                for(int j=0; j < 2*slotNodeDegree-1 && curSlot < slotPool.size(); j++, curSlot++) {
+                for(int j=0; j < slotNodeDegree && curSlot < slotPool.size(); j++, curSlot++) {
                     slotNode.freeSlots.add(j, slotPool.get(curSlot));
                     slotNode.increaseCapacity();
                 }
