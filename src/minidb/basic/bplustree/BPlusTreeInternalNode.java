@@ -97,7 +97,7 @@ public class BPlusTreeInternalNode<K extends Key, V extends Value> extends BPlus
         
         long position = getPageIndex();
     	AsynchronousFileChannel fileChannel = AsynchronousFileChannel.open(path, StandardOpenOption.WRITE);
-        ByteBuffer buffer = ByteBuffer.allocate(2*pageSize);
+        ByteBuffer buffer = ByteBuffer.allocate(pageSize);
         buffer.putShort((short)getNodeType());
         int capacity = getCapacity();
         buffer.putInt(capacity);

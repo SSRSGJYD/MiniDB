@@ -24,10 +24,6 @@ public class SQLParser{
 	
 	public static void main( String[] args) throws Exception 
 	{
-//       Path path = Paths.get("test/select/select_pk_10000.script");
-//       Path path = Paths.get("测试.sql");
-//        Path path = Paths.get("test/insert/insert_1000.script");
-//		byte[] bArray = Files.readAllBytes(path);
 // 
 //		String cmds="create database db\n"
 //				+ "use database db\n";
@@ -48,23 +44,17 @@ public class SQLParser{
 //				+ "drop table playd\n"
 //				+ "drop table playt\n";
 
-//		InputStream targetStream = new ByteArrayInputStream(bArray);
-//		//InputStream targetStream = new ByteArrayInputStream(cmds.getBytes());
-//		InputStreamReader in=new InputStreamReader(targetStream);
-//		BufferedReader br=new BufferedReader(in);
 
 		MiniDB db=new MiniDB();
 		String cmd;
 		long time=0;
-		Scanner scan = new Scanner(new File("测试.sql"));
-		scan.useDelimiter(Pattern.compile(";"));
+		Scanner scan = new Scanner(new File("test/select/select_pk_10000.script"));
+		scan.useDelimiter(Pattern.compile("\n"));
 		while (scan.hasNext()) {
 		    cmd = scan.next();
 			if(cmd.length()<=1)continue;
 		    cmd=cmd.replace('\n',' ');
 		    cmd=cmd.replace('\t',' ');
-		    // rest of your logic
-//		while((cmd=br.readLine())!=null) {
 			cmd=cmd.toLowerCase();
 			CharStream input = CharStreams.fromString(cmd);
 			MiniSQLLexer lexer = new MiniSQLLexer(input);
