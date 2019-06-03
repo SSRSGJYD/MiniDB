@@ -26,7 +26,7 @@ public class BPlusTreeSlotNode<K extends Key, V extends Value> extends BPlusTree
 
     protected long nextPageIndex;
     protected LinkedList<Long> freeSlots;
-    public boolean dirty;
+//    public boolean dirty;
 
     public BPlusTreeSlotNode(int nodeType, long pageIndex, int valueSize, long nextPageIndex) {
         super(nodeType, pageIndex, valueSize);

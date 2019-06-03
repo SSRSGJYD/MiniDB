@@ -38,7 +38,7 @@ public class BPlusTreeLeafNode<K extends Key, V extends Value> extends BPlusTree
     private long prevPageIndex;
     protected LinkedList<K> keyList;
     protected LinkedList<V> valueList;
-    public boolean dirty;
+//    public boolean dirty;
 
     /**
      * constructor
@@ -92,11 +92,12 @@ public class BPlusTreeLeafNode<K extends Key, V extends Value> extends BPlusTree
         fa.writeLong(prevPageIndex);
         int capacity = getCapacity();
         fa.writeInt(capacity);
-        for(int i = 0; i < capacity; i++) {
-            BPlusTreeUtils.writeKeyToFile(fa, keyList.get(i));
-            BPlusTreeUtils.writeRowToFile(fa, valueList.get(i));
+        if(capacity != 0) {
+        	for(int i = 0; i < capacity; i++) {
+                BPlusTreeUtils.writeKeyToFile(fa, keyList.get(i));
+                BPlusTreeUtils.writeRowToFile(fa, valueList.get(i));
+            }
         }
-
         if(fa.length() < getPageIndex() + pageSize) {
             fa.setLength(getPageIndex() + pageSize);
         }
