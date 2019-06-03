@@ -5,7 +5,7 @@ Name : [0-9a-z_]+ ;
 String : '\'' (.)+? '\''
 	;
 NEWLINE:'\r'?'\n'
-     |EOF;
+	;
   
 perm : 'select' | 'update';
    

@@ -20,6 +20,7 @@ public class Cache<T extends BPlusTreeNode> {
     private HashMap<Long, Integer> indexMap; //(key, index)
     private LinkedList<Long> keyList;		 //[key], for LRU
     private int capacity;
+    private int size;
 
     public Cache(RandomAccessFile fa, Path path, int pageSize, int headerSize, int keyType, int keySize, int capacity) {
         this.fa = fa;
@@ -48,24 +49,42 @@ public class Cache<T extends BPlusTreeNode> {
         else {
             keyList.addLast(key);
             indexMap.put(key, keyList.size()-1);
+            size++;
         }
     }
     
     public void putWrite(Long key, T value) throws IOException {
+    	value.dirty = true;
         if(valueMap.size() == capacity) {
             release();
         }
         valueMap.put(key, value);
+        boolean write = true;
         if(indexMap.containsKey(key)) {
             int index = indexMap.get(key);
+            if(index >= size-10) {
+            	// do not write most recent 10 pages immediately
+            	write = false;
+            }
             keyList.remove(index);
             keyList.addLast(key);
         }
         else {
             keyList.addLast(key);
             indexMap.put(key, keyList.size()-1);
+            size++;
         }
-        value.writeNodeAsync(fa, path, pageSize, headerSize, keyType, keySize);
+        if(write) {
+        	value.writeNodeAsync(fa, path, pageSize, headerSize, keyType, keySize);
+        }
+        if(size > 10) {
+        	// write No.11 element backwards
+        	long keyToWrite = keyList.get(size-11);
+        	T valueToWrite = valueMap.get(keyToWrite);
+        	if(valueToWrite.dirty) {
+        		valueToWrite.writeNodeAsync(fa, path, pageSize, headerSize, keyType, keySize); 
+        	}
+        }
     }
 
     public boolean containsKey(long key) {
@@ -94,14 +113,16 @@ public class Cache<T extends BPlusTreeNode> {
             indexMap.put(key, index);
             index++;
         }
+        size = keyList.size();
     }
     
     public void commitAll() throws IOException {
-//    	for(long i=0; i<capacity; i++) {
-//    		Collection<T> values = valueMap.values();
-//    		for(T value : values) {
-//    			value.writeNode(fa, pageSize, headerSize, keyType, keySize);
-//    		}
-//    	}
+		Collection<T> values = valueMap.values();
+		for(T value : values) {
+			if(value.dirty) {
+				value.writeNode(fa, pageSize, headerSize, keyType, keySize);
+				value.dirty = false;
+			}
+		}
     }
 }
