@@ -133,8 +133,8 @@ public class DataBase{
 				throw new IllegalArgumentException("table not exist");
 			}
 			tb=tables.get(sla.tableName);
+			ArrayList<String> names=new ArrayList<String>(tb.schema.descriptors.keySet());
 			if(sla.isStar) {
-				List<String> names=new ArrayList<String>(tb.schema.descriptors.keySet());
 				res=tb.queryT(names, sla.existWhere, sla.lt);
 					
 			}
@@ -142,6 +142,12 @@ public class DataBase{
 				res=tb.queryT(sla.names, sla.existWhere, sla.lt);
 
 			QueryResult qr=(QueryResult) res;
+			if(sla.isStar) {
+				qr.names=names;
+			}
+			else{
+				qr.names=(ArrayList<String>) sla.names;
+			}
 			break;
 		case Statement.selectB:
 
@@ -155,7 +161,15 @@ public class DataBase{
 			}
 			res=Table.queryJT(slb.isStar,tables,slb.cnames,slb.jnames,slb.onConditions,slb.existWhere,slb.lt);
 			qr=(QueryResult) res;
-			qr.types=getTypes(slb.jnames);
+			ArrayList<String> namesr=new ArrayList<String>();
+			if(slb.isStar)
+				qr.names=getNames(slb.jnames);
+			else {
+				for(Pair<String,String> e:slb.cnames) {
+					namesr.add(e.l+"."+e.r);
+				}
+				qr.names=namesr;
+			}
 			break;
 
 		case Statement.update:
@@ -190,12 +204,12 @@ public class DataBase{
 		return res;
 	}
 	
-	private LinkedHashMap<String, Integer> getTypes(List<Pair<String, Integer>> jnames) {
-		LinkedHashMap<String, Integer> types = new LinkedHashMap<String,Integer>();
+	private ArrayList<String> getNames(List<Pair<String, Integer>> jnames) {
+		ArrayList<String> types = new ArrayList<String>();
 		for(Pair<String,Integer> jname:jnames) {
 			Table tb=tables.get(jname.l);
-			for(Map.Entry<String,SchemaDescriptor> e:tb.schema.descriptors.entrySet()) {
-				types.put(tb.tableName+"."+e.getKey(),e.getValue().getType());
+			for(String e:tb.schema.descriptors.keySet()) {
+				types.add(tb.tableName+"."+e);
 			}
 		}
 		return types;
