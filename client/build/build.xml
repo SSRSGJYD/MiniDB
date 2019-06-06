@@ -260,7 +260,7 @@
 		</fx:resources>
 	
 		<fx:application id="fxApplication"
-			name=""
+			name="MiniDBClient"
 			mainClass="application.ClientDialog"
 		/>
 	
@@ -275,14 +275,31 @@
 			<fx:resources refid="appRes"/>
 	
 			<manifest>
-				<attribute name="Implementation-Vendor" value=""/>
-				<attribute name="Implementation-Title" value=""/>
+				<attribute name="Implementation-Vendor" value="MiniDB.ch"/>
+				<attribute name="Implementation-Title" value="MiniDBClient"/>
 				<attribute name="Implementation-Version" value="1.0"/>
 				<attribute name="JavaFX-Feature-Proxy" value="None"/>
 			</manifest>
 		</fx:jar>
 	
 	
+		<mkdir dir="deploy" />
+		<!-- Need to use ${basedir} because somehow the ant task is calculating the directory differently -->
+		<fx:deploy
+			embedJNLP="false"
+			extension="false"
+			includeDT="false"
+			offlineAllowed="true"
+			outdir="${basedir}/deploy"
+			outfile="client" nativeBundles="exe"
+			updatemode="background" >
+	
+			<fx:platform basedir="${java.home}"/>
+			<fx:info title="client" vendor="MiniDB.ch"/>
+	
+			<fx:application refId="fxApplication"/>
+			<fx:resources refid="appRes"/>
+		</fx:deploy>
 	
 	
 	</target>
