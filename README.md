@@ -1,12 +1,8 @@
 # MiniDB
 
-
-
 ## 简介
 
 MiniDB是一个轻量级的关系数据库，支持多数据库的存储，实现了基本的select、insert、delete、join等语句。
-
-
 
 ## 功能
 

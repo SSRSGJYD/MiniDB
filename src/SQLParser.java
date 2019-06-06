@@ -29,8 +29,8 @@ public class SQLParser{
 		String cmd;
 		long time=0;
 //		Scanner scan = new Scanner(new File("test/delete/delete_10000.script"));
-		Scanner scan = new Scanner(new File("test/delete/delete_10000.script"));
-		scan.useDelimiter(Pattern.compile("\n"));
+		Scanner scan = new Scanner(new File("测试.sql"));
+		scan.useDelimiter(Pattern.compile(";"));
 		while (scan.hasNext()) {
 		    cmd = scan.next();
 			if(cmd.length()<=1)continue;
