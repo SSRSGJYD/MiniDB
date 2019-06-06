@@ -20,6 +20,11 @@ import com.alibaba.fastjson.JSON;
 
 public class SQLParser{
 	
+	public String clear(String s) {
+		String res;
+		
+	}
+	
 	public static void main( String[] args) throws Exception 
 	{
 
@@ -31,7 +36,8 @@ public class SQLParser{
 		scan.useDelimiter(Pattern.compile(";"));
 		while (scan.hasNext()) {
 		    cmd = scan.next();
-		    if(cmd.length()<=1)continue;
+		    cmd=cmd.replaceAll("\r", "");
+		    if(cmd.replaceAll("\\s+", "").length()<=1)continue;
 		    cmd=cmd.replace('\n',' ');
 		    cmd=cmd.replace('\t',' ');
 			cmd=cmd.toLowerCase();
