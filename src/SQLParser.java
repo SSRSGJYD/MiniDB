@@ -29,14 +29,17 @@ public class SQLParser{
 		String cmd;
 		long time=0;
 //		Scanner scan = new Scanner(new File("test/delete/delete_10000.script"));
-		Scanner scan = new Scanner(new File("测试.sql"));
+		Scanner scan = new Scanner(new File("test.sql"));
 		scan.useDelimiter(Pattern.compile(";"));
 		while (scan.hasNext()) {
 		    cmd = scan.next();
-			if(cmd.length()<=1)continue;
+		    cmd=cmd.replaceAll("\r", "");
+		    if(cmd.replaceAll("\\s+", "").length()<=1) 
+		    	continue;
 		    cmd=cmd.replace('\n',' ');
 		    cmd=cmd.replace('\t',' ');
 			cmd=cmd.toLowerCase();
+			
 			CharStream input = CharStreams.fromString(cmd);
 			MiniSQLLexer lexer = new MiniSQLLexer(input);
 			lexer.removeErrorListeners();
