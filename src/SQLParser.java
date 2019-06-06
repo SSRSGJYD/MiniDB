@@ -20,8 +20,6 @@ import com.alibaba.fastjson.JSON;
 
 public class SQLParser{
 	
-
-	
 	public static void main( String[] args) throws Exception 
 	{
 
@@ -33,7 +31,7 @@ public class SQLParser{
 		scan.useDelimiter(Pattern.compile(";"));
 		while (scan.hasNext()) {
 		    cmd = scan.next();
-			if(cmd.length()<=1)continue;
+		    if(cmd.length()<=1)continue;
 		    cmd=cmd.replace('\n',' ');
 		    cmd=cmd.replace('\t',' ');
 			cmd=cmd.toLowerCase();
@@ -44,7 +42,7 @@ public class SQLParser{
 	
 			CommonTokenStream tokens = new CommonTokenStream(lexer);
 	
-			MiniSQLParser parser = new MiniSQLParser(tokens);
+			            MiniSQLParser parser = new MiniSQLParser(tokens);
 			parser.removeErrorListeners();
 			parser.addErrorListener(ThrowingErrorListener.INSTANCE);
 		
