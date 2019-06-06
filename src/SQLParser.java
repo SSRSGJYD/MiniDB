@@ -20,10 +20,6 @@ import com.alibaba.fastjson.JSON;
 
 public class SQLParser{
 	
-	public String clear(String s) {
-		String res;
-		
-	}
 	
 	public static void main( String[] args) throws Exception 
 	{
