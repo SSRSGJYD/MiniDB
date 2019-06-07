@@ -53,7 +53,7 @@ public class Server {
 		}
 		if(mode.equals("single")) {
 			sql=sql.replaceAll("\r", "");
-			if(sql.replaceAll("\\s+", "").length()<=1)
+			if(sql.replaceAll("\\s+", "").length()<=1){
 				responseMsg.msg = "{\"msg\":\"nothing\"}";
 				return false;
 			}

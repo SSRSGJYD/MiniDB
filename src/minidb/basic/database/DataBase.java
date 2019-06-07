@@ -124,7 +124,13 @@ public class DataBase{
 		case Statement.selectA:
 
 			StatementSelectA sla=(StatementSelectA) st;
-			if(!isRoot&&perms!=null) {
+			if(!isRoot) {
+				if(perms==null) {
+					throw new IllegalArgumentException("no select permission");
+				}
+				if(perms.get(sla.tableName)==null) {
+					throw new IllegalArgumentException("no select permission");
+				}
 				if(!perms.get(sla.tableName).canSelect) {
 					throw new IllegalArgumentException("no select permission");
 				}
@@ -153,7 +159,13 @@ public class DataBase{
 
 			StatementSelectB slb=(StatementSelectB) st;
 			for(Pair<String,Integer> jname:slb.jnames) {
-				if(!isRoot&&perms!=null) {
+				if(!isRoot) {
+					if(perms==null) {
+						throw new IllegalArgumentException("no select permission");
+					}
+					if(perms.get(jname.l)==null) {
+						throw new IllegalArgumentException("no select permission");
+					}
 					if(!perms.get(jname.l).canSelect) {
 						throw new IllegalArgumentException("no select permission");
 					}
@@ -174,9 +186,18 @@ public class DataBase{
 
 		case Statement.update:
 			StatementUpdate su=(StatementUpdate) st;
-			if((!isRoot&&!perms.get(su.tableName).canUpdate)||perms==null) {
-				throw new IllegalArgumentException("no select permission");
+			if(!isRoot) {
+				if(perms==null) {
+					throw new IllegalArgumentException("no update permission");
+				}
+				if(perms.get(su.tableName)==null) {
+					throw new IllegalArgumentException("no update permission");
+				}
+				if(!perms.get(su.tableName).canUpdate) {
+					throw new IllegalArgumentException("no update permission");
+				}
 			}
+
 			if(!this.tables.containsKey(su.tableName)) {
 				throw new IllegalArgumentException("table not exist");
 			}

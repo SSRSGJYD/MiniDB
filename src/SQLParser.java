@@ -28,8 +28,9 @@ public class SQLParser{
 		String cmd;
 		long time=0;
 //		Scanner scan = new Scanner(new File("test/delete/delete_10000.script"));
-		Scanner scan = new Scanner(new File("测试.sql"));
+		Scanner scan = new Scanner(new File("test.sql"));
 		scan.useDelimiter(Pattern.compile(";"));
+		db.login("un", "pw");
 		while (scan.hasNext()) {
 		    cmd = scan.next();
 		    cmd=cmd.replaceAll("\r", "");
