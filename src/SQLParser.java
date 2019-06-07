@@ -1,14 +1,5 @@
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashSet;
 import java.util.Scanner;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.antlr.v4.runtime.*;
@@ -16,7 +7,6 @@ import org.antlr.v4.runtime.tree.*;
 
 import minidb.basic.database.MiniDB;
 import minidb.result.Result;
-import com.alibaba.fastjson.JSON;
 
 public class SQLParser{
 	
@@ -29,17 +19,15 @@ public class SQLParser{
 		String cmd;
 		long time=0;
 //		Scanner scan = new Scanner(new File("test/delete/delete_10000.script"));
-		Scanner scan = new Scanner(new File("test.sql"));
+		Scanner scan = new Scanner(new File("测试.sql"));
 		scan.useDelimiter(Pattern.compile(";"));
 		while (scan.hasNext()) {
 		    cmd = scan.next();
-		    cmd=cmd.replaceAll("\r", "");
-		    if(cmd.replaceAll("\\s+", "").length()<=1) 
-		    	continue;
+			if(cmd.length()<=1)continue;
 		    cmd=cmd.replace('\n',' ');
 		    cmd=cmd.replace('\t',' ');
 			cmd=cmd.toLowerCase();
-			
+			System.out.println(cmd);
 			CharStream input = CharStreams.fromString(cmd);
 			MiniSQLLexer lexer = new MiniSQLLexer(input);
 			lexer.removeErrorListeners();
