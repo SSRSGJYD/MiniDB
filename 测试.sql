@@ -8,16 +8,20 @@ create table avengers
 	 primary key (ID)
 	);
 
+
 drop table avengers;
 
 create table avengers
 	(id			int not null, 
 	 name			char(32) not null, 
 	 power	int not null,
-	 weight     double,
+	 weight     float,
 	 height     double,
 	 primary key (ID)
 	);
+
+create user un password pw;
+grant select on avengers to un;
 
 INSERT INTO avengers VALUES (10, 'Captain', 50, 78.1, 1.85);
 INSERT INTO avengers VALUES (3, 'Thor', 90, 92.1, 1.89);
@@ -44,9 +48,7 @@ INSERT INTO villain VALUES (4, 'monster', 10);
 create user un password pw;
 grant select on avengers to un;
 
-select * from avengers join villain on avengers.power = villain.power where villain.power > 40;
-
-select avengers.name, villain.name, vilain.power from avengers join villain on avengers.power = villain.power where villain.power > 40;
+select avengers.name, villain.name, villain.power from avengers join villain on avengers.power = villain.power where villain.power > 40;
 
 select * from avengers;
 

@@ -1,6 +1,6 @@
 grammar MiniSQL;
 
-Number : [0-9.]+ ;
+Number : '-'?[0-9.]+ ;
 Name : [0-9a-z_]+ ;
 String : '\'' (.)+? '\''
 	;
