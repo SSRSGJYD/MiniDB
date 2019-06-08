@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import minidb.basic.index.Key;
 import minidb.basic.index.PrimaryKeyValue;
@@ -104,10 +106,10 @@ public class BPlusTree<K extends Key, V extends Value> {
         this.leafNodeHeaderSize = (Short.SIZE + 2 * Long.SIZE + Integer.SIZE) / 8;
         this.slotNodeHeaderSize = 14;
 
-        this.internalNodeDegree = calculateDegree(2 * this.keySize, internalNodeHeaderSize);
-        this.leafNodeDegree = calculateDegree(2 * this.keySize + entrySize, leafNodeHeaderSize);
-        this.overflowNodeDegree = calculateDegree(entrySize, leafNodeHeaderSize);
-        this.slotNodeDegree = calculateDegree(this.keySize, slotNodeHeaderSize);
+        this.internalNodeDegree = ((int)((pageSize - internalNodeHeaderSize)/(2*Long.BYTES+2*keySize)))-1;
+        this.leafNodeDegree = ((int)((pageSize - leafNodeHeaderSize)/(2*keySize+2*valueSize)));
+//        this.overflowNodeDegree = calculateDegree(entrySize, leafNodeHeaderSize);
+        this.slotNodeDegree = ((int)((pageSize - slotNodeHeaderSize)/(Long.BYTES)));
 
         this.slotPool = new LinkedList<Long>();
         this.slotPagePool = new LinkedList<Long>();
@@ -117,27 +119,28 @@ public class BPlusTree<K extends Key, V extends Value> {
         this.deleteCount = 0;
         this.conditionThreshold = conditionThreshold;
         
-        this.useCache = false; //change here to test cache
+        this.useCache = true; //change here to test cache
         
         File f = new File(path);
         if(f.exists()) {
         	this.fa = new RandomAccessFile(path, "rw");
             System.out.println("File already exists, path: "+path+",size: " + fa.length() + " bytes");
+            // initialize node cache
+            internalNodeCache = new Cache<>(fa, f.toPath(), pageSize, treeHeaderSize, keyType, keySize, internalCacheSize);
+            leafNodeCache = new Cache<>(fa, f.toPath(), pageSize, treeHeaderSize, keyType, keySize, leafCacheSize);
             readHeaderFromFile(fa);
             initializeSlotPage(true);
             System.out.println("Tree file loaded");
-            // initialize node cache
-            internalNodeCache = new Cache<>(fa, pageSize, treeHeaderSize, keyType, keySize, internalCacheSize);
-            leafNodeCache = new Cache<>(fa, pageSize, treeHeaderSize, keyType, keySize, leafCacheSize);
         }
         else {
             System.out.println("Creating new tree file");
             this.fa = new RandomAccessFile(path, "rw");
             fa.setLength(0);
-            initializeSlotPage(false);
             // initialize node cache
-            internalNodeCache = new Cache<>(fa, pageSize, treeHeaderSize, keyType, keySize, internalCacheSize);
-            leafNodeCache = new Cache<>(fa, pageSize, treeHeaderSize, keyType, keySize, leafCacheSize);
+            Path p = Paths.get(path);
+            internalNodeCache = new Cache<>(fa, p, pageSize, treeHeaderSize, keyType, keySize, internalCacheSize);
+            leafNodeCache = new Cache<>(fa, p, pageSize, treeHeaderSize, keyType, keySize, leafCacheSize);
+            initializeSlotPage(false);
             //create tree
             createTree();
             writeFileHeader();
@@ -1079,8 +1082,7 @@ public class BPlusTree<K extends Key, V extends Value> {
             }
         }
         else { // need extra slot page
-            int maxSlotNumPerPage = 2 * slotNodeDegree - 1;
-            int slotPageNum = (int) Math.ceil((slotPool.size()-(pageSize-treeHeaderSize) / Long.SIZE) / maxSlotNumPerPage);
+            int slotPageNum = (int) Math.ceil((slotPool.size()-(pageSize-treeHeaderSize) / Long.SIZE) / slotNodeDegree);
             for(int i=0; i<slotPageNum; i++) {
                 slotPagePool.add(slotPool.removeFirst());
             }
@@ -1091,7 +1093,7 @@ public class BPlusTree<K extends Key, V extends Value> {
             int curSlot = (pageSize-treeHeaderSize) / Long.SIZE;
             for(int i=0; i<slotPageNum; i++) {
                 slotNode = createSlotNode(slotPagePool.get(i),slotPagePool.get(i+1));
-                for(int j=0; j < 2*slotNodeDegree-1 && curSlot < slotPool.size(); j++, curSlot++) {
+                for(int j=0; j < slotNodeDegree && curSlot < slotPool.size(); j++, curSlot++) {
                     slotNode.freeSlots.add(j, slotPool.get(curSlot));
                     slotNode.increaseCapacity();
                 }

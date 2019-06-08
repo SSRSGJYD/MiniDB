@@ -3,12 +3,15 @@ package minidb.basic.bplustree;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousFileChannel;
+import java.nio.channels.CompletionHandler;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.LinkedList;
+import java.util.concurrent.Future;
 
 import minidb.basic.index.Key;
 import minidb.basic.index.Value;
@@ -35,6 +38,7 @@ public class BPlusTreeLeafNode<K extends Key, V extends Value> extends BPlusTree
     private long prevPageIndex;
     protected LinkedList<K> keyList;
     protected LinkedList<V> valueList;
+//    public boolean dirty;
 
     /**
      * constructor
@@ -46,6 +50,7 @@ public class BPlusTreeLeafNode<K extends Key, V extends Value> extends BPlusTree
         this.prevPageIndex = prevPageIndex;
         this.keyList = new LinkedList<K>();
         this.valueList = new LinkedList<V>();
+        this.dirty = false;
     }
 
     public long getNextPageIndex() {
@@ -87,11 +92,12 @@ public class BPlusTreeLeafNode<K extends Key, V extends Value> extends BPlusTree
         fa.writeLong(prevPageIndex);
         int capacity = getCapacity();
         fa.writeInt(capacity);
-        for(int i = 0; i < capacity; i++) {
-            BPlusTreeUtils.writeKeyToFile(fa, keyList.get(i));
-            BPlusTreeUtils.writeRowToFile(fa, valueList.get(i));
+        if(capacity != 0) {
+        	for(int i = 0; i < capacity; i++) {
+                BPlusTreeUtils.writeKeyToFile(fa, keyList.get(i));
+                BPlusTreeUtils.writeRowToFile(fa, valueList.get(i));
+            }
         }
-
         if(fa.length() < getPageIndex() + pageSize) {
             fa.setLength(getPageIndex() + pageSize);
         }
@@ -107,31 +113,44 @@ public class BPlusTreeLeafNode<K extends Key, V extends Value> extends BPlusTree
      * @param keySize
      * @throws IOException
      */
-    public void writeNodeAsync(RandomAccessFile fa, String filename, int pageSize, int headerSize, int keyType, int keySize)
+    public void writeNodeAsync(RandomAccessFile fa, Path path, int pageSize, int headerSize, int keyType, int keySize)
             throws IOException {
-//    	Path path = Paths.get(filename);
-//    	AsynchronousFileChannel fileChannel = AsynchronousFileChannel.open(path, StandardOpenOption.WRITE);
-//    	
-    	
         if(this.getNodeType() == BPlusTreeConst.NODE_TYPE_ROOT_INTERNAL ||
                 this.getNodeType() == BPlusTreeConst.NODE_TYPE_ROOT_LEAF) {
             fa.seek(headerSize-16);
             fa.writeLong(getPageIndex());
         }
-        fa.seek(getPageIndex());
-        fa.writeShort(getNodeType());
-        fa.writeLong(nextPageIndex);
-        fa.writeLong(prevPageIndex);
-        int capacity = getCapacity();
-        fa.writeInt(capacity);
-        for(int i = 0; i < capacity; i++) {
-            BPlusTreeUtils.writeKeyToFile(fa, keyList.get(i));
-            BPlusTreeUtils.writeRowToFile(fa, valueList.get(i));
-        }
-
         if(fa.length() < getPageIndex() + pageSize) {
             fa.setLength(getPageIndex() + pageSize);
         }
+        
+        long position = getPageIndex();
+    	AsynchronousFileChannel fileChannel = AsynchronousFileChannel.open(path, StandardOpenOption.WRITE);
+        ByteBuffer buffer = ByteBuffer.allocate(pageSize);
+        buffer.putShort((short)getNodeType());
+        buffer.putLong(nextPageIndex);
+        buffer.putLong(prevPageIndex);
+        int capacity = getCapacity();
+        buffer.putInt(capacity);
+        for(int i = 0; i < capacity; i++) {
+            BPlusTreeUtils.writeKeyToBuffer(buffer, keyList.get(i));
+            BPlusTreeUtils.writeRowToBuffer(buffer, valueList.get(i));
+        }
+        buffer.flip();
+        fileChannel.write(buffer, position, buffer, new CompletionHandler<Integer, ByteBuffer>() {
+
+            @Override
+            public void completed(Integer result, ByteBuffer attachment) {
+//                System.out.println("bytes written: " + result);
+            	dirty = false;
+            }
+
+            @Override
+            public void failed(Throwable exc, ByteBuffer attachment) {
+//                System.out.println("Write failed");
+//                exc.printStackTrace();
+            }
+        });
     }
 
     /**

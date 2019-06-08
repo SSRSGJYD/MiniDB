@@ -124,7 +124,13 @@ public class DataBase{
 		case Statement.selectA:
 
 			StatementSelectA sla=(StatementSelectA) st;
-			if(!isRoot&&perms!=null) {
+			if(!isRoot) {
+				if(perms==null) {
+					throw new IllegalArgumentException("no select permission");
+				}
+				if(perms.get(sla.tableName)==null) {
+					throw new IllegalArgumentException("no select permission");
+				}
 				if(!perms.get(sla.tableName).canSelect) {
 					throw new IllegalArgumentException("no select permission");
 				}
@@ -133,8 +139,8 @@ public class DataBase{
 				throw new IllegalArgumentException("table not exist");
 			}
 			tb=tables.get(sla.tableName);
+			ArrayList<String> names=new ArrayList<String>(tb.schema.descriptors.keySet());
 			if(sla.isStar) {
-				List<String> names=new ArrayList<String>(tb.schema.descriptors.keySet());
 				res=tb.queryT(names, sla.existWhere, sla.lt);
 					
 			}
@@ -142,12 +148,24 @@ public class DataBase{
 				res=tb.queryT(sla.names, sla.existWhere, sla.lt);
 
 			QueryResult qr=(QueryResult) res;
+			if(sla.isStar) {
+				qr.names=names;
+			}
+			else{
+				qr.names=(ArrayList<String>) sla.names;
+			}
 			break;
 		case Statement.selectB:
 
 			StatementSelectB slb=(StatementSelectB) st;
 			for(Pair<String,Integer> jname:slb.jnames) {
-				if(!isRoot&&perms!=null) {
+				if(!isRoot) {
+					if(perms==null) {
+						throw new IllegalArgumentException("no select permission");
+					}
+					if(perms.get(jname.l)==null) {
+						throw new IllegalArgumentException("no select permission");
+					}
 					if(!perms.get(jname.l).canSelect) {
 						throw new IllegalArgumentException("no select permission");
 					}
@@ -155,14 +173,31 @@ public class DataBase{
 			}
 			res=Table.queryJT(slb.isStar,tables,slb.cnames,slb.jnames,slb.onConditions,slb.existWhere,slb.lt);
 			qr=(QueryResult) res;
-			qr.types=getTypes(slb.jnames);
+			ArrayList<String> namesr=new ArrayList<String>();
+			if(slb.isStar)
+				qr.names=getNames(slb.jnames);
+			else {
+				for(Pair<String,String> e:slb.cnames) {
+					namesr.add(e.l+"."+e.r);
+				}
+				qr.names=namesr;
+			}
 			break;
 
 		case Statement.update:
 			StatementUpdate su=(StatementUpdate) st;
-			if((!isRoot&&!perms.get(su.tableName).canUpdate)||perms==null) {
-				throw new IllegalArgumentException("no select permission");
+			if(!isRoot) {
+				if(perms==null) {
+					throw new IllegalArgumentException("no update permission");
+				}
+				if(perms.get(su.tableName)==null) {
+					throw new IllegalArgumentException("no update permission");
+				}
+				if(!perms.get(su.tableName).canUpdate) {
+					throw new IllegalArgumentException("no update permission");
+				}
 			}
+			
 			if(!this.tables.containsKey(su.tableName)) {
 				throw new IllegalArgumentException("table not exist");
 			}
@@ -190,12 +225,12 @@ public class DataBase{
 		return res;
 	}
 	
-	private LinkedHashMap<String, Integer> getTypes(List<Pair<String, Integer>> jnames) {
-		LinkedHashMap<String, Integer> types = new LinkedHashMap<String,Integer>();
+	private ArrayList<String> getNames(List<Pair<String, Integer>> jnames) {
+		ArrayList<String> types = new ArrayList<String>();
 		for(Pair<String,Integer> jname:jnames) {
 			Table tb=tables.get(jname.l);
-			for(Map.Entry<String,SchemaDescriptor> e:tb.schema.descriptors.entrySet()) {
-				types.put(tb.tableName+"."+e.getKey(),e.getValue().getType());
+			for(String e:tb.schema.descriptors.keySet()) {
+				types.add(tb.tableName+"."+e);
 			}
 		}
 		return types;

@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
+import java.util.regex.Pattern;
 
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpContext;
@@ -50,6 +52,14 @@ public class Server {
 			return true;
 		}
 		if(mode.equals("single")) {
+			sql=sql.replaceAll("\r", "");
+			if(sql.replaceAll("\\s+", "").length() <= 1) {
+				responseMsg.msg = "{\"msg\":\"nothing\"}";
+				return false;
+			}
+			sql=sql.replace('\n',' ');
+			sql=sql.replace('\t',' ');
+			sql=sql.toLowerCase();
 			CharStream input = CharStreams.fromString(sql);
 			MiniSQLLexer lexer = new MiniSQLLexer(input);
 			lexer.removeErrorListeners();
@@ -78,14 +88,19 @@ public class Server {
 			}
 		}
 		else {
-			InputStream targetStream = new ByteArrayInputStream(sql.getBytes());
-			InputStreamReader in=new InputStreamReader(targetStream);
-			BufferedReader br=new BufferedReader(in);
+			Scanner scan = new Scanner(sql);
+			scan.useDelimiter(Pattern.compile(";"));
 			String cmd;
 			Result res = null;
 			long time=0;
-			while((cmd=br.readLine())!=null) {
-				if(cmd.length()==0)continue;
+			while (scan.hasNext()) {
+				cmd = scan.next();
+				cmd=cmd.replaceAll("\r", "");
+				if(cmd.replaceAll("\\s+", "").length()<=1)
+					continue;
+				cmd=cmd.replace('\n',' ');
+				cmd=cmd.replace('\t',' ');
+				cmd=cmd.toLowerCase();
 				CharStream input = CharStreams.fromString(cmd);
 				MiniSQLLexer lexer = new MiniSQLLexer(input);
 				lexer.removeErrorListeners();
@@ -178,6 +193,7 @@ public class Server {
 	            parseQuery(query, parameters);    
 				username = (String) parameters.get("username");
 				password = (String) parameters.get("password");
+		
 			}
             
 			System.out.println("username:" + username);

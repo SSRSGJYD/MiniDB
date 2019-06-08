@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.BorderPane?>
 
-<VBox maxHeight="595.0" maxWidth="-Infinity" minHeight="595.0" minWidth="-Infinity" prefHeight="595.0" prefWidth="950.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="minidb.client.SceneController">
+<VBox maxHeight="595.0" maxWidth="-Infinity" minHeight="595.0" minWidth="-Infinity" prefHeight="595.0" prefWidth="950.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.SceneController">
    <children>
       <MenuBar minHeight="25.0" prefHeight="25.0">
         <menus>

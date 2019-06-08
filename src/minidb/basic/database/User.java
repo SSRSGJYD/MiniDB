@@ -15,8 +15,10 @@ public class User  implements Serializable{
 	boolean isRoot;
 	
 	public User(String un,String pw) {
-		if(un.equals("root"))
+		String rootun="root";
+		if(un.equals(rootun)) {
 			this.isRoot=true;
+		}
 		else 
 			this.isRoot=false;
 		this.username=un;

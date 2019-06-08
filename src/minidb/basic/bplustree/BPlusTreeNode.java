@@ -2,6 +2,7 @@ package minidb.basic.bplustree;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.file.Path;
 import java.util.LinkedList;
 
 import minidb.basic.bplustree.BPlusTreeConst;
@@ -21,6 +22,7 @@ abstract class BPlusTreeNode<K extends Key, V extends Value> {
     private int capacity;       // current capacity
     private boolean valid;      // valid(useful) or not
     private int valueSize;      // type of value
+    public boolean dirty;
 
     /**
      * constructor
@@ -34,6 +36,7 @@ abstract class BPlusTreeNode<K extends Key, V extends Value> {
         this.capacity = 0;
         this.valid = false;
         this.valueSize = valueSize;
+        this.dirty = false;
     }
 
     public long getPageIndex() {
@@ -79,7 +82,7 @@ abstract class BPlusTreeNode<K extends Key, V extends Value> {
     public abstract void writeNode(RandomAccessFile fa, int pageSize, int headerSize, int keyType, int keySize)
             throws IOException;
     
-    public abstract void writeNodeAsync(RandomAccessFile fa, String filename, int pageSize, int headerSize, int keyType, int keySize)
+    public abstract void writeNodeAsync(RandomAccessFile fa, Path path, int pageSize, int headerSize, int keyType, int keySize)
             throws IOException;
 
     /**

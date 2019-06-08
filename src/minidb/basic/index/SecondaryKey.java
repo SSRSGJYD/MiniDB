@@ -4,6 +4,7 @@ import minidb.types.TypeConst;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 
 /**
  * class of key of secondary index
@@ -110,6 +111,44 @@ public class SecondaryKey<K extends Comparable<K>, PK extends Comparable<PK>> ex
                 break;
             default:  //TypeConst.VALUE_TYPE_STRING:
             	fa.writeChars((String)primaryKey);
+                break;
+        }
+    }
+    
+    @Override
+    public void writeToBuffer(ByteBuffer buffer) {
+    	switch (keyType) {
+	        case TypeConst.VALUE_TYPE_INT:
+	            buffer.putInt((Integer)key);
+	            break;
+	        case TypeConst.VALUE_TYPE_LONG:
+	        	buffer.putLong((Long)key);
+	            break;
+	        case TypeConst.VALUE_TYPE_FLOAT:
+	        	buffer.putFloat((Float)key);
+	            break;
+	        case TypeConst.VALUE_TYPE_DOUBLE:
+	        	buffer.putDouble((Double)key);
+	            break;
+	        default:  //TypeConst.VALUE_TYPE_STRING:
+	        	buffer.put(((String)key).getBytes());
+	            break;
+	    }
+        switch (PKType) {
+            case TypeConst.VALUE_TYPE_INT:
+            	buffer.putInt((Integer)primaryKey);
+                break;
+            case TypeConst.VALUE_TYPE_LONG:
+            	buffer.putLong((Long)primaryKey);
+                break;
+            case TypeConst.VALUE_TYPE_FLOAT:
+            	buffer.putFloat((Float)primaryKey);
+                break;
+            case TypeConst.VALUE_TYPE_DOUBLE:
+            	buffer.putDouble((Double)primaryKey);
+                break;
+            default:  //TypeConst.VALUE_TYPE_STRING:
+            	buffer.put(((String)primaryKey).getBytes());
                 break;
         }
     }
