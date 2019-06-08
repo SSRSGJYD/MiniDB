@@ -45,7 +45,7 @@ public class SQLParser{
 	
 			CommonTokenStream tokens = new CommonTokenStream(lexer);
 	
-			            MiniSQLParser parser = new MiniSQLParser(tokens);
+            MiniSQLParser parser = new MiniSQLParser(tokens);
 			parser.removeErrorListeners();
 			parser.addErrorListener(ThrowingErrorListener.INSTANCE);
 		

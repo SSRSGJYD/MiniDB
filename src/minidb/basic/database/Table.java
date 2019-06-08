@@ -660,8 +660,12 @@ public class Table implements Serializable{
 		for(LinkedHashMap<String,Object> rec:rowl) {
 			if(!rowRec.contains(rec.get(thisCon))) {
 				LinkedHashMap<String,Object> rowres=new LinkedHashMap<String,Object>();
+				LinkedHashMap<String,Object> rowbr=new LinkedHashMap<String,Object> ();
+				for(Entry<String,Object> entry:rec.entrySet()) {
+					rowbr.put(this.tableName+"."+entry.getKey(), entry.getValue());
+				}
 				rowres.putAll(nullRec);
-				rowres.putAll(rec);
+				rowres.putAll(rowbr);
 				res.add(rowres);
 			}
 		}
@@ -719,8 +723,12 @@ public class Table implements Serializable{
 		for(LinkedHashMap<String,Object> rec:rowl) {
 			if(!rowRec.contains(rec.get(thisCon))) {
 				LinkedHashMap<String,Object> rowres=new LinkedHashMap<String,Object>();
+				LinkedHashMap<String,Object> rowbr=new LinkedHashMap<String,Object> ();
+				for(Entry<String,Object> entry:rec.entrySet()) {
+					rowbr.put(this.tableName+"."+entry.getKey(), entry.getValue());
+				}
 				rowres.putAll(nullRec);
-				rowres.putAll(rec);
+				rowres.putAll(rowbr);
 				res.add(rowres);
 			}
 		}
