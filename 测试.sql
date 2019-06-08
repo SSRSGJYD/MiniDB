@@ -45,6 +45,8 @@ INSERT INTO villain VALUES (2, 'Red Skull', 40);
 INSERT INTO villain VALUES (3, 'Hella', 90);
 INSERT INTO villain VALUES (4, 'monster', 10);
 
+create user un password pw;
+grant select on avengers to un;
 
 select avengers.name, villain.name, villain.power from avengers join villain on avengers.power = villain.power where villain.power > 40;
 

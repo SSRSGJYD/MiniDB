@@ -53,7 +53,11 @@ public class Server {
 		}
 		if(mode.equals("single")) {
 			sql=sql.replaceAll("\r", "");
+<<<<<<< HEAD
 			if(sql.replaceAll("\\s+", "").length()<=1){
+=======
+			if(sql.replaceAll("\\s+", "").length() <= 1) {
+>>>>>>> master
 				responseMsg.msg = "{\"msg\":\"nothing\"}";
 				return false;
 			}
@@ -96,7 +100,12 @@ public class Server {
 			while (scan.hasNext()) {
 				cmd = scan.next();
 				cmd=cmd.replaceAll("\r", "");
+<<<<<<< HEAD
 				if(cmd.replaceAll("\\s+", "").length()<=1)continue;
+=======
+				if(cmd.replaceAll("\\s+", "").length()<=1)
+					continue;
+>>>>>>> master
 				cmd=cmd.replace('\n',' ');
 				cmd=cmd.replace('\t',' ');
 				cmd=cmd.toLowerCase();

@@ -1,2 +1,2 @@
-use database db
-select * from play where (id > 5000 and id < 5050)
+use database db;
+select * from play where (id > 5000 and id < 5050);
