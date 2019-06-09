@@ -197,7 +197,7 @@ public class DataBase{
 					throw new IllegalArgumentException("no update permission");
 				}
 			}
-			
+
 			if(!this.tables.containsKey(su.tableName)) {
 				throw new IllegalArgumentException("table not exist");
 			}
