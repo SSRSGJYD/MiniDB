@@ -8,7 +8,7 @@ MiniDB是一个轻量级的关系数据库，支持多数据库的存储，实�
 
 环境：Java1.8及以上
 
-运行方式：下载release版本的server.jar (https://github.com/SSRSGJYD/MiniDB/releases)，在同级目录下执行
+运行方式：下载release版本的server.jar (<https://github.com/SSRSGJYD/MiniDB/releases>)，在同级目录下执行
 
 ```shell
 java -jar server.jar
