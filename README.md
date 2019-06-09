@@ -4,6 +4,16 @@
 
 MiniDB是一个轻量级的关系数据库，支持多数据库的存储，实现了基本的select、insert、delete、join等语句。
 
+## 运行
+
+环境：Java1.8及以上
+
+运行方式：下载release版本的server.jar (https://github.com/SSRSGJYD/MiniDB/releases)，在同级目录下执行
+
+```shell
+java -jar server.jar
+```
+
 ## 功能
 
 ### 数据库操作
@@ -21,6 +31,7 @@ MiniDB是一个轻量级的关系数据库，支持多数据库的存储，实�
 + insert
 + delete
 + select
++ join、outer join
 
 ### 权限管理
 
@@ -62,8 +73,6 @@ MiniDB是一个轻量级的关系数据库，支持多数据库的存储，实�
 + server模块：监听端口，调用执行模块，将结果返回client
 + client模块：图形界面客户端，通过http与server进行通信
 
-
-
 ### 存储、索引模块
 
 数据库支持在单一属性上的Primary Index和Secondary Index，其中Secondary Index中查询到的数据是主键。所有的数据和索引都采用B+树进行存储管理，数据直接存储在主键索引的叶节点中。
@@ -81,8 +90,6 @@ MiniDB是一个轻量级的关系数据库，支持多数据库的存储，实�
 ### client模块
 
 图形界面客户端基于JavaFX框架，利用HttpClient和httpasyncclient实现http异步通信。
-
-
 
 ### server模块
 
@@ -174,11 +181,3 @@ create table play2(id int, age int, primary key(id))
 | 10000 | 1588.4ms | 8961.646596ms    | 3275.003313ms      | 685.172844ms        |
 
 
-
-## 组内分工
-
-苏乐： 词法语法解析模块、执行模块
-
-周展平：B+树索引、client
-
-周泽龙：server
