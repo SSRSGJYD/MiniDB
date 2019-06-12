@@ -118,11 +118,23 @@ public class Cache<T extends BPlusTreeNode> {
     
     public void commitAll() throws IOException {
 		Collection<T> values = valueMap.values();
-		for(T value : values) {
-			if(value.dirty) {
-				value.writeNode(fa, pageSize, headerSize, keyType, keySize);
-				value.dirty = false;
+		Boolean finish = false;
+		while(!finish) {
+			for(T value : values) {
+				if(value.dirty) {
+					try {
+						Thread.sleep(10);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					continue;
+//					value.writeNode(fa, pageSize, headerSize, keyType, keySize);
+//					value.dirty = false;
+				}
 			}
+			finish = true;
 		}
+		
     }
 }
