@@ -18,8 +18,8 @@ public class SQLParser{
 		MiniDB db=new MiniDB();
 		String cmd;
 		long time=0;
-		Scanner scan = new Scanner(new File("test/tmp.sql"));
-//		Scanner scan = new Scanner(new File("test/insert/insert_10000.script"));
+//		Scanner scan = new Scanner(new File("test/tmp.sql"));
+		Scanner scan = new Scanner(new File("test/insert/insert_10000.script"));
 //		Scanner scan = new Scanner(new File("test/delete/delete_10000.script"));
 //		Scanner scan = new Scanner(new File("测试.sql"));
 		scan.useDelimiter(Pattern.compile(";"));
